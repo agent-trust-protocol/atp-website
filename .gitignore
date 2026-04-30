@@ -1,0 +1,229 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+
+# Next.js
+.next/
+out/
+build/
+
+# Environment variables
+.env*
+!.env.example
+!.env.docker.example
+# Explicitly ignore all env variants (in case previously committed)
+.env.production
+.env.staging
+.env.local
+.env.production.example
+.env.production.template
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# IDE/Tool configurations (local development)
+.claude/
+.zenflow/
+.zencoder/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+server.log
+.vercel
+
+# Backup files and archives
+.backup/
+*.bak
+*.old/
+**/*.old
+**/*.old/**
+*.tar.gz
+*.tgz
+
+# Internal scripts and tooling
+activate-*.sh
+deactivate-*.sh
+check-*.sh
+deploy-*.sh
+fix-*.sh
+test-*.sh
+push-to-github*.sh
+migrate-to-*.sh
+public-launch.sh
+run-with-real-data.sh
+e2e-*.sh
+CORRECTED-*.sh
+diagnose-*.sh
+quick-*.sh
+force-*.sh
+godaddy-*.sh
+health-*.sh
+!scripts/dev/health-check.sh
+manual-*.sh
+mock-*.sh
+monitor-*.sh
+move-*.sh
+reset-*.sh
+restart-*.sh
+setup-*.sh
+start-*.sh
+stop-*.sh
+update-*.sh
+verify-*.sh
+wait-*.sh
+
+# Internal documentation
+*_GUIDE.md
+*_INSTRUCTIONS.md
+*_SUMMARY.md
+*_COMPLETED.md
+*_MIGRATION.md
+*_IMPLEMENTATION.md
+*_MODE.md
+CLERK_*.md
+ENTERPRISE_*.md
+MAINTENANCE*.md
+POSTGRESQL_*.md
+PRIORITY_*.md
+COMPLETE_*.md
+ENV_*.md
+README-*.md
+!README.md
+
+# SSL certificates and keys
+ssl/
+certs/
+
+# Coverage reports
+coverage/
+
+# Secrets and sensitive files
+secrets/
+*.key
+*.pem
+*.crt
+
+# Build artifacts
+dist/
+**/dist/
+*.tsbuildinfo
+.turbo/
+.turbopack/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Internal monitoring and configs
+/monitoring/
+ecosystem.config.js
+
+# AI/ML model files and data
+*.pkl
+*.h5
+*.pb
+data/
+collections/
+
+# Temporary files
+tmp/
+temp/
+.cache/
+.eslintcache
+.rts2_cache_*/
+.nyc_output/
+lerna-debug.log
+
+# MCP config (may contain tokens)
+.mcp.json
+
+# AI assistant configurations
+.clinerules/
+.kilocode/
+.roo/
+.windsurf/
+.cursor/
+.giga/
+.roomodes
+.kiro/
+.qoder/
+.augment/
+.agent-os/
+.bmad-*/
+.copilot/
+.gemini/
+.trae/
+
+# Docker internal files
+docker-build-test.log
+build.log
+build-*.log
+
+# Test artifacts
+test-results/
+benchmark.ts
+test-*.js
+test-*.cjs
+test-scenarios/
+
+# Root level scripts (internal)
+add-ssh-key.sh
+build-packages-locally.sh
+configure-ssl.sh
+generate-dev-certs.sh
+root@165.227.13.206
+
+# Accidental local paths
+Users/
+
+# Runtime files
+.atp-pids
+*.pids
+
+# Deployment archives and backups (belong on server, not in repo)
+deployment-backups/
+website-repo-old/
+atp-ip-protection-deploy.tar.gz
+*.tar.gz
+.npmrc
+
+# Local dev artifacts (user-specific, not part of the project)
+quicksort.js
+npm-publish.sh
+release-v*.sh
+
+# User-created agent profiles (local only)
+*-agent-bot/
+*-agent/
+# First-party CLI package name ends with -agent; keep it tracked
+!packages/create-atp-agent/
+!packages/create-atp-agent/**
+packages/create-atp-agent/node_modules/
+packages/create-atp-agent/dist/
+packages/create-atp-agent/.create-atp-agent/
+*-security/
+security-*/
+agent-*/
+.*.agent.md
+.env*.local
