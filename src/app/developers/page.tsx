@@ -151,6 +151,40 @@ console.log(await agent.getTrustScore('did:atp:other'));`;
 
   return (
     <div className="min-h-screen relative">
+      {/* Get Started — onboarding entry point */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <h2 className="font-semibold text-lg">Ready to build?</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Choose a setup path and we&apos;ll walk you through the rest.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild size="sm" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600">
+                <Link href="/onboard/new">
+                  <Rocket className="h-4 w-4 mr-2" />
+                  New Project →
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline" className="border-primary/30 hover:border-primary/60">
+                <Link href="/onboard/existing">
+                  <Command className="h-4 w-4 mr-2" />
+                  Connect Existing →
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline" className="border-primary/30 hover:border-primary/60">
+                <Link href="/onboard/dashboard-only">
+                  <Terminal className="h-4 w-4 mr-2" />
+                  Explore Dashboard →
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section with Enhanced Styling */}
       <div className="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
