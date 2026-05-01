@@ -379,7 +379,7 @@ export default function OnboardAgentClient() {
         </CardHeader>
 
         <CardContent>
-          {!done && (
+          {done ? renderDone() : (
             <>
               <Alert className="mb-4">
                 <Info className="h-4 w-4" />
@@ -500,14 +500,12 @@ export default function OnboardAgentClient() {
                 ) : (
                   <Button disabled={submitting} onClick={handleSubmit}>
                     {submitting ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Shield className="w-4 h-4 mr-1" />}
-                    {submitting ? 'Onboarding...' : 'Onboard Agent'}
+                    {submitting ? 'Setting up your project...' : 'Onboard Agent'}
                   </Button>
                 )}
               </div>
             </>
           )}
-
-          {done && renderDone()}
         </CardContent>
       </Card>
     </div>

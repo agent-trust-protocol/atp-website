@@ -49,9 +49,12 @@ export function ExecutionLog({ command, onComplete }: ExecutionLogProps) {
 
   useEffect(() => {
     let i = 0;
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
     const total = SIMULATED_LINES.length;
 
     const tick = () => {
+      if (cancelled) return;
       if (i >= total) {
         setState('success');
         setProgress(100);
@@ -61,14 +64,22 @@ export function ExecutionLog({ command, onComplete }: ExecutionLogProps) {
       setLines((prev) => [...prev, { ...SIMULATED_LINES[i], ts: now() }]);
       setProgress(Math.round(((i + 1) / total) * 95));
       i++;
-      setTimeout(tick, 280 + Math.random() * 180);
+      timerId = setTimeout(tick, 280 + Math.random() * 180);
     };
 
     tick();
+    return () => {
+      cancelled = true;
+      if (timerId !== null) clearTimeout(timerId);
+    };
   }, [onComplete]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    try {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } catch {
+      bottomRef.current?.scrollIntoView();
+    }
   }, [lines]);
 
   const handleCopy = async () => {
@@ -120,7 +131,7 @@ export function ExecutionLog({ command, onComplete }: ExecutionLogProps) {
         {visibleLines.map((line, idx) => (
           <div key={idx} className="flex gap-2">
             <span className="text-muted-foreground flex-shrink-0 select-none">{line.ts}</span>
-            <span className={line.text.startsWith('✓') ? 'text-green-400' : 'text-foreground/80'}>
+            <span className={line.text?.startsWith('✓') ? 'text-green-400' : 'text-foreground/80'}>
               {line.text}
             </span>
           </div>

@@ -34,7 +34,10 @@ const publicRoutes = [
   '/policies',
   '/playground', // Public for developer acquisition
   '/integrations', // Integration docs
-  '/sales-guide' // Sales materials - publicly accessible
+  '/sales-guide', // Sales materials - publicly accessible
+  '/onboard', // Onboarding wizard — public, no auth required
+  '/api/preflight', // Onboarding environment checks
+  '/dashboard' // Demo dashboard — publicly explorable (synthetic data only)
 ];
 
 function isPublicRoute(pathname: string): boolean {

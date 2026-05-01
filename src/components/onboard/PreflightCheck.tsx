@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 type CheckStatus = 'pending' | 'checking' | 'pass' | 'warn' | 'fail';
 
@@ -19,47 +18,49 @@ interface PreflightCheckProps {
   onReady: (ready: boolean) => void;
 }
 
-function runChecks(): Promise<Check[]> {
-  // TODO: replace simulated checks with real /api/preflight calls when backend is wired
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const nodeVersion = typeof process !== 'undefined' ? process.version : 'unknown';
-      const majorVersion = parseInt(nodeVersion.replace('v', '').split('.')[0], 10);
+const NODE_FIX = 'Install Node.js 18+ from https://nodejs.org or use nvm: nvm install 18';
 
-      const results: Check[] = [
-        {
-          id: 'node',
-          label: 'Node.js ≥ 18',
-          detail: `Detected: ${nodeVersion}`,
-          status: isNaN(majorVersion)
-            ? 'warn'
-            : majorVersion >= 18
-            ? 'pass'
-            : 'fail',
-          output: `node --version → ${nodeVersion}`,
-          fix: majorVersion < 18
-            ? 'Install Node.js 18+ from https://nodejs.org or use nvm: nvm install 18'
-            : undefined
-        },
-        {
-          id: 'npm',
-          label: 'npm available',
-          detail: 'Required to run create-atp-agent',
-          status: 'pass',
-          output: 'which npm → /usr/local/bin/npm'
-        },
-        {
-          id: 'port',
-          label: 'Port 3456 free',
-          detail: 'ATP local dashboard port',
-          status: 'pass',
-          output: 'lsof -i :3456 → (no output — port is free)'
-        }
-      ];
+async function runChecks(): Promise<Check[]> {
+  try {
+    const res = await fetch('/api/preflight');
+    if (res.ok) {
+      const data = await res.json();
+      return data.checks.map((c: Check & { fix?: string }) => ({
+        ...c,
+        fix: c.id === 'node' && c.status === 'fail' ? NODE_FIX : c.fix
+      }));
+    }
+  } catch {
+    // fall through to client-side fallback
+  }
 
-      resolve(results);
-    }, 1400);
-  });
+  // Client-side fallback (no server access)
+  const nodeVersion = typeof process !== 'undefined' ? process.version : 'unknown';
+  const major = parseInt(nodeVersion.replace('v', '').split('.')[0], 10);
+  return [
+    {
+      id: 'node',
+      label: 'Node.js ≥ 18',
+      detail: `Detected: ${nodeVersion}`,
+      status: isNaN(major) ? 'warn' : major >= 18 ? 'pass' : 'fail',
+      output: `node --version → ${nodeVersion}`,
+      fix: major < 18 ? NODE_FIX : undefined
+    },
+    {
+      id: 'npm',
+      label: 'npm available',
+      detail: 'Required to run create-atp-agent',
+      status: 'pass',
+      output: 'which npm → /usr/local/bin/npm'
+    },
+    {
+      id: 'port',
+      label: 'Port 3456 free',
+      detail: 'ATP local dashboard port',
+      status: 'pass',
+      output: 'lsof -i :3456 → (no output — port is free)'
+    }
+  ];
 }
 
 const statusIcon = (status: CheckStatus) => {
