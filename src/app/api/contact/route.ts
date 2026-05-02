@@ -29,11 +29,11 @@ export async function POST(request: NextRequest) {
       <p>${message.replace(/\n/g, '<br/>')}</p>
     `;
 
-    const sentToPrimary = await emailService.sendEmail({ to: contactEmail, subject, html });
+    const sentToPrimary = await emailService.sendEmail({ to: contactEmail, subject, html, replyTo: email });
 
     const sentToFallback = contactEmail === fallbackEmail
       ? true
-      : await emailService.sendEmail({ to: fallbackEmail, subject: `[Copy] ${subject}`, html });
+      : await emailService.sendEmail({ to: fallbackEmail, subject: `[Copy] ${subject}`, html, replyTo: email });
 
     if (!sentToPrimary && !sentToFallback) {
       return NextResponse.json({ message: 'Unable to send your message right now. Please try again later.' }, { status: 502 });
