@@ -6,6 +6,7 @@ interface EmailOptions {
   subject: string;
   html: string;
   text?: string;
+  replyTo?: string;
 }
 
 class EmailService {
@@ -20,12 +21,17 @@ class EmailService {
     const configuredProvider = process.env.EMAIL_PROVIDER;
     const emailProvider = configuredProvider ?? (process.env.RESEND_API_KEY ? 'resend' : 'smtp');
 
-    // Use Resend's onboarding domain in development if main domain not verified
     const isDevelopment = process.env.NODE_ENV !== 'production';
     this.fromEmail = process.env.EMAIL_FROM || (isDevelopment ? 'onboarding@resend.dev' : 'noreply@agenttrustprotocol.com');
 
-    if (emailProvider === 'resend' && !process.env.EMAIL_FROM && !isDevelopment) {
-      console.warn('⚠️  EMAIL_FROM is not set in production. Set it to a verified Resend sender address.');
+    if (emailProvider === 'resend' && !process.env.EMAIL_FROM) {
+      if (isDevelopment) {
+        // onboarding@resend.dev can only deliver to the Resend account owner's email.
+        // Set EMAIL_FROM to a verified sender domain to send to arbitrary recipients.
+        console.warn('⚠️  Using onboarding@resend.dev — Resend will only deliver to the account owner\'s email. Set EMAIL_FROM to a verified sender address for full functionality.');
+      } else {
+        console.warn('⚠️  EMAIL_FROM is not set in production. Set it to a verified Resend sender address (e.g. noreply@agenttrustprotocol.com).');
+      }
     }
     this.fromName = process.env.EMAIL_FROM_NAME || 'Agent Trust Protocol™ by Sovr INC';
 
@@ -88,7 +94,8 @@ class EmailService {
           to: [options.to],
           subject: options.subject,
           html: options.html,
-          text: options.text || options.html.replace(/<[^>]*>/g, '')
+          text: options.text || options.html.replace(/<[^>]*>/g, ''),
+          ...(options.replyTo ? { replyTo: options.replyTo } : {})
         });
 
         if (error) {
@@ -106,7 +113,8 @@ class EmailService {
         to: options.to,
         subject: options.subject,
         html: options.html,
-        text: options.text || options.html.replace(/<[^>]*>/g, '')
+        text: options.text || options.html.replace(/<[^>]*>/g, ''),
+        ...(options.replyTo ? { replyTo: options.replyTo } : {})
       };
 
       const info = await this.transporter!.sendMail(mailOptions);
@@ -204,7 +212,8 @@ class EmailService {
     return this.sendEmail({
       to: adminEmail,
       subject: `New ATP Access Request from ${request.firstName} ${request.lastName}`,
-      html
+      html,
+      replyTo: request.email
     });
   }
 
