@@ -17,11 +17,16 @@ class EmailService {
   constructor() {
     // Configure email service
     // Supports multiple providers: SendGrid, Resend, SMTP, etc.
-    const emailProvider = process.env.EMAIL_PROVIDER || 'smtp';
+    const configuredProvider = process.env.EMAIL_PROVIDER;
+    const emailProvider = configuredProvider ?? (process.env.RESEND_API_KEY ? 'resend' : 'smtp');
 
     // Use Resend's onboarding domain in development if main domain not verified
     const isDevelopment = process.env.NODE_ENV !== 'production';
     this.fromEmail = process.env.EMAIL_FROM || (isDevelopment ? 'onboarding@resend.dev' : 'noreply@agenttrustprotocol.com');
+
+    if (emailProvider === 'resend' && !process.env.EMAIL_FROM && !isDevelopment) {
+      console.warn('⚠️  EMAIL_FROM is not set in production. Set it to a verified Resend sender address.');
+    }
     this.fromName = process.env.EMAIL_FROM_NAME || 'Agent Trust Protocol™ by Sovr INC';
 
     if (emailProvider === 'sendgrid' && process.env.SENDGRID_API_KEY) {
@@ -38,6 +43,8 @@ class EmailService {
     } else if (emailProvider === 'resend' && process.env.RESEND_API_KEY) {
       // Resend API (using official SDK)
       this.resend = new Resend(process.env.RESEND_API_KEY);
+    } else if (emailProvider === 'resend' && !process.env.RESEND_API_KEY) {
+      console.warn('⚠️  EMAIL_PROVIDER is set to resend but RESEND_API_KEY is missing.');
     } else if (process.env.SMTP_HOST) {
       // Generic SMTP
       this.transporter = nodemailer.createTransport({
