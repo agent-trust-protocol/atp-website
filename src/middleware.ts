@@ -37,7 +37,9 @@ const publicRoutes = [
   '/sales-guide', // Sales materials - publicly accessible
   '/onboard', // Onboarding wizard — public, no auth required
   '/api/preflight', // Onboarding environment checks
-  '/dashboard' // Demo dashboard — publicly explorable (synthetic data only)
+  '/dashboard', // Demo dashboard — publicly explorable (synthetic data only)
+  '/admin/login', // Founder admin login — public so founder can reach it
+  '/api/admin/setup', // One-time founder account creation
 ];
 
 function isPublicRoute(pathname: string): boolean {
@@ -116,6 +118,6 @@ export const config = {
      * - files with extensions (images, etc.)
      */
     // eslint-disable-next-line max-len
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)'
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)'
   ]
 };
