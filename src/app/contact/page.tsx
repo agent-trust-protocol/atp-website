@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { ContactForm } from '@/components/contact-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -36,58 +34,8 @@ export default function ContactPage() {
                 Fill out the form below and we'll get back to you within 24 hours.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name *</Label>
-                  <Input id="firstName" placeholder="John" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name *</Label>
-                  <Input id="lastName" placeholder="Doe" required />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input id="email" type="email" placeholder="john.doe@company.com" required />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
-                <Input id="company" placeholder="Your Company Inc." />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="inquiryType">Inquiry Type</Label>
-                <select
-                  id="inquiryType"
-                  name="inquiryType"
-                  aria-label="Select inquiry type"
-                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <option value="">Select an option</option>
-                  <option value="enterprise">Enterprise Sales</option>
-                  <option value="technical">Technical Support</option>
-                  <option value="partnership">Partnership</option>
-                  <option value="demo">Request Demo</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="message">Message *</Label>
-                <Textarea
-                  id="message"
-                  placeholder="Tell us about your AI security needs, deployment plans, or any questions you have..."
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <Button className="w-full bg-gradient-to-r from-[hsl(var(--atp-quantum))] to-[hsl(var(--atp-primary))] text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 h-14 px-8 text-lg font-semibold">
-                Send Message
-              </Button>
+            <CardContent>
+              <ContactForm />
             </CardContent>
           </Card>
 
