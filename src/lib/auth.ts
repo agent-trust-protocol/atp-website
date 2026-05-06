@@ -22,7 +22,7 @@ if (!secret && !isNextBuild) {
 const authSecret = secret ?? 'dev-only-secret-not-for-production';
 
 // Must match NEXT_PUBLIC_BASE_URL used by the auth client (src/lib/auth-client.ts)
-const baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 // PostgreSQL connection for Better Auth
 const {DATABASE_URL} = process.env;
