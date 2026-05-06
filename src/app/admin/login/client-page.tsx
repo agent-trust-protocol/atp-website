@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 
 export default function AdminLoginClient() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,17 +18,19 @@ export default function AdminLoginClient() {
       const result = await authClient.signIn.email({
         email,
         password,
-        callbackURL: '/admin',
+        // No callbackURL — we handle navigation ourselves so the
+        // session cookie is fully committed before we navigate.
       });
 
       if (result.error) {
         setError('Invalid email or password.');
+        setLoading(false);
       } else {
-        router.push('/admin');
+        // Hard navigation forces the browser to re-read the session cookie.
+        window.location.href = '/admin';
       }
     } catch {
       setError('Login failed. Check your credentials.');
-    } finally {
       setLoading(false);
     }
   };
