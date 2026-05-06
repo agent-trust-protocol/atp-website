@@ -1,6 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    window.location.href = '/admin/login';
+  };
+
   return (
     <div className="min-h-screen bg-black">
       {/* Sticky founder bar */}
@@ -12,12 +20,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             Testing Hub
           </Link>
         </div>
-        <Link
-          href="/api/auth/sign-out"
-          className="bg-black/10 hover:bg-black/20 rounded px-2 py-0.5 text-xs transition-colors"
+        <button
+          onClick={handleSignOut}
+          className="bg-black/10 hover:bg-black/20 rounded px-2 py-0.5 text-xs transition-colors cursor-pointer"
         >
           Sign out
-        </Link>
+        </button>
       </div>
       {children}
     </div>
