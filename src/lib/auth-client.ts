@@ -3,7 +3,8 @@ import { magicLinkClient } from 'better-auth/client/plugins';
 import type { Session } from './auth';
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+  // Check all possible URL env vars so it works regardless of which one is set in Vercel.
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
   plugins: [magicLinkClient()]
 });
 
