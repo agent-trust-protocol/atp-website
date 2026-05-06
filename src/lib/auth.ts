@@ -42,7 +42,8 @@ export const auth = betterAuth({
   baseURL,
   database: pool as any, // Better Auth accepts a pg Pool directly
   emailAndPassword: {
-    enabled: false // Disabled - using magic link instead
+    enabled: true,
+    requireEmailVerification: false
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30 // 30 days
