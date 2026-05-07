@@ -196,21 +196,10 @@ function PortalContent() {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16 max-w-4xl text-center">
-        <Card>
-          <CardHeader>
-            <CardTitle>Authentication Required</CardTitle>
-            <CardDescription>Please sign in to access your portal.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <a href="/login?returnTo=/portal">Sign In</a>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    // Redirect to login — don't show a blank card here since middleware should
+    // have already blocked unauthenticated requests.
+    router.replace('/login?returnTo=/portal');
+    return null;
   }
 
   const activeKeyCount = apiKeys.filter(k => k.status === 'active').length;

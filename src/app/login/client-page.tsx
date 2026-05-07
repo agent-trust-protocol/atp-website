@@ -106,10 +106,10 @@ function LoginForm() {
             </p>
           </form>
 
-          <div className="text-center text-sm">
-            Don&apos;t have an account?{' '}
+          <div className="text-center text-sm text-muted-foreground">
+            Access is invite-only.{' '}
             <Link href="/request-access" className="text-primary hover:underline">
-              Request access
+              Request an invite
             </Link>
           </div>
         </CardContent>

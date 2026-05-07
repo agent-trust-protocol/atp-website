@@ -33,9 +33,12 @@ export const signInWithGithub = () => {
   return authClient.signIn.social({ provider: 'github' });
 };
 
-// Magic link sign-in
-export const signInWithMagicLink = (email: string, callbackURL?: string) => {
-  return authClient.signIn.magicLink({ email, callbackURL: callbackURL || '/portal' });
+// Magic link sign-in — routes through /auth/callback so the session confirmation
+// screen shows before the browser lands on the protected destination.
+export const signInWithMagicLink = (email: string, returnTo?: string) => {
+  const dest = returnTo || '/portal';
+  const callbackURL = `/auth/callback?returnTo=${encodeURIComponent(dest)}`;
+  return authClient.signIn.magicLink({ email, callbackURL });
 };
 
 // Helper hooks for common auth operations
