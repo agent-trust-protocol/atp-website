@@ -98,7 +98,10 @@ export function middleware(request: NextRequest) {
       if (pathname.startsWith('/api/')) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      // Redirect page routes to login with return URL
+      // Admin routes redirect to founder login, all others to regular login
+      if (pathname.startsWith('/admin')) {
+        return NextResponse.redirect(new URL('/admin/login', request.url));
+      }
       const loginUrl = new URL('/login', request.url);
       if (pathname !== '/') {
         loginUrl.searchParams.set('returnTo', pathname);
