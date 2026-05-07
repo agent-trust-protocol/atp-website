@@ -307,7 +307,7 @@ export default function DocsPage() {
                       </div>
                     </div>
                     <Button asChild variant="outline" size="sm" className="w-full">
-                      <Link href="/api">
+                      <Link href="/api-reference">
                         <Code size={16} className="mr-2" />
                         SDK Documentation
                       </Link>
@@ -325,7 +325,7 @@ export default function DocsPage() {
                       </div>
                     </div>
                     <Button asChild variant="outline" size="sm" className="w-full">
-                      <Link href="/api#rest">
+                      <Link href="/api-reference">
                         <ExternalLink size={16} className="mr-2" />
                         API Reference
                       </Link>
