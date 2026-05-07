@@ -89,8 +89,10 @@ export function middleware(request: NextRequest) {
 
   // Protect routes that are not public
   if (!isPublicRoute(pathname)) {
-    // Check for Better Auth session cookie or demo token
-    const sessionCookie = request.cookies.get('better-auth.session_token');
+    // Check for Better Auth session cookie (both regular and __Secure- prefix in HTTPS)
+    const sessionCookie =
+      request.cookies.get('better-auth.session_token') ||
+      request.cookies.get('__Secure-better-auth.session_token');
     const demoToken = request.cookies.get('atp_token');
 
     if (!sessionCookie && !demoToken) {
