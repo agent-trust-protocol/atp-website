@@ -40,8 +40,8 @@ const publicRoutes = [
   '/onboard', // Onboarding wizard — public, no auth required
   '/api/preflight', // Onboarding environment checks
   '/dashboard', // Demo dashboard — publicly explorable (synthetic data only)
-  '/admin/login', // Founder admin login — public so founder can reach it
-  '/api/admin/setup', // One-time founder account creation
+  '/admin', // Admin protected client-side via layout session check
+  '/api/admin', // Admin API routes
 ];
 
 function isPublicRoute(pathname: string): boolean {
