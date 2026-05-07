@@ -2,8 +2,18 @@ import { createAuthClient } from 'better-auth/react';
 import { magicLinkClient } from 'better-auth/client/plugins';
 import type { Session } from './auth';
 
+// In the browser, always use the current origin so auth requests are same-origin.
+// This avoids CORS preflight issues when Vercel redirects between www and non-www.
+// On the server (SSR / RSC), fall back to env vars.
+const baseURL =
+  typeof window !== 'undefined'
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      'http://localhost:3000';
+
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+  baseURL,
   plugins: [magicLinkClient()]
 });
 

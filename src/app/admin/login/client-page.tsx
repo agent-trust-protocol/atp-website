@@ -1,15 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Lock } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
-export default function AdminLoginPage() {
+export default function AdminLoginClient() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,74 +15,91 @@ export default function AdminLoginPage() {
     setError('');
 
     try {
-      await authClient.signIn.email({
+      const result = await authClient.signIn.email({
         email,
         password,
+        // No callbackURL — we handle navigation ourselves so the
+        // session cookie is fully committed before we navigate.
       });
 
-      // Hard navigate to commit cookie and avoid redirect loops
-      window.location.href = '/admin';
-    } catch (err: any) {
-      setError(err?.message || 'Invalid email or password.');
-    } finally {
+      if (result.error) {
+        setError('Invalid email or password.');
+        setLoading(false);
+      } else {
+        // Hard navigation forces the browser to re-read the session cookie.
+        window.location.href = '/admin';
+      }
+    } catch {
+      setError('Login failed. Check your credentials.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 px-4">
-      <Card className="w-full max-w-md bg-gray-800 border-gray-700">
-        <CardHeader className="text-center space-y-2">
-          <div className="flex justify-center">
-            <Lock className="w-8 h-8 text-yellow-500" />
+    <div className="min-h-screen flex items-center justify-center bg-black px-4">
+      <div className="w-full max-w-sm">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500/10 border border-yellow-500/30 mb-4">
+            <span className="text-yellow-400 text-xl">⚡</span>
           </div>
-          <CardTitle className="text-2xl font-bold text-white">Founder Admin</CardTitle>
-          <CardDescription className="text-gray-300">Email & Password Sign In</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <Alert variant="destructive" className="bg-red-900/50 border-red-700">
-                <AlertDescription className="text-red-200">{error}</AlertDescription>
-              </Alert>
-            )}
+          <h1 className="text-white text-2xl font-bold">Founder Access</h1>
+          <p className="text-gray-500 text-sm mt-1">ATP internal testing portal</p>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-200">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
-              />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
+              {error}
             </div>
+          )}
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-200">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
-              />
-            </div>
+          <div>
+            <label className="block text-gray-400 text-sm mb-1.5" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/20"
+              placeholder="founder@agenttrustprotocol.com"
+            />
+          </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold"
-            >
-              {loading ? 'Signing In...' : 'Sign In'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          <div>
+            <label className="block text-gray-400 text-sm mb-1.5" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/20"
+              placeholder="••••••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-500/40 disabled:cursor-not-allowed text-black font-semibold rounded-lg py-2.5 text-sm transition-colors"
+          >
+            {loading ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-700 text-xs mt-6">
+          This page is not linked anywhere. Keep the URL private.
+        </p>
+      </div>
     </div>
   );
 }
