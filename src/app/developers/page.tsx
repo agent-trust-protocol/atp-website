@@ -3,1155 +3,398 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Code2,
-  Zap,
-  Book,
-  FileText,
-  PlayCircle,
-  Download,
-  ExternalLink,
-  CheckCircle,
-  ArrowRight,
-  Terminal,
-  Shield,
-  Globe,
-  Star,
-  GitBranch,
-  Rocket,
-  Copy,
-  Check,
-  Sparkles,
-  Layers,
-  Lock,
-  Network,
-  Activity,
-  Code,
-  Command
+  Zap, Shield, Globe, Activity, FileText, BookOpen, Code2,
+  ArrowRight, Copy, Check, ChevronDown, Github, Package,
+  Rocket, Terminal, Layers, Lock, Network, Star,
+  ExternalLink, GitBranch, TrendingUp, Users
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from '@/components/ui/accordion';
-import { CodePlayground } from '@/components/atp/code-playground';
+import { DocsShell, type SidebarSection } from '@/components/layout/DocsShell';
 import { AnimatedCounter } from '@/components/atp/animated-counter';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  HelpCircle,
-  Youtube,
-  TrendingUp,
-  Users,
-  MessageSquare,
-  Github
-} from 'lucide-react';
 
+/* ─── Sidebar nav ─── */
+const SIDEBAR_NAV: SidebarSection[] = [
+  {
+    title: 'Getting Started',
+    links: [
+      { href: '/developers', label: 'Quick Start', icon: Rocket, badge: '30s' },
+      { href: '/docs/quickstart', label: '1-Line Integration', icon: Zap },
+      { href: '/docs/quantum', label: 'Quantum-Safe', icon: Shield },
+    ],
+  },
+  {
+    title: 'Reference',
+    links: [
+      { href: '/docs', label: 'Full Docs', icon: BookOpen },
+      { href: '/api-reference', label: 'API Reference', icon: FileText },
+      { href: '/examples', label: 'Examples', icon: Code2 },
+    ],
+  },
+  {
+    title: 'Protocols',
+    links: [
+      { href: '/integrations/mcp', label: 'MCP', icon: Network },
+      { href: '/integrations/swarm', label: 'Swarm', icon: Layers },
+      { href: '/integrations/adk', label: 'ADK', icon: Terminal },
+      { href: '/integrations/a2a', label: 'A2A', icon: Globe },
+    ],
+  },
+  {
+    title: 'Community',
+    links: [
+      { href: 'https://github.com/agent-trust-protocol/atp-core', label: 'GitHub', icon: Github },
+      { href: 'https://www.npmjs.com/package/atp-sdk', label: 'NPM', icon: Package },
+    ],
+  },
+];
+
+/* ─── Code samples ─── */
+const INSTALL_COMMANDS = {
+  npm: 'npm install atp-sdk',
+  yarn: 'yarn add atp-sdk',
+  pnpm: 'pnpm add atp-sdk',
+};
+
+const AGENT_CODE = `import { Agent } from 'atp-sdk';
+
+// Quantum-safe agent — ready in one line
+const agent = await Agent.quickstart('MyBot');
+
+console.log('DID:         ', agent.getDID());
+console.log('Quantum-safe:', agent.isQuantumSafe()); // true
+console.log('Trust score: ', await agent.getTrustScore());
+
+// Send a secure message to another agent
+await agent.send('did:atp:other-agent', 'Hello, world!');`;
+
+/* ─── FAQ data ─── */
+const FAQ = [
+  {
+    q: 'Does it work without running any services?',
+    a: 'Yes. Agent.quickstart() runs in standalone mode — your agent gets a locally-generated DID and quantum-safe keys instantly. ATP services unlock additional features (trust scoring, audit trail, multi-agent messaging) when available.',
+  },
+  {
+    q: 'Which agent runtimes does ATP support?',
+    a: 'ATP is runtime-agnostic. First-class adapters are available for OpenClaw/NemoClaw, LangChain, Motleycrew, and Google ADK. Any runtime can be integrated via the atp-sdk adapter API.',
+  },
+  {
+    q: 'What makes the cryptography "quantum-safe"?',
+    a: 'ATP uses CRYSTALS-Dilithium (ML-DSA) for signatures and CRYSTALS-Kyber (ML-KEM) for key exchange — both NIST-standardized post-quantum algorithms. Ed25519 is used for classical scenarios where quantum resistance is not yet required.',
+  },
+  {
+    q: 'Is ATP open source?',
+    a: 'The core SDK (atp-sdk) and runtime adapters are Apache-2.0. Cloud hosting, enterprise SLA, and managed policy services are offered under a commercial license.',
+  },
+  {
+    q: 'How does trust scoring work?',
+    a: 'Trust scores are computed from verifiable credential attestations, behavioral telemetry, and cryptographic proof of identity. Scores update in real time and can be used to gate agent-to-agent interactions via policy profiles.',
+  },
+];
+
+/* ─── Feature data ─── */
+const FEATURES = [
+  {
+    icon: Shield,
+    title: 'Quantum-Safe Cryptography',
+    desc: 'CRYSTALS-Dilithium signatures and CRYSTALS-Kyber key exchange — NIST-standardized post-quantum algorithms built in by default.',
+    points: ['ML-DSA / ML-KEM (NIST PQC)', 'Ed25519 for classical scenarios', 'Automatic key rotation'],
+  },
+  {
+    icon: Activity,
+    title: 'Trust Scoring',
+    desc: 'Dynamic trust scores computed from verifiable credentials, behavioral telemetry, and cryptographic proof of identity.',
+    points: ['Real-time score updates', 'Verifiable credential support', 'Policy-gated interactions'],
+  },
+  {
+    icon: Globe,
+    title: 'Protocol Agnostic',
+    desc: 'Works with any agent runtime. First-class adapters for OpenClaw, LangChain, Motleycrew, ADK, and custom runtimes.',
+    points: ['MCP · Swarm · ADK · A2A', 'Custom adapter API', 'No runtime lock-in'],
+  },
+  {
+    icon: Lock,
+    title: 'Immutable Audit Trail',
+    desc: 'Blockchain-anchored audit log with Merkle-tree verification. Every action is signed, timestamped, and tamper-evident.',
+    points: ['Merkle-tree integrity proofs', 'Validator consensus anchoring', 'RBAC access control'],
+  },
+];
+
+const ECOSYSTEMS = ['MCP', 'Swarm', 'ADK', 'A2A', 'OpenClaw', 'LangChain', 'Custom'];
+
+const RESOURCES = [
+  { icon: BookOpen, title: 'Full Documentation', desc: 'Guides, concepts, and deep dives into every ATP feature.', href: '/docs', cta: 'Read the docs' },
+  { icon: FileText, title: 'API Reference', desc: 'Complete TypeScript API reference with examples for every method.', href: '/api-reference', cta: 'Browse API' },
+  { icon: Code2, title: 'Examples', desc: 'Runnable examples: finance workflows, stateful sessions, multi-agent crews.', href: '/examples', cta: 'View examples' },
+  { icon: Github, title: 'GitHub', desc: 'Source code, issues, and contributions. Apache-2.0 licensed.', href: 'https://github.com/agent-trust-protocol/atp-core', cta: 'Open GitHub', external: true },
+];
+
+/* ─── Component ─── */
 export default function DevelopersPage() {
+  const [installTab, setInstallTab] = useState<'npm' | 'yarn' | 'pnpm'>('npm');
+  const [codeTab, setCodeTab] = useState<'install' | 'agent'>('install');
   const [copied, setCopied] = useState<string | null>(null);
-  const [installMethod, setInstallMethod] = useState<'npm' | 'yarn' | 'pnpm'>('npm');
-  const [communityStats, setCommunityStats] = useState({
-    githubStars: 0,
-    npmDownloads: 0,
-    contributors: 0,
-    growth: 0,
-    isLoading: true
-  });
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [stats, setStats] = useState({ githubStars: 0, npmDownloads: 0, contributors: 0, growth: 0, loading: true });
 
-  // Fetch real community stats from APIs
   useEffect(() => {
     let mounted = true;
-
-    const fetchStats = async () => {
+    const load = async () => {
       try {
-        // Fetch both APIs in parallel
-        const [githubResponse, npmResponse] = await Promise.all([
-          fetch('/api/github/stats', { cache: 'no-store' }),
-          fetch('/api/npm/stats', { cache: 'no-store' })
+        const [gh, npm] = await Promise.all([
+          fetch('/api/github/stats', { cache: 'no-store' }).then(r => r.json()),
+          fetch('/api/npm/stats', { cache: 'no-store' }).then(r => r.json()),
         ]);
-
-        const githubData = await githubResponse.json();
-        const npmData = await npmResponse.json();
-
-        // Calculate growth percentage (simplified - can be enhanced with historical data)
-        // For now, use a dynamic calculation based on current stats
-        const baseGrowth = githubData.stars > 100 ? 127 : (githubData.stars > 50 ? 89 : 45);
-        const growth = Math.max(0, baseGrowth);
-
-        if (mounted) {
-          setCommunityStats({
-            githubStars: githubData.stars || 0,
-            npmDownloads: npmData.downloads || npmData.monthlyDownloads || 0,
-            contributors: githubData.contributors || 0,
-            growth,
-            isLoading: false
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching community stats:', error);
-        if (mounted) {
-          // Set fallback values on error
-          setCommunityStats(prev => ({
-            ...prev,
-            isLoading: false
-          }));
-        }
+        const growth = gh.stars > 100 ? 127 : gh.stars > 50 ? 89 : 45;
+        if (mounted) setStats({ githubStars: gh.stars || 0, npmDownloads: npm.downloads || npm.monthlyDownloads || 0, contributors: gh.contributors || 0, growth, loading: false });
+      } catch {
+        if (mounted) setStats(prev => ({ ...prev, loading: false }));
       }
     };
-
-    fetchStats();
-
-    // Refresh stats every 5 minutes
-    const interval = setInterval(fetchStats, 5 * 60 * 1000);
-
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
+    load();
+    const id = setInterval(load, 5 * 60 * 1000);
+    return () => { mounted = false; clearInterval(id); };
   }, []);
 
-  const copyToClipboard = async (text: string, id: string) => {
+  const copy = async (text: string, id: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const installCommands = {
-    npm: 'npm install atp-sdk',
-    yarn: 'yarn add atp-sdk',
-    pnpm: 'pnpm add atp-sdk'
-  };
-
-  const quickStartCode = `import { Agent } from 'atp-sdk';
-
-// Create quantum-safe agent (works immediately!)
-const agent = await Agent.quickstart('MyBot');
-console.log('Standalone:', agent.isStandalone());
-// ⚡ MyBot ready!
-//   DID:          did:atp:a1b2c3...
-//   Quantum-safe: yes
-//   Standalone:   true
-
-// With ATP services running, enables full features
-await agent.send('did:atp:other', 'Hello!');
-console.log(await agent.getTrustScore('did:atp:other'));`;
+  const activeCode = codeTab === 'install' ? INSTALL_COMMANDS[installTab] : AGENT_CODE;
 
   return (
-    <div className="min-h-screen relative">
-      {/* Get Started — onboarding entry point */}
-      <div className="border-b border-border bg-card/50">
-        <div className="container mx-auto px-4 py-6 sm:py-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex-1">
-              <h2 className="font-semibold text-lg">Ready to build?</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Choose a setup path and we&apos;ll walk you through the rest.
+    <DocsShell sidebarNav={SIDEBAR_NAV}>
+
+      {/* ─── Hero ─── */}
+      <section style={{
+        padding: '2.5rem 2rem 2rem',
+        maxWidth: '980px',
+        margin: '0 auto',
+        borderBottom: '1px solid var(--color-border)',
+      }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-primary)', background: 'var(--color-primary-highlight)', padding: '0.25rem 0.75rem', borderRadius: '9999px', marginBottom: '1.25rem' }}>
+          <Zap size={11} />
+          Developer Portal
+        </div>
+
+        <h1 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.375rem)', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '1rem', color: 'var(--color-text)' }}>
+          Build secure AI agents with{' '}
+          <span style={{ color: 'var(--color-primary)' }}>quantum-safe cryptography</span>
+        </h1>
+
+        <p style={{ fontSize: 'clamp(1rem, 1.2vw, 1.0625rem)', color: 'var(--color-text-muted)', maxWidth: '54ch', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+          One line of code. Thirty seconds to your first quantum-safe agent. The world's first post-quantum trust protocol for AI — runtime-agnostic and production-ready.
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '2rem' }}>
+          <Link href="/docs" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '40px', padding: '0 1.25rem', borderRadius: '0.5rem', fontSize: '0.875rem', fontWeight: 500, background: 'var(--color-primary)', color: '#fff', textDecoration: 'none', transition: 'background 180ms' }}
+            className="hover:!bg-[var(--color-primary-hover)]">
+            Get Started <ArrowRight size={14} />
+          </Link>
+          <a href="https://github.com/agent-trust-protocol/atp-core" target="_blank" rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '40px', padding: '0 1.25rem', borderRadius: '0.5rem', fontSize: '0.875rem', fontWeight: 500, border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', textDecoration: 'none', transition: 'background 180ms, color 180ms' }}
+            className="hover:!bg-[var(--color-surface-offset)] hover:!text-[var(--color-text)]">
+            <Github size={15} /> GitHub <ExternalLink size={12} />
+          </a>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {([
+            [Zap, '1-Line Integration'],
+            [Shield, 'Quantum-Safe'],
+            [Globe, 'Protocol Agnostic'],
+            [Activity, 'Audit Trail'],
+            [Lock, 'NIST PQC'],
+          ] as [React.ElementType, string][]).map(([Icon, label]) => (
+            <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', padding: '0.25rem 0.625rem', borderRadius: '9999px', background: 'var(--color-surface)' }}>
+              <Icon size={11} style={{ color: 'var(--color-primary)' }} />
+              {label}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <div style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem' }}>
+
+        {/* ─── Setup Path Cards ─── */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Quick Start</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+            {[
+              { icon: Rocket, title: 'New Project', desc: 'Scaffold a new agent project with ATP pre-configured and ready to run.', href: '/onboard/new', cta: 'Start new →' },
+              { icon: Terminal, title: 'Existing Project', desc: 'Add ATP to your existing agent — one npm install and one import.', href: '/onboard/existing', cta: 'Add to project →' },
+              { icon: Globe, title: 'Zero Install', desc: 'Try the interactive playground in your browser — no setup required.', href: '/playground', cta: 'Open playground →' },
+            ].map(({ icon: Icon, title, desc, href, cta }) => (
+              <Link key={title} href={href} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '1rem', padding: '1.25rem', textDecoration: 'none', transition: 'box-shadow 180ms, border-color 180ms, transform 180ms', cursor: 'pointer' }}
+                className="hover:!border-[var(--color-primary)] hover:shadow-md hover:-translate-y-0.5">
+                <div style={{ width: '36px', height: '36px', borderRadius: '0.75rem', background: 'var(--color-primary-highlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                  <Icon size={18} />
+                </div>
+                <div>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text)', marginBottom: '0.25rem' }}>{title}</p>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', lineHeight: 1.55 }}>{desc}</p>
+                </div>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  {cta}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Code Tabs ─── */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <div style={{ borderRadius: '1rem', border: '1px solid var(--color-border)', overflow: 'hidden' }}>
+            {/* Tab header */}
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-surface-offset)', borderBottom: '1px solid var(--color-border)', padding: '0 1rem', gap: '0.25rem', overflowX: 'auto' }}>
+              {(['install', 'agent'] as const).map(tab => (
+                <button key={tab} onClick={() => setCodeTab(tab)} style={{ padding: '0.75rem 1rem', fontSize: '0.75rem', fontWeight: 500, color: codeTab === tab ? 'var(--color-primary)' : 'var(--color-text-faint)', borderBottom: `2px solid ${codeTab === tab ? 'var(--color-primary)' : 'transparent'}`, whiteSpace: 'nowrap', background: 'none', border: 'none', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: codeTab === tab ? 'var(--color-primary)' : 'transparent', cursor: 'pointer', transition: 'color 150ms' }}>
+                  {tab === 'install' ? 'Install' : 'First Agent'}
+                </button>
+              ))}
+              {codeTab === 'install' && (
+                <div style={{ display: 'flex', gap: '0.25rem', marginLeft: '0.5rem' }}>
+                  {(['npm', 'yarn', 'pnpm'] as const).map(pm => (
+                    <button key={pm} onClick={() => setInstallTab(pm)} style={{ padding: '0.375rem 0.625rem', fontSize: '0.75rem', borderRadius: '0.375rem', border: '1px solid', borderColor: installTab === pm ? 'var(--color-primary)' : 'var(--color-border)', color: installTab === pm ? 'var(--color-primary)' : 'var(--color-text-muted)', background: installTab === pm ? 'var(--color-primary-highlight)' : 'transparent', fontWeight: installTab === pm ? 600 : 400, cursor: 'pointer', transition: 'all 150ms' }}>
+                      {pm}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <button onClick={() => copy(activeCode, 'code')} style={{ marginLeft: 'auto', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.375rem 0.625rem', fontSize: '0.75rem', color: 'var(--color-text-faint)', border: '1px solid var(--color-border)', borderRadius: '0.5rem', background: 'none', cursor: 'pointer', transition: 'background 150ms, color 150ms' }}
+                className="hover:!bg-[var(--color-surface-dynamic)] hover:!text-[var(--color-text)]">
+                {copied === 'code' ? <Check size={12} style={{ color: 'var(--color-primary)' }} /> : <Copy size={12} />}
+                {copied === 'code' ? 'Copied' : 'Copy'}
+              </button>
+            </div>
+
+            {/* Code body */}
+            <div style={{ background: 'var(--color-code-bg)', padding: '1.25rem 1.5rem', overflowX: 'auto' }}>
+              <pre style={{ fontFamily: "'Geist Mono', 'JetBrains Mono', monospace", fontSize: '0.8125rem', lineHeight: 1.65, color: 'var(--color-text)', margin: 0 }}>
+                <code>{activeCode}</code>
+              </pre>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Features Grid ─── */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--color-text)', marginBottom: '0.375rem' }}>Built for production</h2>
+          <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Everything you need to secure AI agents at enterprise scale.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+            {FEATURES.map(({ icon: Icon, title, desc, points }) => (
+              <div key={title} style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '0.75rem', padding: '1.25rem' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '0.75rem', background: 'var(--color-primary-highlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', marginBottom: '0.75rem' }}>
+                  <Icon size={18} />
+                </div>
+                <p style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text)', marginBottom: '0.375rem' }}>{title}</p>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', lineHeight: 1.6, marginBottom: '0.875rem' }}>{desc}</p>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  {points.map(pt => (
+                    <li key={pt} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                      <Check size={13} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                      {pt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Ecosystem Strip ─── */}
+        <section style={{ marginBottom: '2.5rem', padding: '1.25rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '0.75rem' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-faint)', marginBottom: '0.75rem' }}>Protocol Support</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            {ECOSYSTEMS.map(name => (
+              <span key={name} style={{ display: 'inline-flex', alignItems: 'center', padding: '0.3125rem 0.875rem', borderRadius: '9999px', fontSize: '0.8125rem', fontWeight: 500, border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', background: 'var(--color-bg)' }}>
+                {name}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Stats Row ─── */}
+        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+          {[
+            { icon: Star, label: 'GitHub Stars', value: stats.githubStars, suffix: '' },
+            { icon: Package, label: 'NPM Downloads', value: stats.npmDownloads, suffix: '/mo' },
+            { icon: Users, label: 'Contributors', value: stats.contributors, suffix: '' },
+            { icon: TrendingUp, label: '30d Growth', value: stats.growth, suffix: '%' },
+          ].map(({ icon: Icon, label, value, suffix }) => (
+            <div key={label} style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '0.75rem', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
+                <Icon size={15} />
+                {label}
+              </div>
+              <p style={{ fontSize: '1.625rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', lineHeight: 1 }}>
+                {stats.loading ? '—' : <AnimatedCounter value={value} suffix={suffix} />}
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="sm" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600">
-                <Link href="/onboard/new">
-                  <Rocket className="h-4 w-4 mr-2" />
-                  New Project →
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline" className="border-primary/30 hover:border-primary/60">
-                <Link href="/onboard/existing">
-                  <Command className="h-4 w-4 mr-2" />
-                  Connect Existing →
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline" className="border-primary/30 hover:border-primary/60">
-                <Link href="/onboard/dashboard-only">
-                  <Terminal className="h-4 w-4 mr-2" />
-                  Explore Dashboard →
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+          ))}
+        </section>
 
-      {/* Hero Section with Enhanced Styling */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-        <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 relative">
-          <div className="text-center mb-12 lg:mb-16 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center mb-6 animate-fade-in-up">
-              <div className="relative w-24 h-24 mb-4 atp-quantum-glow rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/20">
-                <Code2 size={48} className="text-primary animate-in zoom-in-50 duration-1000" />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent via-cyan-400/10 to-blue-500/10 pointer-events-none" />
-              </div>
-            </div>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-extralight mb-6 animate-fade-in-up">
-              <span className="atp-gradient-text">For Developers</span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-foreground/80 mb-8 leading-relaxed animate-fade-in-up">
-              Build secure AI agents in <span className="atp-gradient-text font-semibold">1 line of code</span> in <span className="atp-gradient-text font-semibold">30 seconds</span> with
-              the world's first <span className="text-primary font-medium">quantum-safe security protocol</span> for AI agents.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-8 animate-fade-in-up">
-              <Badge className="text-sm px-4 py-2 border border-green-300/40 bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 font-semibold">
-                <Zap size={14} className="mr-2" />
-                1-Line Integration
-              </Badge>
-              <Badge className="text-sm px-4 py-2 border border-blue-300/40 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 font-semibold">
-                <Shield size={14} className="mr-2" />
-                Quantum-Safe
-              </Badge>
-              <Badge className="text-sm px-4 py-2 border border-purple-300/40 bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 font-semibold">
-                <Globe size={14} className="mr-2" />
-                Protocol Agnostic
-              </Badge>
-              <Badge className="text-sm px-4 py-2 border border-yellow-300/40 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 font-semibold">
-                <Sparkles size={14} className="mr-2" />
-                Production Ready
-              </Badge>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-up">
-              <Button asChild size="lg" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg hover:shadow-xl transition-all">
-                <Link href="/docs">
-                  <Book className="h-5 w-5 mr-2" />
-                  Get Started
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-atp-electric-cyan/30 hover:bg-atp-electric-cyan/10 hover:border-atp-electric-cyan/50 transition-all">
-                <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                  <GitBranch className="h-5 w-5 mr-2" />
-                  View on GitHub
-                  <ExternalLink className="h-4 w-4 ml-2" />
-                </a>
-              </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button size="lg" variant="outline" className="border-2 border-primary/30 hover:bg-primary/10 transition-all">
-                    <PlayCircle className="h-5 w-5 mr-2" />
-                    Quick Demo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Rocket className="h-5 w-5 text-atp-electric-cyan" />
-                      Quick Start Demo
-                    </DialogTitle>
-                    <DialogDescription>
-                      See how easy it is to integrate ATP in your application
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Tabs defaultValue="install" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="install">Install</TabsTrigger>
-                      <TabsTrigger value="code">Code</TabsTrigger>
-                      <TabsTrigger value="result">Result</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="install" className="space-y-4">
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <Button
-                            variant={installMethod === 'npm' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setInstallMethod('npm')}
-                            className="flex-1"
-                          >
-                            npm
-                          </Button>
-                          <Button
-                            variant={installMethod === 'yarn' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setInstallMethod('yarn')}
-                            className="flex-1"
-                          >
-                            yarn
-                          </Button>
-                          <Button
-                            variant={installMethod === 'pnpm' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setInstallMethod('pnpm')}
-                            className="flex-1"
-                          >
-                            pnpm
-                          </Button>
-                        </div>
-                        <div className="relative">
-                          <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm border border-gray-800">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-muted-foreground text-xs">Terminal</span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => copyToClipboard(installCommands[installMethod], 'install')}
-                              >
-                                {copied === 'install' ? (
-                                  <Check className="h-3 w-3 text-green-400" />
-                                ) : (
-                                  <Copy className="h-3 w-3" />
-                                )}
-                              </Button>
-                            </div>
-                            <div className="text-green-400">{installCommands[installMethod]}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="code" className="space-y-4">
-                      <div className="relative">
-                        <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm border border-gray-800 max-h-[400px] overflow-auto">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-muted-foreground text-xs">example.ts</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0"
-                              onClick={() => copyToClipboard(quickStartCode, 'code')}
-                            >
-                              {copied === 'code' ? (
-                                <Check className="h-3 w-3 text-green-400" />
-                              ) : (
-                                <Copy className="h-3 w-3" />
-                              )}
-                            </Button>
-                          </div>
-                          <pre className="text-sm">
-                            <code className="text-blue-400">import</code> <code className="text-yellow-400">{'{ Agent }'}</code> <code className="text-blue-400">from</code> <code className="text-green-400">'atp-sdk'</code>;<br/><br/>
-                            <code className="text-gray-400">// Create quantum-safe agent</code><br/>
-                            <code className="text-blue-400">const</code> <code className="text-purple-400">agent</code> = <code className="text-blue-400">await</code> <code className="text-yellow-400">Agent</code>.<code className="text-cyan-400">create</code>(<code className="text-green-400">'MyBot'</code>);<br/>
-                            <code className="text-yellow-400">console</code>.<code className="text-cyan-400">log</code>(<code className="text-green-400">'DID:'</code>, <code className="text-purple-400">agent</code>.<code className="text-cyan-400">getDID</code>());<br/>
-                            <code className="text-yellow-400">console</code>.<code className="text-cyan-400">log</code>(<code className="text-green-400">'Quantum-safe:'</code>, <code className="text-purple-400">agent</code>.<code className="text-cyan-400">isQuantumSafe</code>()); <code className="text-gray-400">// true</code>
-                          </pre>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="result" className="space-y-4">
-                      <Alert>
-                        <CheckCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          <div className="space-y-2">
-                            <div className="font-mono text-sm">
-                              <div className="text-green-400">✓ Agent created successfully</div>
-                              <div className="text-muted-foreground mt-2">DID: did:atp:testnet:agent-abc123</div>
-                              <div className="text-muted-foreground">Quantum-safe: true</div>
-                              <div className="text-muted-foreground">Trust Level: BASIC</div>
-                            </div>
-                          </div>
-                        </AlertDescription>
-                      </Alert>
-                      <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-lg p-4 border border-green-500/20">
-                        <p className="text-sm text-foreground">
-                          <strong>That's it!</strong> Your agent now has quantum-safe cryptography, decentralized identity, and trust scoring.
-                        </p>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8 sm:py-12">
-        {/* Quick Start Section with Enhanced UI */}
-        <div className="mb-12 lg:mb-16">
-          <Card className="glass border-atp-electric-cyan/30 bg-gradient-to-br from-primary/5 to-secondary/5 hover:border-atp-electric-cyan/50 transition-all">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Rocket className="h-6 w-6 text-atp-electric-cyan" />
-                Quick Start (30 Seconds)
-              </CardTitle>
-              <CardDescription className="text-base">
-                Get started with ATP in 1 line of code - works immediately without any services
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="basic">Standalone Mode</TabsTrigger>
-                  <TabsTrigger value="full">With ATP Services</TabsTrigger>
-                </TabsList>
-                <TabsContent value="basic" className="space-y-4 mt-4">
-                  <div className="space-y-3">
-                    <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm border border-gray-800">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-muted-foreground text-xs">Works immediately - no services needed</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0"
-                          onClick={() => copyToClipboard(`import { Agent } from 'atp-sdk';
-const agent = await Agent.quickstart('MyBot');
-console.log('Standalone:', agent.isStandalone());`, 'basic')}
-                        >
-                          {copied === 'basic' ? (
-                            <Check className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="text-blue-400">import <span className="text-yellow-400">{'{ Agent }'}</span> from <span className="text-green-400">'atp-sdk'</span>;</div>
-                        <div className="text-blue-400">const <span className="text-purple-400">agent</span> = <span className="text-blue-400">await</span> <span className="text-yellow-400">Agent</span>.<span className="text-cyan-400">quickstart</span>(<span className="text-green-400">'MyBot'</span>);</div>
-                        <div><span className="text-yellow-400">console</span>.<span className="text-cyan-400">log</span>(<span className="text-green-400">'Standalone:'</span>, <span className="text-purple-400">agent</span>.<span className="text-cyan-400">isStandalone</span>());</div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground bg-blue-500/10 border border-blue-500/30 rounded p-2">
-                      ℹ️ <strong>Standalone mode:</strong> Agent runs offline with locally-generated DID and quantum-safe keys. No 30-second timeout or crash. When ATP services are available, connects automatically for full features.
-                    </p>
-                  </div>
-                </TabsContent>
-                <TabsContent value="full" className="space-y-4 mt-4">
-                  <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm border border-gray-800 max-h-[300px] overflow-auto">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-muted-foreground text-xs">Full features with ATP services</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0"
-                        onClick={() => copyToClipboard(quickStartCode, 'full')}
-                      >
-                        {copied === 'full' ? (
-                          <Check className="h-4 w-4 text-green-400" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <pre className="text-sm whitespace-pre-wrap">{quickStartCode}</pre>
-                  </div>
-                </TabsContent>
-              </Tabs>
-              <div className="flex flex-wrap gap-3">
-                <Button asChild className="bg-gradient-to-r from-green-500 to-emerald-500">
-                  <Link href="/docs">
-                    <Book className="h-4 w-4 mr-2" />
-                    Full Documentation
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="border-atp-electric-cyan/30">
-                  <Link href="/examples">
-                    <PlayCircle className="h-4 w-4 mr-2" />
-                    See Examples
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="border-atp-electric-cyan/30">
-                  <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                    <GitBranch className="h-4 w-4 mr-2" />
-                    GitHub
-                    <ExternalLink className="h-3 w-3 ml-2" />
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Key Features Grid with Enhanced Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-            <CardHeader>
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Zap className="h-7 w-7 text-green-400" />
-              </div>
-              <CardTitle className="text-xl">1-Line Integration</CardTitle>
-              <CardDescription>
-                Get quantum-safe security in 1 line of code. Works immediately - no setup required.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2.5 text-sm">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Works immediately (no services needed)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Full features with ATP services</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>TypeScript support included</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-            <CardHeader>
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Shield className="h-7 w-7 text-blue-400" />
-              </div>
-              <CardTitle className="text-xl">Quantum-Safe by Default</CardTitle>
-              <CardDescription>
-                All agents use hybrid ML-DSA + Ed25519 cryptography by default.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2.5 text-sm">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Future-proof against quantum attacks</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>NIST-standardized algorithms</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Backward compatible</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-            <CardHeader>
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Globe className="h-7 w-7 text-purple-400" />
-              </div>
-              <CardTitle className="text-xl">Protocol Agnostic</CardTitle>
-              <CardDescription>
-                Works with MCP, Swarm, ADK, A2A, and any agent protocol.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2.5 text-sm">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Universal security layer</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Cross-protocol trust</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                  <span>Unified audit trail</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Ecosystem Security Highlight */}
-        <div className="mb-12">
-          <Card className="glass border-primary/30 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Layers className="h-6 w-6 text-primary" />
-                ATP: The Ecosystem Security Layer
-              </CardTitle>
-              <CardDescription className="text-base">
-                Universal security for all AI agent protocols - MCP, Swarm, ADK, A2A, and more
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/50 border border-border/50">
-                  <Network className="h-8 w-8 text-blue-400 mb-2" />
-                  <div className="font-semibold mb-1">MCP</div>
-                  <div className="text-xs text-muted-foreground">Anthropic</div>
+        {/* ─── Resources Grid ─── */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--color-text)', marginBottom: '1rem' }}>Resources</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+            {RESOURCES.map(({ icon: Icon, title, desc, href, cta, external }) => (
+              <a key={title} href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}
+                style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '0.75rem', padding: '1.125rem', textDecoration: 'none', transition: 'border-color 180ms, box-shadow 180ms' }}
+                className="hover:!border-[var(--color-primary)] hover:shadow-sm">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Icon size={16} style={{ color: 'var(--color-primary)' }} />
+                  <p style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text)' }}>{title}</p>
                 </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/50 border border-border/50">
-                  <Activity className="h-8 w-8 text-green-400 mb-2" />
-                  <div className="font-semibold mb-1">Swarm</div>
-                  <div className="text-xs text-muted-foreground">OpenAI</div>
-                </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/50 border border-border/50">
-                  <Code className="h-8 w-8 text-purple-400 mb-2" />
-                  <div className="font-semibold mb-1">ADK</div>
-                  <div className="text-xs text-muted-foreground">Google</div>
-                </div>
-                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-background/50 border border-border/50">
-                  <Globe className="h-8 w-8 text-cyan-400 mb-2" />
-                  <div className="font-semibold mb-1">A2A</div>
-                  <div className="text-xs text-muted-foreground">Vendor-neutral</div>
-                </div>
-              </div>
-              <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
-                <p className="text-sm text-foreground">
-                  <strong>One security layer for all protocols.</strong> ATP provides universal quantum-safe security,
-                  cross-protocol trust, and unified audit trails for the entire AI agent ecosystem.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Developer Resources with Enhanced Cards */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-semibold mb-8 text-center">Developer Resources</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Book className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                  Documentation
-                </CardTitle>
-                <CardDescription>
-                  Complete guides, API reference, and integration tutorials
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline" className="w-full group-hover:border-primary/50">
-                  <Link href="/docs">
-                    View Docs
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <PlayCircle className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                  Examples & Tutorials
-                </CardTitle>
-                <CardDescription>
-                  Real-world examples and step-by-step tutorials
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline" className="w-full group-hover:border-primary/50">
-                  <Link href="/examples">
-                    View Examples
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <FileText className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                  API Reference
-                </CardTitle>
-                <CardDescription>
-                  Complete API documentation and type definitions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline" className="w-full group-hover:border-primary/50">
-                  <Link href="/api-reference">
-                    View API Docs
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="glass hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <GitBranch className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                  GitHub Repository
-                </CardTitle>
-                <CardDescription>
-                  Source code, issues, and community contributions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline" className="w-full group-hover:border-primary/50">
-                  <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                    View on GitHub
-                    <ExternalLink className="h-4 w-4 ml-2 group-hover:scale-110 transition-transform" />
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Live Code Playground */}
-        <div className="mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-            <div>
-              <h2 className="font-display text-2xl font-semibold">Live Code Playground</h2>
-              <p className="text-sm text-muted-foreground">Run ATP snippets in-browser or fork the quickstart on Stackblitz.</p>
-            </div>
-            <Button asChild variant="outline" size="sm" className="border-atp-electric-cyan/40 hover:bg-atp-electric-cyan/10 whitespace-nowrap">
-              <a href="https://stackblitz.com/fork/github/agent-trust-protocol/atp-core/tree/main/packages/sdk/examples" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Open in Stackblitz
+                <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', lineHeight: 1.55 }}>{desc}</p>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: 'auto' }}>
+                  {cta} {external ? <ExternalLink size={11} /> : <ArrowRight size={11} />}
+                </span>
               </a>
-            </Button>
+            ))}
           </div>
-          <CodePlayground />
-        </div>
+        </section>
 
-        {/* Community Stats */}
-        <div className="mb-12">
-          <Card className="glass border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Users className="h-6 w-6 text-primary" />
-                Community Stats
-              </CardTitle>
-              <CardDescription className="text-base">
-                Join thousands of developers building with ATP
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 rounded-lg bg-background/50 border border-border/50 hover:border-primary/50 transition-all">
-                  <Star className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">
-                    {communityStats.isLoading ? (
-                      <Skeleton className="h-8 w-16 mx-auto" />
-                    ) : (
-                      <AnimatedCounter
-                        value={communityStats.githubStars}
-                        duration={2000}
-                      />
-                    )}
+        {/* ─── FAQ ─── */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--color-text)', marginBottom: '1rem' }}>FAQ</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {FAQ.map(({ q, a }, i) => (
+              <div key={i} style={{ border: '1px solid var(--color-border)', borderRadius: '0.75rem', overflow: 'hidden' }}>
+                <button onClick={() => setFaqOpen(faqOpen === i ? null : i)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '1rem 1.125rem', fontSize: '0.9375rem', fontWeight: 500, color: 'var(--color-text)', background: faqOpen === i ? 'var(--color-surface)' : 'transparent', cursor: 'pointer', textAlign: 'left', transition: 'background 150ms' }}>
+                  {q}
+                  <ChevronDown size={16} style={{ color: 'var(--color-text-muted)', flexShrink: 0, transform: faqOpen === i ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }} />
+                </button>
+                {faqOpen === i && (
+                  <div style={{ padding: '0 1.125rem 1rem', fontSize: '0.9375rem', color: 'var(--color-text-muted)', lineHeight: 1.7, borderTop: '1px solid var(--color-border)' }}>
+                    <div style={{ paddingTop: '0.875rem' }}>{a}</div>
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">GitHub Stars</div>
-                </div>
-                <div className="text-center p-4 rounded-lg bg-background/50 border border-border/50 hover:border-primary/50 transition-all">
-                  <Download className="h-8 w-8 text-green-400 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">
-                    {communityStats.isLoading ? (
-                      <Skeleton className="h-8 w-16 mx-auto" />
-                    ) : (
-                      <AnimatedCounter
-                        value={communityStats.npmDownloads}
-                        duration={2000}
-                      />
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">NPM Downloads</div>
-                </div>
-                <div className="text-center p-4 rounded-lg bg-background/50 border border-border/50 hover:border-primary/50 transition-all">
-                  <Users className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">
-                    {communityStats.isLoading ? (
-                      <Skeleton className="h-8 w-16 mx-auto" />
-                    ) : (
-                      <AnimatedCounter
-                        value={communityStats.contributors}
-                        duration={2000}
-                      />
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Contributors</div>
-                </div>
-                <div className="text-center p-4 rounded-lg bg-background/50 border border-border/50 hover:border-primary/50 transition-all">
-                  <TrendingUp className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-foreground">
-                    {communityStats.isLoading ? (
-                      <Skeleton className="h-8 w-16 mx-auto" />
-                    ) : (
-                      <>
-                        +<AnimatedCounter
-                          value={communityStats.growth}
-                          duration={2000}
-                          suffix="%"
-                        />
-                      </>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Growth (30d)</div>
-                </div>
+                )}
               </div>
-              <div className="mt-6 flex flex-wrap gap-3 justify-center">
-                <Button asChild variant="outline" className="border-primary/30">
-                  <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                    <Github className="h-4 w-4 mr-2" />
-                    View on GitHub
-                    <ExternalLink className="h-3 w-3 ml-2" />
-                  </a>
-                </Button>
-                <Button asChild variant="outline" className="border-primary/30">
-                  <a href="https://www.npmjs.com/package/atp-sdk" target="_blank" rel="noopener noreferrer">
-                    <Download className="h-4 w-4 mr-2" />
-                    View on NPM
-                    <ExternalLink className="h-3 w-3 ml-2" />
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            ))}
+          </div>
+        </section>
 
-        {/* Written Tutorials Section */}
-        <div className="mb-12">
-          <Card className="glass border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Book className="h-6 w-6 text-primary" />
-                Step-by-Step Guides
-              </CardTitle>
-              <CardDescription className="text-base">
-                Comprehensive written tutorials to master ATP development
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="glass border-border/50 hover:border-primary/50 transition-all group">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mb-4">
-                      <Rocket className="h-6 w-6 text-green-400" />
-                    </div>
-                    <h3 className="font-semibold mb-3 text-lg">Quick Start Guide</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Get your first quantum-safe agent running in 5 minutes with our comprehensive setup guide.
-                    </p>
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Environment setup</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>First agent creation</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Basic communication</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Security verification</span>
-                      </div>
-                    </div>
-                    <Button asChild variant="outline" size="sm" className="w-full mt-4 border-primary/30 hover:border-primary/50">
-                      <Link href="/docs/quick-start">
-                        Read Guide
-                        <ArrowRight className="h-3 w-3 ml-2" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-                <Card className="glass border-border/50 hover:border-primary/50 transition-all group">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mb-4">
-                      <Network className="h-6 w-6 text-blue-400" />
-                    </div>
-                    <h3 className="font-semibold mb-3 text-lg">Protocol Integration</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Learn how to secure MCP, Swarm, ADK, and A2A agents with ATP's universal security layer.
-                    </p>
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>MCP adapter setup</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Swarm integration</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>ADK security layer</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>A2A protocol binding</span>
-                      </div>
-                    </div>
-                    <Button asChild variant="outline" size="sm" className="w-full mt-4 border-primary/30 hover:border-primary/50">
-                      <Link href="/docs/protocols">
-                        Read Guide
-                        <ArrowRight className="h-3 w-3 ml-2" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-                <Card className="glass border-border/50 hover:border-primary/50 transition-all group">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center mb-4">
-                      <Shield className="h-6 w-6 text-purple-400" />
-                    </div>
-                    <h3 className="font-semibold mb-3 text-lg">Enterprise Deployment</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Production-ready setup with monitoring, compliance, and enterprise-grade security.
-                    </p>
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Production architecture</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Monitoring dashboards</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>Compliance setup</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span>High availability</span>
-                      </div>
-                    </div>
-                    <Button asChild variant="outline" size="sm" className="w-full mt-4 border-primary/30 hover:border-primary/50">
-                      <Link href="/docs/enterprise">
-                        Read Guide
-                        <ArrowRight className="h-3 w-3 ml-2" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-              <div className="mt-6 text-center">
-                <Button asChild variant="outline" className="border-primary/30">
-                  <Link href="/docs">
-                    <Book className="h-4 w-4 mr-2" />
-                    View All Guides
-                    <ArrowRight className="h-3 w-3 ml-2" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* ─── CTA Banner ─── */}
+        <section style={{ padding: '2rem', background: 'var(--color-primary-highlight)', border: '1px solid', borderColor: 'color-mix(in srgb, var(--color-primary) 25%, transparent)', borderRadius: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.375rem' }}>Ready to build?</h2>
+            <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', maxWidth: '48ch' }}>Secure your first AI agent in 30 seconds. No credit card required for open-source usage.</p>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <Link href="/docs" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5625rem 1.125rem', borderRadius: '0.5rem', fontSize: '0.9375rem', fontWeight: 500, background: 'var(--color-primary)', color: '#fff', textDecoration: 'none', transition: 'background 180ms' }}
+              className="hover:!bg-[var(--color-primary-hover)]">
+              Get Started <ArrowRight size={14} />
+            </Link>
+            <a href="https://github.com/agent-trust-protocol/atp-core" target="_blank" rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5625rem 1.125rem', borderRadius: '0.5rem', fontSize: '0.9375rem', fontWeight: 500, border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', textDecoration: 'none', background: 'transparent', transition: 'background 180ms, color 180ms' }}
+              className="hover:!bg-[color-mix(in_srgb,_var(--color-primary)_8%,_transparent)] hover:!text-[var(--color-text)]">
+              <Github size={15} /> View on GitHub
+            </a>
+          </div>
+        </section>
 
-        {/* FAQ Section with Accordion */}
-        <div className="mb-12">
-          <Card className="glass border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <HelpCircle className="h-6 w-6 text-primary" />
-                Frequently Asked Questions
-              </CardTitle>
-              <CardDescription className="text-base">
-                Common questions from developers
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-left">
-                    What makes ATP different from other security protocols?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    ATP is the <strong>ecosystem security layer</strong> for AI agents. Unlike protocol-specific solutions,
-                    ATP works across all agent protocols (MCP, Swarm, ADK, A2A) providing universal quantum-safe security,
-                    cross-protocol trust, and unified audit trails. It's protocol-agnostic - it doesn't replace protocols, it secures them.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-left">
-                    Do I need ATP services running to use the SDK?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    No! The SDK works immediately with basic features (quantum-safe identity, signatures) without any services.
-                    For full features like identity registration, credentials, and permissions, you can run ATP services locally or use our cloud offering.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-left">
-                    Is ATP really quantum-safe by default?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    Yes! All new agents created with <code className="text-primary">Agent.quickstart()</code> automatically use
-                    hybrid ML-DSA + Ed25519 cryptography. ML-DSA (Dilithium successor) is NIST-standardized post-quantum cryptography
-                    that protects against future quantum computing attacks, while Ed25519 provides current security.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-left">
-                    Can I use ATP with my existing agent protocol?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    Absolutely! ATP is protocol-agnostic and works with any agent protocol. We provide adapters for MCP, Swarm, ADK,
-                    and A2A, but you can also create custom adapters for your protocol. ATP adds a security layer without requiring
-                    you to change your existing agent implementation.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-left">
-                    What's the difference between open source and enterprise?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    The <strong>open source core</strong> is free forever and includes the complete protocol, 1-line SDK integration,
-                    quantum-safe cryptography, and basic trust scoring. <strong>Enterprise</strong> adds advanced monitoring dashboards,
-                    enterprise SSO & RBAC, compliance reporting (SOC 2, HIPAA, GDPR), high availability clustering, and 24/7 priority support.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-left">
-                    How do I contribute to ATP?
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    We welcome contributions! Visit our <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">GitHub repository</a> to
-                    see open issues, submit pull requests, or join our community discussions. All contributions are appreciated!
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Why ATP Section */}
-        <div className="mb-12">
-          <Card className="glass border-primary/30">
-            <CardHeader>
-              <CardTitle className="text-2xl">Why ATP for Developers?</CardTitle>
-              <CardDescription className="text-base">
-                ATP is the ecosystem security layer for AI agents
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Star className="h-5 w-5 text-yellow-400" />
-                    Developer Experience
-                  </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>1-line integration - fastest onboarding</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>TypeScript-first with full type safety</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Works offline for testing</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Comprehensive examples and docs</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-primary" />
-                    Security & Trust
-                  </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Quantum-safe by default</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Decentralized identity (DID)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Dynamic trust scoring</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Immutable audit trails</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Globe className="h-5 w-5 text-primary" />
-                    Protocol Support
-                  </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>MCP (Anthropic)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Swarm (OpenAI)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>ADK (Google)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>A2A (Vendor-neutral)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Any custom protocol</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Rocket className="h-5 w-5 text-primary" />
-                    Production Ready
-                  </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>
-                        <a href="https://github.com/agent-trust-protocol/atp-core/actions" target="_blank" rel="noopener noreferrer" className="hover:text-foreground hover:underline transition-colors">
-                          Test suite green on CI
-                        </a>
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Enterprise-grade security</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>High performance</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Active maintenance</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* CTA Section */}
-        <div className="text-center">
-          <Card className="glass border-atp-electric-cyan/30 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5">
-            <CardContent className="pt-8 pb-8">
-              <h2 className="text-3xl font-semibold mb-4">Ready to Build Secure AI Agents?</h2>
-              <p className="text-muted-foreground mb-8 max-w-2xl mx-auto text-lg">
-                Join developers building the future of secure AI agent infrastructure with ATP.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <Button asChild size="lg" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg">
-                  <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                    <Star className="h-5 w-5 mr-2" />
-                    Star on GitHub
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </a>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-2 border-atp-electric-cyan/30 hover:bg-atp-electric-cyan/10">
-                  <Link href="/docs">
-                    <Book className="h-5 w-5 mr-2" />
-                    Read Documentation
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-2 border-atp-electric-cyan/30 hover:bg-atp-electric-cyan/10">
-                  <Link href="/examples">
-                    <PlayCircle className="h-5 w-5 mr-2" />
-                    View Examples
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
-    </div>
+    </DocsShell>
   );
 }
