@@ -21,6 +21,7 @@ import {
   Lightbulb,
   Rocket
 } from 'lucide-react';
+import { DocsShell } from '@/components/layout/DocsShell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,38 +45,71 @@ export const metadata: Metadata = {
   ]
 };
 
+const DOCS_SIDEBAR = [
+  {
+    title: 'Getting Started',
+    links: [
+      { href: '/docs#getting-started', label: 'Installation', icon: Download },
+      { href: '/docs#getting-started', label: 'Quick Start', icon: Zap },
+      { href: '/docs#getting-started', label: 'First Agent', icon: Rocket },
+    ],
+  },
+  {
+    title: 'Core Concepts',
+    links: [
+      { href: '/docs#concepts', label: 'Trust Scoring', icon: Shield },
+      { href: '/docs#concepts', label: 'Agent Identity (DIDs)', icon: Users },
+      { href: '/docs#concepts', label: 'Policy Engine', icon: Settings },
+      { href: '/docs#concepts', label: 'Audit Trail', icon: FileText },
+    ],
+  },
+  {
+    title: 'Integration',
+    links: [
+      { href: '/docs#integration', label: 'OpenClaw / NemoClaw', icon: Code },
+      { href: '/docs#integration', label: 'LangChain', icon: Globe },
+      { href: '/docs#integration', label: 'Custom Runtime', icon: Terminal },
+    ],
+  },
+  {
+    title: 'Security',
+    links: [
+      { href: '/docs#security', label: 'Quantum-Safe Crypto', icon: Lock },
+      { href: '/docs#security', label: 'Key Management', icon: Settings },
+      { href: '/docs#security', label: 'Compliance', icon: CheckCircle },
+    ],
+  },
+  {
+    title: 'Deployment',
+    links: [
+      { href: '/docs#deployment', label: 'Docker', icon: Terminal },
+      { href: '/docs#deployment', label: 'Cloud / Kubernetes', icon: Globe },
+    ],
+  },
+  {
+    title: 'Help',
+    links: [
+      { href: '/docs#faq', label: 'FAQ', icon: HelpCircle },
+    ],
+  },
+];
+
 export default function DocsPage() {
   return (
-    <div className="min-h-screen relative">
-      <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16">
+    <DocsShell sidebarNav={DOCS_SIDEBAR}>
+      <div style={{ maxWidth: '980px', margin: '0 auto', padding: '2.5rem 2rem' }}>
         {/* Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <div className="flex items-center justify-center mb-6 animate-fade-in-up">
-            <div className="relative w-20 h-20 mb-4 atp-quantum-glow rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-              <Book size={40} className="text-primary animate-in zoom-in-50 duration-1000" />
-            </div>
+        <div style={{ marginBottom: '2.5rem', paddingBottom: '2rem', borderBottom: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-primary)', background: 'var(--color-primary-highlight)', padding: '0.25rem 0.75rem', borderRadius: '9999px', marginBottom: '1rem' }}>
+            <Book size={11} />
+            Documentation
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extralight mb-6 animate-fade-in-up">
-            <span className="atp-gradient-text">Documentation</span>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', marginBottom: '0.75rem' }}>
+            ATP™ Developer Documentation
           </h1>
-          <p className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-4xl mx-auto leading-relaxed animate-fade-in-up">
-            Complete guide to implementing <span className="atp-gradient-text font-medium">quantum-safe security</span>
-            for your AI agents with ATP's enterprise-grade protocol.
+          <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', maxWidth: '54ch', lineHeight: 1.7 }}>
+            Complete guide to implementing quantum-safe security for your AI agents.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8 animate-fade-in-up">
-            <Badge className="text-sm px-4 py-2 atp-trust-high border-0 font-semibold">
-              <Shield size={14} className="mr-2" />
-              Quantum-Safe
-            </Badge>
-            <Badge className="text-sm px-4 py-2 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-300/40 font-semibold">
-              <Code size={14} className="mr-2" />
-              Developer-First
-            </Badge>
-            <Badge className="text-sm px-4 py-2 bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-300/40 font-semibold">
-              <Zap size={14} className="mr-2" />
-              Production-Ready
-            </Badge>
-          </div>
         </div>
 
         <Tabs defaultValue="getting-started" className="space-y-8">
@@ -800,6 +834,6 @@ export default function DocsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DocsShell>
   );
 }

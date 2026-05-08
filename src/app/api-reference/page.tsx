@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { DocsShell } from '@/components/layout/DocsShell';
 import {
   Code2,
   Terminal,
@@ -30,17 +31,46 @@ export const metadata: Metadata = {
   description: 'Complete API documentation for ATP: authentication methods, endpoints, SDKs, rate limits, and error codes.'
 };
 
+const API_SIDEBAR = [
+  {
+    title: 'Getting Started',
+    links: [
+      { href: '/api-reference#quickstart', label: 'Quick Start', icon: Zap },
+      { href: '/api-reference#auth', label: 'Authentication', icon: Key },
+    ],
+  },
+  {
+    title: 'Endpoints',
+    links: [
+      { href: '/api-reference#endpoints', label: 'Core Endpoints', icon: Code2 },
+      { href: '/api-reference#rate-limits', label: 'Rate Limits', icon: Clock },
+      { href: '/api-reference#webhooks', label: 'Webhooks', icon: Activity },
+    ],
+  },
+  {
+    title: 'SDKs',
+    links: [
+      { href: '/api-reference#sdks', label: 'TypeScript SDK', icon: Terminal },
+      { href: '/api-reference#sdks', label: 'Python SDK', icon: Globe },
+    ],
+  },
+];
+
 export default function APIReferencePage() {
   return (
     <GatedAPIReference>
-    <div className="min-h-screen relative">
-      <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16">
+    <DocsShell sidebarNav={API_SIDEBAR}>
+      <div style={{ maxWidth: '980px', margin: '0 auto', padding: '2.5rem 2rem' }}>
         {/* Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extralight mb-6">
-            <span className="atp-gradient-text">API Reference</span>
+        <div style={{ marginBottom: '2.5rem', paddingBottom: '2rem', borderBottom: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-primary)', background: 'var(--color-primary-highlight)', padding: '0.25rem 0.75rem', borderRadius: '9999px', marginBottom: '1rem' }}>
+            <Code2 size={11} />
+            API Reference
+          </div>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', marginBottom: '0.75rem' }}>
+            ATP™ API Reference
           </h1>
-          <p className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', maxWidth: '54ch', lineHeight: 1.7 }}>
             Complete documentation for ATP APIs, SDKs, authentication, and integration guides.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
@@ -394,7 +424,7 @@ const agent2 = await client.agents.create({
           </Card>
         </div>
       </div>
-    </div>
+    </DocsShell>
     </GatedAPIReference>
   );
 }

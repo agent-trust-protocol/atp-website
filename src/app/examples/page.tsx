@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { DocsShell } from '@/components/layout/DocsShell';
 import {
   PlayCircle,
   Code2,
@@ -44,38 +45,46 @@ export const metadata: Metadata = {
   ]
 };
 
+const EXAMPLES_SIDEBAR = [
+  {
+    title: 'Learning',
+    links: [
+      { href: '/examples#quickstart', label: 'Quick Start', icon: Zap },
+      { href: '/examples#use-cases', label: 'Use Cases', icon: Lightbulb },
+    ],
+  },
+  {
+    title: 'Patterns',
+    links: [
+      { href: '/examples#patterns', label: 'Integration Patterns', icon: Code2 },
+      { href: '/examples#apps', label: 'Sample Apps', icon: PlayCircle },
+    ],
+  },
+  {
+    title: 'Reference',
+    links: [
+      { href: '/examples#best-practices', label: 'Best Practices', icon: CheckCircle },
+      { href: '/examples#security', label: 'Security Patterns', icon: Shield },
+    ],
+  },
+];
+
 export default function ExamplesPage() {
   return (
-    <div className="min-h-screen relative">
-      <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16">
+    <DocsShell sidebarNav={EXAMPLES_SIDEBAR}>
+      <div style={{ maxWidth: '980px', margin: '0 auto', padding: '2.5rem 2rem' }}>
         {/* Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <div className="flex items-center justify-center mb-6 animate-fade-in-up">
-            <div className="relative w-20 h-20 mb-4 atp-quantum-glow rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-              <PlayCircle size={40} className="text-primary animate-in zoom-in-50 duration-1000" />
-            </div>
+        <div style={{ marginBottom: '2.5rem', paddingBottom: '2rem', borderBottom: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-primary)', background: 'var(--color-primary-highlight)', padding: '0.25rem 0.75rem', borderRadius: '9999px', marginBottom: '1rem' }}>
+            <PlayCircle size={11} />
+            Examples
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extralight mb-6 animate-fade-in-up">
-            <span className="atp-gradient-text">Examples & Patterns</span>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', marginBottom: '0.75rem' }}>
+            Examples & Integration Patterns
           </h1>
-          <p className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-4xl mx-auto leading-relaxed animate-fade-in-up">
-            Learn ATP through <span className="atp-gradient-text font-medium">real-world examples</span>,
-            integration patterns, and best practices for quantum-safe AI agent security.
+          <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', maxWidth: '54ch', lineHeight: 1.7 }}>
+            Real-world examples and best practices for quantum-safe AI agent security.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8 animate-fade-in-up">
-            <Badge className="text-sm px-4 py-2 atp-trust-high border-0 font-semibold">
-              <Code2 size={14} className="mr-2" />
-              Code Examples
-            </Badge>
-            <Badge className="text-sm px-4 py-2 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-300/40 font-semibold">
-              <Lightbulb size={14} className="mr-2" />
-              Best Practices
-            </Badge>
-            <Badge className="text-sm px-4 py-2 bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-300/40 font-semibold">
-              <Star size={14} className="mr-2" />
-              Real-World Patterns
-            </Badge>
-          </div>
         </div>
 
         <Tabs defaultValue="quickstart" className="space-y-8">
@@ -1288,6 +1297,6 @@ export default function ExamplesPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DocsShell>
   );
 }

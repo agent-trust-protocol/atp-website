@@ -1,24 +1,18 @@
 import Link from 'next/link';
-import { Link2, Cpu, Shield, ArrowRight, Puzzle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Link2, Cpu, Shield, ArrowRight, Puzzle, Network, Layers, Globe } from 'lucide-react';
 
 export const metadata = {
-  title: 'Integrations — Agent Trust Protocol',
-  description: 'Connect ATP with your existing AI stack. Native integrations for LangChain, MCP, OpenClaw, and more.',
+  title: 'Integrations — Agent Trust Protocol™',
+  description: 'Connect ATP™ with your existing AI stack. Native integrations for LangChain, MCP, OpenClaw, and more.',
 };
 
-const integrations = [
+const INTEGRATIONS = [
   {
     name: 'LangChain',
     slug: 'langchain',
     icon: Link2,
     description: 'Add quantum-safe trust verification to LangChain agents and chains with a single decorator. Full support for LangGraph workflows.',
     badges: ['Python', 'Quantum-Safe', 'AI Agents'],
-    badgeColors: ['bg-yellow-500/10 text-yellow-400 border-yellow-500/20', 'bg-blue-500/10 text-blue-400 border-blue-500/20', 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'],
-    color: 'from-yellow-500/20 to-yellow-600/5',
-    border: 'border-yellow-500/20',
   },
   {
     name: 'Model Context Protocol',
@@ -26,9 +20,6 @@ const integrations = [
     icon: Cpu,
     description: 'Secure MCP servers and tool calls with ATP identity verification. Zero-trust architecture for multi-model pipelines.',
     badges: ['TypeScript', 'Zero-Trust', 'Serverless'],
-    badgeColors: ['bg-blue-500/10 text-blue-400 border-blue-500/20', 'bg-purple-500/10 text-purple-400 border-purple-500/20', 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'],
-    color: 'from-blue-500/20 to-blue-600/5',
-    border: 'border-blue-500/20',
   },
   {
     name: 'OpenClaw',
@@ -36,93 +27,77 @@ const integrations = [
     icon: Shield,
     description: 'Enterprise-grade agent orchestration with ATP trust scoring built in. Manage multi-agent pipelines with policy enforcement.',
     badges: ['Enterprise', 'REST API', 'Multi-Agent'],
-    badgeColors: ['bg-purple-500/10 text-purple-400 border-purple-500/20', 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', 'bg-orange-500/10 text-orange-400 border-orange-500/20'],
-    color: 'from-purple-500/20 to-purple-600/5',
-    border: 'border-purple-500/20',
   },
 ];
 
+const MORE = ['Google ADK', 'CrewAI', 'AutoGen', 'Swarm', 'OpenAI SDK', 'Motleycrew'];
+
 export default function IntegrationsPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh' }}>
+
       {/* Hero */}
-      <section className="relative py-24 px-4 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
-        <div className="relative max-w-3xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-sm text-primary mb-2">
-            <Puzzle className="h-4 w-4" />
+      <section style={{ padding: '3.5rem 1.5rem 2.5rem', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-primary)', background: 'var(--color-primary-highlight)', padding: '0.25rem 0.75rem', borderRadius: '9999px', marginBottom: '1.25rem' }}>
+            <Puzzle size={11} />
             Native integrations
           </div>
-          <h1 className="text-5xl font-bold tracking-tight atp-gradient-text">
-            Integrations
+          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', marginBottom: '0.75rem' }}>
+            Connect ATP™ to your AI stack
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Drop ATP into your existing AI stack in minutes. Native SDKs for the frameworks your team already uses — no infrastructure changes required.
+          <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', maxWidth: '52ch', lineHeight: 1.7 }}>
+            Drop ATP into the frameworks your team already uses — no infrastructure changes required.
           </p>
         </div>
       </section>
 
       {/* Integration cards */}
-      <section className="max-w-6xl mx-auto px-4 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {integrations.map((integration) => {
-            const Icon = integration.icon;
-            return (
-              <Card
-                key={integration.slug}
-                className={`glass flex flex-col border ${integration.border} bg-gradient-to-br ${integration.color}`}
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className={`p-2 rounded-lg border ${integration.border} bg-background/50`}>
-                      <Icon className="h-5 w-5 text-foreground/80" />
-                    </div>
-                    <CardTitle className="text-lg">{integration.name}</CardTitle>
-                  </div>
-                  <CardDescription className="text-sm leading-relaxed">
-                    {integration.description}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="flex flex-col gap-4 flex-1">
-                  <div className="flex flex-wrap gap-2">
-                    {integration.badges.map((badge, i) => (
-                      <Badge
-                        key={badge}
-                        variant="outline"
-                        className={`text-xs ${integration.badgeColors[i]}`}
-                      >
-                        {badge}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <div className="mt-auto">
-                    <Button asChild variant="outline" className="w-full group">
-                      <Link href={`/integrations/${integration.slug}`}>
-                        View docs
-                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* More coming soon */}
-        <div className="mt-12 text-center space-y-4">
-          <p className="text-muted-foreground">
-            More integrations coming soon — OpenAI SDK, CrewAI, AutoGen, and more.
-          </p>
-          <Button asChild variant="ghost">
-            <Link href="/request-access">
-              Request an integration →
-            </Link>
-          </Button>
+      <section style={{ padding: '2.5rem 1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+          {INTEGRATIONS.map(({ name, slug, icon: Icon, description, badges }) => (
+            <div key={slug} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '1rem', padding: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '0.75rem', background: 'var(--color-primary-highlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                  <Icon size={18} />
+                </div>
+                <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)' }}>{name}</p>
+              </div>
+              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.6, flex: 1 }}>{description}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginBottom: '0.25rem' }}>
+                {badges.map(badge => (
+                  <span key={badge} style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '9999px', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', background: 'var(--color-bg)' }}>
+                    {badge}
+                  </span>
+                ))}
+              </div>
+              <Link href={`/integrations/${slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', color: 'var(--color-primary)', fontWeight: 500, textDecoration: 'none' }}>
+                View docs <ArrowRight size={13} />
+              </Link>
+            </div>
+          ))}
         </div>
       </section>
+
+      {/* Coming soon */}
+      <section style={{ padding: '2.5rem 1.5rem' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-faint)', marginBottom: '1rem' }}>
+            Coming soon
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            {MORE.map(name => (
+              <span key={name} style={{ fontSize: '0.8125rem', padding: '0.3125rem 0.875rem', borderRadius: '9999px', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', background: 'var(--color-surface)' }}>
+                {name}
+              </span>
+            ))}
+          </div>
+          <Link href="/request-access" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', color: 'var(--color-primary)', fontWeight: 500, textDecoration: 'none' }}>
+            Request an integration <ArrowRight size={13} />
+          </Link>
+        </div>
+      </section>
+
     </div>
   );
 }
