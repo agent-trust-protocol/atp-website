@@ -1,20 +1,27 @@
 import Link from 'next/link';
+import { BrandLogo } from '@/components/ui/brand-logo';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="max-w-md w-full text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <h1 className="text-6xl font-bold text-gray-400 dark:text-gray-500 mb-2">
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '1.5rem' }}>
+      <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem', opacity: 0.4 }}>
+          <BrandLogo />
+        </div>
+        <p style={{ fontSize: '5rem', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--color-text)', lineHeight: 1, marginBottom: '0.75rem' }}>
           404
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
+        </p>
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text)', marginBottom: '0.5rem' }}>
           Page not found
+        </p>
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '2rem', lineHeight: 1.6 }}>
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <Link
           href="/"
-          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.625rem 1.25rem', borderRadius: '0.5rem', background: 'var(--color-primary)', color: '#fff', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none' }}
         >
-          Go Home
+          Back to home
         </Link>
       </div>
     </div>

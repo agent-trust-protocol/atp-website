@@ -1,564 +1,299 @@
 import Link from 'next/link';
-import {
-  Check,
-  ArrowRight,
-  Building,
-  Users,
-  Zap,
-  Shield,
-  Award,
-  Github,
-  Star,
-  Download,
-  TrendingUp,
-  Lock
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Check, ArrowRight, Github, Building2, Cloud, X } from 'lucide-react';
 import type { Metadata } from 'next';
-import { PricingToggle } from './pricing-toggle';
-import { PricingCalculator } from './pricing-calculator';
 
 export const metadata: Metadata = {
   title: 'Pricing — Agent Trust Protocol™',
-  description: 'OpenCore pricing: start free with open source; upgrade to Enterprise for production.'
+  description: 'OpenCore pricing: start free with open source; upgrade to Cloud or Enterprise when you need more.',
 };
+
+const TIERS = [
+  {
+    name: 'Open Source',
+    price: '$0',
+    period: 'forever free',
+    description: 'Complete ATP protocol, self-hosted.',
+    cta: 'Get started free',
+    ctaHref: 'https://github.com/agent-trust-protocol/atp-core',
+    ctaExternal: true,
+    highlight: false,
+    icon: Github,
+    features: [
+      'Core ATP protocol',
+      '3-line SDK integration',
+      'Quantum-safe cryptography',
+      'W3C DID/VC standards',
+      'Basic trust scoring',
+      'Up to 10 agents',
+      'Self-hosted deployment',
+      'Community support',
+    ],
+  },
+  {
+    name: 'Cloud',
+    price: '$29',
+    period: 'per month',
+    description: 'Fully managed, zero infrastructure.',
+    cta: 'Start free trial',
+    ctaHref: '/request-access',
+    ctaExternal: false,
+    highlight: true,
+    badge: 'Most Popular',
+    icon: Cloud,
+    features: [
+      'Everything in Open Source',
+      'Hosted SaaS platform',
+      'Up to 100 agents',
+      '250K requests/month',
+      'Advanced dashboard',
+      'Email + chat support',
+      '99.9% uptime SLA',
+      'Managed updates',
+    ],
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: 'contact sales',
+    description: 'Unlimited scale, compliance, SLA.',
+    cta: 'Talk to sales',
+    ctaHref: '/contact',
+    ctaExternal: false,
+    highlight: false,
+    icon: Building2,
+    features: [
+      'Everything in Cloud',
+      'Unlimited agents',
+      'Enterprise SSO / SAML',
+      'RBAC & audit trail',
+      'SOC 2, HIPAA, GDPR',
+      'High availability clustering',
+      'Dedicated support & SLA',
+      '30-day enterprise trial',
+    ],
+  },
+];
+
+const TABLE_ROWS: { feature: string; os: string | boolean; cloud: string | boolean; enterprise: string | boolean }[] = [
+  { feature: 'ATP Protocol Core',           os: true,            cloud: true,         enterprise: true },
+  { feature: 'Quantum-Safe Signatures',     os: true,            cloud: true,         enterprise: true },
+  { feature: 'Basic Monitoring',            os: true,            cloud: true,         enterprise: true },
+  { feature: 'Advanced Dashboard',          os: false,           cloud: true,         enterprise: true },
+  { feature: 'Enterprise SSO',              os: false,           cloud: false,        enterprise: true },
+  { feature: 'Compliance Reporting',        os: false,           cloud: false,        enterprise: true },
+  { feature: 'High Availability',           os: false,           cloud: true,         enterprise: true },
+  { feature: 'Support',                     os: 'Community',     cloud: 'Email + chat', enterprise: '24/7 dedicated' },
+  { feature: 'Deployment',                  os: 'Self-hosted',   cloud: 'Fully managed', enterprise: 'Both' },
+  { feature: 'SLA',                         os: '—',             cloud: '99.9%',      enterprise: 'Custom' },
+];
+
+const FAQS = [
+  {
+    q: 'Is the open source version really free?',
+    a: 'Yes. The ATP core protocol is 100% open source under Apache 2.0. You get the complete quantum-safe agent security stack with no usage fees, no credit card required.',
+  },
+  {
+    q: "What's included in the Cloud plan?",
+    a: 'Cloud is a fully managed hosted service — no infrastructure to run. It includes the advanced dashboard, 99.9% uptime SLA, up to 100 agents, 250K requests/month, and email + chat support.',
+  },
+  {
+    q: 'Can I migrate from open source to Cloud or Enterprise?',
+    a: 'Yes. ATP is designed for seamless migration. Your data and configurations transfer directly, and our team assists with any custom setup.',
+  },
+  {
+    q: 'Do you offer volume discounts?',
+    a: 'Yes. We offer custom pricing for large deployments, multi-year contracts, and academic institutions. Contact our sales team.',
+  },
+  {
+    q: 'How does the Enterprise 30-day trial work?',
+    a: 'Get full Enterprise access for 30 days with dedicated onboarding support. No credit card required. Includes custom configuration for your environment.',
+  },
+  {
+    q: 'What support is included with each plan?',
+    a: 'Open Source includes community support via GitHub. Cloud includes email + chat support. Enterprise includes 24/7 dedicated support with custom SLAs.',
+  },
+];
+
+function Cell({ value }: { value: string | boolean }) {
+  if (value === true) return <Check size={16} style={{ color: 'var(--color-primary)', margin: '0 auto' }} />;
+  if (value === false) return <X size={16} style={{ color: 'var(--color-text-faint)', margin: '0 auto' }} />;
+  return <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>{value}</span>;
+}
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen relative overflow-hidden bg-white dark:bg-gray-950">
-      {/* Background - clean white */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950" />
+    <div style={{ minHeight: '100vh' }}>
 
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16">
-          {/* Header */}
-          <div className="text-center mb-12 lg:mb-16">
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extralight mb-6 animate-fade-in-up">
-              <span className="atp-gradient-text">OpenCore Pricing</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up">
-              Start with our <span className="atp-gradient-text font-medium">open source core</span> forever free,
-              upgrade to enterprise features when you need them.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-8 animate-fade-in-up">
-              <Badge className="bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-sm px-4 py-2 border border-green-200 dark:border-green-500/20">
-                <Github size={14} className="mr-2" />
-                Open Source
-              </Badge>
-              <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-sm px-4 py-2 border border-blue-200 dark:border-blue-500/20">
-                <Award size={14} className="mr-2" />
-                Apache 2.0 License
-              </Badge>
-            </div>
-
-            {/* TL;DR — two clear paths */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10 animate-fade-in-up">
-              <div className="rounded-xl border border-green-200 dark:border-green-500/30 bg-green-50/60 dark:bg-green-900/20 p-5 text-left">
-                <div className="flex items-center gap-2 mb-2">
-                  <Github className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  <span className="text-sm font-semibold text-green-700 dark:text-green-300">Open Source — free forever</span>
-                </div>
-                <p className="text-sm text-foreground/70 mb-3">Full SDK, all crypto, policies, audit, and profiles. Self-host, MIT-style community support.</p>
-                <Button asChild size="sm" variant="outline" className="border-green-500/40 hover:bg-green-500/10">
-                  <a href="https://github.com/agent-trust-protocol/atp-core" target="_blank" rel="noopener noreferrer">
-                    npm install atp-sdk<ArrowRight size={14} className="ml-1" />
-                  </a>
-                </Button>
-              </div>
-              <div className="rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50/60 dark:bg-blue-900/20 p-5 text-left">
-                <div className="flex items-center gap-2 mb-2">
-                  <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Enterprise — contact sales</span>
-                </div>
-                <p className="text-sm text-foreground/70 mb-3">Managed cloud, SSO, SOC 2, priority SLAs, and dedicated support. Custom pricing based on scale.</p>
-                <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <Link href="/contact">Talk to sales<ArrowRight size={14} className="ml-1" /></Link>
-                </Button>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">Or compare detailed tiers below.</p>
-
-            {/* Billing Toggle */}
-            <PricingToggle />
+      {/* Hero */}
+      <section style={{ padding: '3.5rem 1.5rem 2.5rem', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-primary)', background: 'var(--color-primary-highlight)', padding: '0.25rem 0.75rem', borderRadius: '9999px', marginBottom: '1.25rem' }}>
+            Apache 2.0 · Open Core
           </div>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', marginBottom: '0.75rem' }}>
+            Simple, transparent pricing
+          </h1>
+          <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', maxWidth: '48ch', margin: '0 auto', lineHeight: 1.7 }}>
+            Start free with the open source core. Upgrade to Cloud or Enterprise when your team needs more scale, compliance, or support.
+          </p>
+        </div>
+      </section>
 
-          {/* Social Proof */}
-          <div className="mb-12 text-center animate-fade-in-up">
-            <p className="text-sm text-muted-foreground mb-6">Trusted by innovative teams building the future of AI</p>
-            <div className="flex flex-wrap justify-center items-center gap-6 mb-6">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-6 py-3 flex items-center gap-3 shadow-sm">
-                <Shield className="h-5 w-5 text-green-500" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">10,000+</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Agents Secured</div>
+      {/* Tier cards */}
+      <section style={{ padding: '2.5rem 1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', alignItems: 'start' }}>
+          {TIERS.map(({ name, price, period, description, cta, ctaHref, ctaExternal, highlight, badge, icon: Icon, features }) => (
+            <div
+              key={name}
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.25rem',
+                background: 'var(--color-surface)',
+                border: highlight ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+                borderRadius: '1rem',
+                padding: highlight ? '1.5rem' : '1.5rem',
+              }}
+            >
+              {badge && (
+                <div style={{ position: 'absolute', top: '-0.75rem', left: '50%', transform: 'translateX(-50%)', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#fff', background: 'var(--color-primary)', padding: '0.1875rem 0.625rem', borderRadius: '9999px', whiteSpace: 'nowrap' }}>
+                  {badge}
                 </div>
+              )}
+
+              {/* Header */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '0.625rem', background: highlight ? 'var(--color-primary)' : 'var(--color-primary-highlight)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: highlight ? '#fff' : 'var(--color-primary)', flexShrink: 0 }}>
+                    <Icon size={16} />
+                  </div>
+                  <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)' }}>{name}</p>
+                </div>
+                <div style={{ marginBottom: '0.25rem' }}>
+                  <span style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>{price}</span>
+                  <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginLeft: '0.375rem' }}>{period}</span>
+                </div>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>{description}</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-6 py-3 flex items-center gap-3 shadow-sm">
-                <TrendingUp className="h-5 w-5 text-cyan-500" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">99.9%</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Uptime SLA</div>
-                </div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-6 py-3 flex items-center gap-3 shadow-sm">
-                <Lock className="h-5 w-5 text-purple-500" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">Quantum-Safe</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Cryptography</div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Pricing Tiers */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 mb-16">
+              {/* Features */}
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+                {features.map(f => (
+                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                    <Check size={14} style={{ color: 'var(--color-primary)', marginTop: '2px', flexShrink: 0 }} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
 
-            {/* Open Source Core */}
-            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg relative group hover:scale-[1.02] md:hover:scale-105 transition-all duration-300">
-              <CardHeader className="text-center pt-8 pb-8">
-                <div className="relative p-4 rounded-xl w-fit mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <div className="absolute inset-0 atp-gradient-primary rounded-xl opacity-90" />
-                  <Github className="relative z-10 text-white" size={36} />
-                </div>
-                <CardTitle className="font-display text-2xl mb-3">Open Source Core</CardTitle>
-                <CardDescription className="text-muted-foreground mb-6">
-                  Complete ATP protocol implementation
-                </CardDescription>
-                <div className="text-center">
-                  <div className="text-5xl font-bold atp-gradient-text mb-2">$0</div>
-                  <div className="text-sm text-muted-foreground">Forever Free</div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Core ATP protocol</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">3-line SDK integration</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Quantum-safe cryptography</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">W3C DID/VC standards</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Basic trust scoring</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Up to 10 agents, 5K requests</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Self-hosted deployment</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Community support</span>
-                  </div>
-                </div>
-                <Button asChild className="w-full bg-gradient-to-r from-[hsl(var(--atp-quantum))] to-[hsl(var(--atp-primary))] text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 h-14 px-8 text-lg font-semibold">
-                  <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                    <Download className="h-5 w-5 mr-3" />
-                    Get Started Free
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Startup */}
-            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg relative group hover:scale-[1.02] md:hover:scale-105 transition-all duration-300">
-              <CardHeader className="text-center pt-8 pb-6">
-                <div className="relative p-3 rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl opacity-90" />
-                  <Zap className="relative z-10 text-white" size={32} />
-                </div>
-                <CardTitle className="font-display text-xl mb-2">Startup</CardTitle>
-                <CardDescription className="text-muted-foreground mb-4">
-                  Growing teams and small businesses
-                </CardDescription>
-                <div className="text-center">
-                  <div className="text-4xl font-bold atp-gradient-text mb-1">$250</div>
-                  <div className="text-xs text-muted-foreground">per month ($3K/year)</div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3 mb-6">
-                  <div className="text-xs font-semibold text-green-400 uppercase mb-3 text-center">Everything in Open Source, plus:</div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">SaaS hosted platform</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">Up to 25 agents, 25K requests</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">Email support</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">5GB storage</span>
-                  </div>
-                </div>
-                <Button asChild className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:scale-105 transition-all duration-300 h-12 text-sm font-semibold">
-                  <Link href="/enterprise/contact">
-                    <ArrowRight className="h-4 w-4 mr-2" />
-                    Get Started
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Professional - Most Popular */}
-            <Card className="bg-white dark:bg-gray-800 border-2 border-blue-500 dark:border-blue-400 shadow-lg hover:shadow-xl relative group hover:scale-[1.02] md:hover:scale-105 transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 shadow-lg">
-                  <Star size={14} className="mr-2" />
-                  Most Popular
-                </Badge>
-              </div>
-              <CardHeader className="text-center pt-12 pb-6">
-                <div className="relative p-3 rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-90" />
-                  <Users className="relative z-10 text-white" size={32} />
-                </div>
-                <CardTitle className="font-display text-xl mb-2">Professional</CardTitle>
-                <CardDescription className="text-muted-foreground mb-4">
-                  Growing organizations & mid-market
-                </CardDescription>
-                <div className="text-center">
-                  <div className="text-4xl font-bold atp-gradient-text mb-1">$1.5K</div>
-                  <div className="text-xs text-muted-foreground">per month ($18K/year)</div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3 mb-6">
-                  <div className="text-xs font-semibold text-blue-400 uppercase mb-3 text-center">Everything in Startup, plus:</div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">Up to 100 agents, 250K requests</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">Advanced analytics</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">Priority support</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">50GB storage</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs">Compliance frameworks</span>
-                  </div>
-                </div>
-                <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:scale-105 transition-all duration-300 h-12 text-sm font-semibold">
-                  <Link href="/enterprise/contact">
-                    <ArrowRight className="h-4 w-4 mr-2" />
-                    Get Started
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Enterprise Edition */}
-            <Card className="bg-white dark:bg-gray-800 border-2 border-cyan-500 dark:border-cyan-400 shadow-lg hover:shadow-xl relative group hover:scale-[1.02] md:hover:scale-105 transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                <Badge className="atp-gradient-secondary text-white px-4 py-2 shadow-lg">
-                  <Building size={14} className="mr-2" />
-                  Enterprise
-                </Badge>
-              </div>
-              <CardHeader className="text-center pt-16 pb-8">
-                <div className="relative p-4 rounded-xl w-fit mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <div className="absolute inset-0 atp-gradient-secondary rounded-xl opacity-90" />
-                  <Building className="relative z-10 text-white" size={36} />
-                </div>
-                <CardTitle className="font-display text-2xl mb-3">Enterprise</CardTitle>
-                <CardDescription className="text-muted-foreground mb-6">
-                  Large organizations & Fortune 500
-                </CardDescription>
-                <div className="text-center">
-                  <div className="text-5xl font-bold atp-gradient-text mb-2">$50K</div>
-                  <div className="text-sm text-muted-foreground">per year minimum</div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-4 mb-8">
-                  <div className="text-xs font-semibold text-cyan-400 uppercase mb-4 text-center">Everything in Professional, plus:</div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Up to 1,000+ agents, 2.5M requests</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Enterprise SSO/SAML & RBAC</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">SOC2, HIPAA, GDPR compliance</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">High availability clustering</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Behavioral analytics with ML</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">24/7 dedicated support & SLA</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Custom integrations & services</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check size={18} className="text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">30-day enterprise trial</span>
-                  </div>
-                </div>
-                <Button asChild className="w-full bg-gradient-to-r from-[hsl(var(--atp-electric-cyan))] to-[hsl(var(--atp-electric-cyan-light))] text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 h-14 px-8 text-lg font-semibold">
-                  <Link href="/enterprise/contact">
-                    <ArrowRight className="h-5 w-5 mr-3" />
-                    Start 30-Day Trial
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-          </div>
-
-          {/* Feature Comparison */}
-          <div className="mb-16">
-            <h2 className="font-display text-3xl lg:text-4xl font-light mb-12 text-center">
-              <span className="atp-gradient-text">Feature Comparison</span>
-            </h2>
-
-            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                      <th className="text-left p-6 font-semibold">Feature</th>
-                      <th className="text-center p-6 font-semibold">Open Source</th>
-                      <th className="text-center p-6 font-semibold">Enterprise</th>
-                      <th className="text-center p-6 font-semibold">Cloud</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm">
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">ATP Protocol Core</td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Quantum-Safe Signatures</td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Basic Monitoring</td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Advanced Dashboard</td>
-                      <td className="text-center p-6 text-muted-foreground">—</td>
-                      <td className="text-center p-6 text-blue-500">In Dev</td>
-                      <td className="text-center p-6 text-blue-500">In Dev</td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Enterprise SSO</td>
-                      <td className="text-center p-6 text-muted-foreground">—</td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Compliance Reporting</td>
-                      <td className="text-center p-6 text-muted-foreground">—</td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">High Availability</td>
-                      <td className="text-center p-6 text-muted-foreground">—</td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                      <td className="text-center p-6"><Check size={18} className="text-green-500 mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Priority Support</td>
-                      <td className="text-center p-6 text-muted-foreground">Community</td>
-                      <td className="text-center p-6">24/7</td>
-                      <td className="text-center p-6">24/7</td>
-                    </tr>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">Deployment</td>
-                      <td className="text-center p-6 text-muted-foreground">Self-hosted</td>
-                      <td className="text-center p-6 text-muted-foreground">Self-hosted</td>
-                      <td className="text-center p-6 text-cyan-400">Fully managed</td>
-                    </tr>
-                    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="p-6 font-medium">SLA</td>
-                      <td className="text-center p-6 text-muted-foreground">—</td>
-                      <td className="text-center p-6">Custom</td>
-                      <td className="text-center p-6 text-cyan-600 dark:text-cyan-400">99.9%</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          </div>
-
-          {/* Pricing Calculator */}
-          <div className="mb-16">
-            <h2 className="font-display text-3xl lg:text-4xl font-light mb-8 text-center">
-              <span className="atp-gradient-text">Not Sure Which Plan?</span>
-            </h2>
-            <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Use our calculator to find the perfect plan based on your needs
-            </p>
-            <div className="max-w-3xl mx-auto">
-              <PricingCalculator />
-            </div>
-          </div>
-
-          {/* FAQ */}
-          <div className="mb-16">
-            <h2 className="font-display text-3xl lg:text-4xl font-light mb-12 text-center">
-              <span className="atp-gradient-text">Frequently Asked Questions</span>
-            </h2>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Is the open source version really free?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Yes! The ATP core protocol is 100% open source under Apache 2.0 license.
-                    You get the complete quantum-safe agent security stack forever free.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">What&apos;s the difference between Enterprise and Cloud?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Enterprise is self-hosted with advanced features. Cloud is our fully managed service
-                    with zero setup and global infrastructure.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Can I migrate from open source to enterprise?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Absolutely! ATP is designed for seamless migration. Your data and configurations
-                    transfer directly to enterprise features.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">When will ATP Cloud be available?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    ATP Cloud launches Q2 2026. Request early access today to join the
-                    beta program and shape the platform.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Do you offer volume discounts?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Yes! We offer custom pricing for large deployments, multi-year contracts,
-                    and academic institutions. Contact our sales team.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">What support is included?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Open source includes community support. Enterprise includes 24/7 priority support,
-                    professional services, and dedicated customer success.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">How does the 30-day enterprise trial work?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Get full access to enterprise features for 30 days with dedicated onboarding support.
-                    No credit card required. Includes custom configuration for your environment.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center p-8 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
-            <h2 className="font-display text-3xl lg:text-4xl font-light mb-4">
-              <span className="atp-gradient-text">Ready to Secure Your Agents?</span>
-            </h2>
-            <p className="text-lg mb-8 text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-              Start with open source today, upgrade when you need enterprise features
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="atp-gradient-primary hover:scale-105 transition-all duration-300">
-                <a href="https://github.com/agent-trust-protocol/core" target="_blank" rel="noopener noreferrer">
-                  <Download className="h-4 w-4 mr-2" />
-                  Start Free
+              {/* CTA */}
+              {ctaExternal ? (
+                <a
+                  href={ctaHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.375rem', fontSize: '0.875rem', fontWeight: 600, padding: '0.625rem 1rem', borderRadius: '0.5rem', background: highlight ? 'var(--color-primary)' : 'var(--color-bg)', border: highlight ? 'none' : '1px solid var(--color-border)', color: highlight ? '#fff' : 'var(--color-text)', textDecoration: 'none', cursor: 'pointer' }}
+                >
+                  {cta} <ArrowRight size={13} />
                 </a>
-              </Button>
-              <Button asChild size="lg" className="atp-gradient-secondary hover:scale-105 transition-all duration-300">
-                <Link href="/enterprise/contact">
-                  <Building className="h-4 w-4 mr-2" />
-                  Start Enterprise Trial
+              ) : (
+                <Link
+                  href={ctaHref}
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.375rem', fontSize: '0.875rem', fontWeight: 600, padding: '0.625rem 1rem', borderRadius: '0.5rem', background: highlight ? 'var(--color-primary)' : 'var(--color-bg)', border: highlight ? 'none' : '1px solid var(--color-border)', color: highlight ? '#fff' : 'var(--color-text)', textDecoration: 'none' }}
+                >
+                  {cta} <ArrowRight size={13} />
                 </Link>
-              </Button>
+              )}
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Comparison table */}
+      <section style={{ padding: '2.5rem 1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-faint)', marginBottom: '1.25rem' }}>
+            Feature comparison
+          </p>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
+                  <th style={{ textAlign: 'left', padding: '0.75rem 1rem', color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.8125rem' }}>Feature</th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem 1rem', color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.8125rem' }}>Open Source</th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem 1rem', color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.8125rem' }}>Cloud</th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem 1rem', color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.8125rem' }}>Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {TABLE_ROWS.map((row, i) => (
+                  <tr key={row.feature} style={{ borderBottom: i < TABLE_ROWS.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
+                    <td style={{ padding: '0.75rem 1rem', color: 'var(--color-text)', fontWeight: 500 }}>{row.feature}</td>
+                    <td style={{ textAlign: 'center', padding: '0.75rem 1rem' }}><Cell value={row.os} /></td>
+                    <td style={{ textAlign: 'center', padding: '0.75rem 1rem', background: 'var(--color-primary-highlight)' }}><Cell value={row.cloud} /></td>
+                    <td style={{ textAlign: 'center', padding: '0.75rem 1rem' }}><Cell value={row.enterprise} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ padding: '2.5rem 1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-faint)', marginBottom: '1.25rem' }}>
+            FAQ
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            {FAQS.map(({ q, a }, i) => (
+              <details
+                key={q}
+                style={{ borderTop: i === 0 ? '1px solid var(--color-border)' : 'none', borderBottom: '1px solid var(--color-border)' }}
+              >
+                <summary style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', cursor: 'pointer', listStyle: 'none', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text)', userSelect: 'none' }}>
+                  {q}
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-text-muted)', flexShrink: 0, marginLeft: '1rem' }}>+</span>
+                </summary>
+                <p style={{ padding: '0 0 1rem', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.7, margin: 0 }}>
+                  {a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding: '2.5rem 1.5rem' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '1rem', padding: '2.5rem', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.625rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)', marginBottom: '0.75rem' }}>
+            Ready to secure your agents?
+          </h2>
+          <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem', maxWidth: '44ch', margin: '0 auto 1.5rem' }}>
+            Start with open source today, upgrade when you need enterprise features.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center' }}>
+            <a
+              href="https://github.com/agent-trust-protocol/atp-core"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', fontWeight: 600, padding: '0.625rem 1.25rem', borderRadius: '0.5rem', background: 'var(--color-primary)', color: '#fff', textDecoration: 'none' }}
+            >
+              Get started free <ArrowRight size={13} />
+            </a>
+            <Link
+              href="/contact"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', fontWeight: 600, padding: '0.625rem 1.25rem', borderRadius: '0.5rem', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', textDecoration: 'none' }}
+            >
+              Talk to sales <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Navbar } from '@/components/ui/navbar';
+import { MarketingHeader } from '@/components/layout/MarketingHeader';
 import { Footer } from '@/components/ui/footer';
 import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
@@ -41,8 +41,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0A2463' },
-    { media: '(prefers-color-scheme: dark)', color: '#00D9FF' }
+    { media: '(prefers-color-scheme: light)', color: '#f7f6f2' },
+    { media: '(prefers-color-scheme: dark)', color: '#0e0e0d' }
   ]
 };
 
@@ -77,7 +77,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased" style={fontStyles} suppressHydrationWarning>
         <ThemeProvider defaultTheme="light" storageKey="atp-ui-theme">
-          <Navbar />
+          <MarketingHeader />
           <main className="relative">
             {children}
           </main>

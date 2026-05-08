@@ -1,147 +1,172 @@
-/* Using system fonts instead of Google Fonts for faster builds */
+/* ATP 2.0 Design System */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Light mode — warm neutral palette (default) */
   :root {
-    /* ATP Harmonized Color System - Dark Mode Default */
-    --background: 222 84% 5%; /* Deep navy */
-    --foreground: 210 40% 98%; /* Soft white */
-    --card: 217 33% 17%; /* Elevated surface */
-    --card-foreground: 210 40% 98%;
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 40% 98%;
-    
-    /* Primary: Refined quantum blue */
-    --primary: 217 85% 40%; /* Softer, more balanced */
-    --primary-foreground: 210 40% 98%;
-    
-    /* Secondary: Toned electric cyan */
-    --secondary: 191 85% 55%; /* Less intense, better harmony */
-    --secondary-foreground: 222 84% 5%;
-    
-    /* Accent: Shifted emerald toward cyan family */
-    --accent: 170 65% 50%; /* Better color harmony */
-    --accent-foreground: 210 40% 98%;
-    
-    --muted: 217 30% 22%;
-    --muted-foreground: 215 20% 65%;
-    --destructive: 0 70% 50%; /* Softer red */
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 30% 25%;
-    --input: 217 30% 22%;
-    --ring: 191 85% 55%;
-    --radius: 0.75rem;
-    
-    /* ATP Brand Colors - Professional Enterprise Edition */
-    --atp-quantum-blue: 217 85% 40%;
-    --atp-quantum-blue-dark: 217 90% 30%;
-    --atp-quantum-blue-light: 217 75% 50%;
-    --atp-electric-cyan: 191 70% 45%; /* Reduced intensity for professional look */
-    --atp-electric-cyan-dark: 191 85% 35%;
-    --atp-electric-cyan-light: 191 60% 55%;
-    --atp-emerald: 170 60% 45%; /* More muted for enterprise */
-    --atp-amber: 38 80% 50%; /* Slightly more conservative */
-    --atp-crimson: 0 65% 45%; /* Softer red */
-    --atp-midnight: 222 87% 5%;
-    --atp-navy: 222 84% 5%;
-    --atp-slate: 220 15% 25%; /* New professional gray */
-    --atp-steel: 210 20% 35%; /* New steel blue-gray */
-    
-    /* Glassmorphism Variables */
-    --glass-bg: rgba(15, 23, 42, 0.7);
-    --glass-border: rgba(0, 217, 255, 0.15);
-    --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.4);
-  }
+    --background: 44 30% 96%;       /* #f7f6f2 warm parchment */
+    --foreground: 40 8% 10%;        /* #1a1916 warm near-black */
+    --card: 43 25% 97%;             /* #f9f8f5 warm surface */
+    --card-foreground: 40 8% 10%;
+    --popover: 43 25% 97%;
+    --popover-foreground: 40 8% 10%;
 
-  .light {
-    /* Light Mode - Soft and Professional */
-    --background: 220 20% 98%; /* Off-white with blue tint */
-    --foreground: 217 85% 20%; /* Dark blue text */
-    --card: 0 0% 100%; /* Pure white cards */
-    --card-foreground: 217 85% 20%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 217 85% 20%;
-    
-    /* Adjusted for light mode */
-    --primary: 217 85% 45%; /* Brighter quantum blue */
+    --primary: 183 100% 28%;        /* #00858c restrained teal */
     --primary-foreground: 0 0% 100%;
-    --secondary: 191 70% 45%; /* Darker cyan for contrast */
-    --secondary-foreground: 0 0% 100%;
-    --accent: 170 50% 40%; /* Muted emerald */
+
+    --secondary: 40 8% 81%;         /* #d4d1ca border tone */
+    --secondary-foreground: 40 8% 10%;
+
+    --accent: 183 100% 28%;
     --accent-foreground: 0 0% 100%;
-    
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+
+    --muted: 38 22% 93%;            /* #f0ede8 warm muted bg */
+    --muted-foreground: 40 3% 43%;  /* #6e6d68 warm muted text */
+
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 85% 45%;
-    
-    /* Light mode brand colors - Professional Enterprise */
-    --atp-quantum-blue: 217 85% 45%;
-    --atp-quantum-blue-dark: 217 90% 35%;
-    --atp-quantum-blue-light: 217 70% 55%;
-    --atp-electric-cyan: 191 65% 40%; /* More conservative for light mode */
-    --atp-electric-cyan-dark: 191 80% 30%;
-    --atp-electric-cyan-light: 191 55% 50%;
-    --atp-emerald: 170 45% 35%; /* More muted */
-    --atp-amber: 38 75% 45%; /* More conservative */
-    --atp-crimson: 0 65% 40%; /* Softer */
-    --atp-midnight: 220 20% 98%;
-    --atp-navy: 217 85% 20%;
-    --atp-slate: 220 10% 20%; /* Professional gray */
-    --atp-steel: 210 15% 30%; /* Steel blue-gray */
-    
-    /* Light glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(10, 36, 99, 0.08);
-    --glass-shadow: 0 4px 24px rgba(10, 36, 99, 0.06);
+
+    --border: 40 8% 81%;            /* #d4d1ca */
+    --input: 40 8% 81%;
+    --ring: 183 100% 28%;
+    --radius: 0.75rem;
+
+    /* ATP 2.0 semantic palette */
+    --atp-teal: 183 100% 28%;
+    --atp-teal-hover: 183 100% 22%;
+    --atp-teal-light: 184 47% 47%;
+    --atp-teal-highlight: 183 30% 90%;
+    --atp-success: 100 53% 30%;
+    --atp-warning: 24 73% 34%;
+    --atp-error: 0 65% 40%;
+    --atp-amber: 38 80% 50%;
+    --atp-crimson: 0 65% 45%;
+
+    /* Backward-compat aliases → mapped to new teal palette */
+    --atp-quantum-blue: 183 100% 28%;
+    --atp-quantum-blue-dark: 183 100% 22%;
+    --atp-quantum-blue-light: 184 47% 47%;
+    --atp-electric-cyan: 184 47% 47%;
+    --atp-electric-cyan-dark: 183 100% 28%;
+    --atp-electric-cyan-light: 184 50% 60%;
+    --atp-emerald: 100 53% 30%;
+    --atp-midnight: 40 5% 6%;
+    --atp-navy: 40 8% 10%;
+    --atp-slate: 40 5% 30%;
+    --atp-steel: 40 4% 40%;
+
+    /* Trust level semantics */
+    --atp-trust-enterprise: 183 100% 28%;
+    --atp-trust-premium: 38 80% 50%;
+    --atp-trust-verified: 100 53% 30%;
+    --atp-trust-basic: 211 70% 50%;
+    --atp-trust-untrusted: 0 0% 45%;
+
+    /* Reference-design raw color values (used by layout components) */
+    --color-bg: #f7f6f2;
+    --color-surface: #f9f8f5;
+    --color-surface-2: #fbfbf9;
+    --color-surface-offset: #f0ede8;
+    --color-surface-dynamic: #e6e4df;
+    --color-border: #d4d1ca;
+    --color-text: #1a1916;
+    --color-text-muted: #6e6d68;
+    --color-text-faint: #b5b4af;
+    --color-primary: #00858c;
+    --color-primary-hover: #006b72;
+    --color-primary-highlight: #d0e4e6;
+    --color-code-bg: #edeae4;
+    --shadow-sm: 0 1px 3px oklch(0.2 0.01 80 / 0.07);
+    --shadow-md: 0 4px 14px oklch(0.2 0.01 80 / 0.09);
+    --shadow-lg: 0 16px 40px oklch(0.2 0.01 80 / 0.12);
+
+    /* Glassmorphism — repainted to neutral surface (no neon) */
+    --glass-bg: rgba(249, 248, 245, 0.9);
+    --glass-border: rgba(212, 209, 202, 0.6);
+    --glass-shadow: 0 4px 16px oklch(0.2 0.01 80 / 0.08);
   }
 
   .dark {
-    /* Dark Mode - Same as root for consistency */
-    --background: 222 84% 5%;
-    --foreground: 210 40% 98%;
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 40% 98%;
-    
-    --primary: 217 85% 40%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 191 85% 55%;
-    --secondary-foreground: 222 84% 5%;
-    --accent: 170 65% 50%;
-    --accent-foreground: 210 40% 98%;
-    
-    --muted: 217 30% 22%;
-    --muted-foreground: 215 20% 65%;
+    /* Dark mode — warm charcoal palette */
+    --background: 40 5% 6%;         /* #0e0e0d warm charcoal */
+    --foreground: 40 6% 84%;        /* #d8d7d4 warm off-white */
+    --card: 40 3% 8%;               /* #141413 dark surface */
+    --card-foreground: 40 6% 84%;
+    --popover: 40 3% 8%;
+    --popover-foreground: 40 6% 84%;
+
+    --primary: 184 47% 47%;         /* #3fa8b0 muted teal */
+    --primary-foreground: 40 5% 6%;
+
+    --secondary: 40 3% 19%;         /* #333230 */
+    --secondary-foreground: 40 6% 84%;
+
+    --accent: 184 47% 47%;
+    --accent-foreground: 40 5% 6%;
+
+    --muted: 40 4% 12%;             /* #1f1e1c */
+    --muted-foreground: 40 2% 48%;  /* #7a7976 */
+
     --destructive: 0 70% 50%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 30% 25%;
-    --input: 217 30% 22%;
-    --ring: 191 85% 55%;
-    
-    /* Dark mode brand colors - Professional Enterprise */
-    --atp-quantum-blue: 217 85% 40%;
-    --atp-quantum-blue-dark: 217 90% 30%;
-    --atp-quantum-blue-light: 217 75% 50%;
-    --atp-electric-cyan: 191 70% 45%; /* Reduced intensity for professional look */
-    --atp-electric-cyan-dark: 191 90% 40%;
-    --atp-electric-cyan-light: 191 70% 65%;
-    --atp-emerald: 170 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 3% 19%;            /* #333230 */
+    --input: 40 3% 19%;
+    --ring: 184 47% 47%;
+
+    /* Dark ATP semantics */
+    --atp-teal: 184 47% 47%;
+    --atp-teal-hover: 184 47% 38%;
+    --atp-teal-light: 184 50% 60%;
+    --atp-teal-highlight: 184 20% 18%;
+    --atp-success: 100 42% 42%;
+    --atp-warning: 24 60% 46%;
+    --atp-error: 0 65% 50%;
     --atp-amber: 38 85% 55%;
     --atp-crimson: 0 70% 50%;
-    --atp-midnight: 222 87% 5%;
-    --atp-navy: 222 84% 5%;
-    
-    /* Dark glassmorphism */
-    --glass-bg: rgba(15, 23, 42, 0.7);
-    --glass-border: rgba(0, 217, 255, 0.15);
-    --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.4);
+
+    /* Backward-compat aliases */
+    --atp-quantum-blue: 184 47% 47%;
+    --atp-quantum-blue-dark: 184 47% 35%;
+    --atp-quantum-blue-light: 184 50% 60%;
+    --atp-electric-cyan: 184 50% 60%;
+    --atp-electric-cyan-dark: 184 47% 47%;
+    --atp-electric-cyan-light: 184 55% 68%;
+    --atp-emerald: 100 42% 42%;
+    --atp-midnight: 40 5% 6%;
+    --atp-navy: 40 5% 8%;
+    --atp-slate: 40 4% 35%;
+    --atp-steel: 40 3% 45%;
+
+    --atp-trust-enterprise: 184 47% 50%;
+    --atp-trust-premium: 38 85% 55%;
+    --atp-trust-verified: 100 42% 42%;
+    --atp-trust-basic: 211 80% 60%;
+    --atp-trust-untrusted: 0 0% 55%;
+
+    /* Reference-design raw values (dark) */
+    --color-bg: #0e0e0d;
+    --color-surface: #141413;
+    --color-surface-2: #1a1918;
+    --color-surface-offset: #1f1e1c;
+    --color-surface-dynamic: #272623;
+    --color-border: #333230;
+    --color-text: #d8d7d4;
+    --color-text-muted: #7a7976;
+    --color-text-faint: #4e4d4b;
+    --color-primary: #3fa8b0;
+    --color-primary-hover: #258a93;
+    --color-primary-highlight: #1e3436;
+    --color-code-bg: #191917;
+    --shadow-sm: 0 1px 3px oklch(0 0 0 / 0.25);
+    --shadow-md: 0 4px 16px oklch(0 0 0 / 0.35);
+    --shadow-lg: 0 16px 48px oklch(0 0 0 / 0.5);
+
+    --glass-bg: rgba(20, 20, 19, 0.88);
+    --glass-border: rgba(51, 50, 48, 0.7);
+    --glass-shadow: 0 4px 20px oklch(0 0 0 / 0.35);
   }
 }
 
@@ -149,553 +174,305 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
   }
-  
+
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    background-attachment: fixed;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    line-height: 1.65;
   }
-  
-  /* Dark mode gradient background */
-  .dark body {
-    @apply bg-gradient-to-br from-atp-midnight via-atp-navy to-slate-900;
-  }
-  
-  /* Light mode subtle gradient */
-  .light body {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20;
-  }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter Tight', system-ui, sans-serif;
-    font-weight: 300;
-    letter-spacing: -0.025em;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
-  
+
   h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 200;
-    line-height: 1.15; /* prevent descender clipping (e.g., 'g') */
-    padding-bottom: 0.05em; /* small buffer to avoid visual cut-off */
+    font-size: clamp(1.875rem, 3.5vw, 2.5rem);
+    font-weight: 700;
   }
-  
-  /* Apply gradient only to main page titles, not dashboard components */
-  h1:not(.text-white):not([style*="WebkitTextFillColor"]) {
-    background: linear-gradient(135deg, hsl(var(--atp-quantum-blue)), hsl(var(--atp-electric-cyan)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
+
   h2 {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 300;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 600;
   }
-  
+
   h3 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 400;
+    font-size: clamp(1.125rem, 1.5vw, 1.5rem);
+    font-weight: 600;
   }
-  
+
   code, pre, .font-mono {
-    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-family: 'Geist Mono', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
     font-variant-numeric: tabular-nums;
   }
-  
-  /* Dot grid background pattern */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  .dark body::before {
-    background-image: radial-gradient(circle, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
-  
-  .light body::before {
-    background-image: radial-gradient(circle, rgba(10, 36, 99, 0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
 }
 
-/* ATP Quantum-Safe Theme Styles */
+/* ─── Surface Components ─── */
 
-/* Glassmorphism Components */
+/* Neutral glass surface — no neon blur, just a clean elevated card */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   color: hsl(var(--foreground));
-  -webkit-text-fill-color: hsl(var(--foreground));
 }
 
-.glass-intense {
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.6);
-}
-
-/* ATP Gradient System - Refined for harmony */
+/* ATP 2.0 Gradient System — teal-based */
 .atp-gradient-primary {
-  background: linear-gradient(135deg, hsl(var(--atp-quantum-blue)) 0%, hsl(var(--atp-quantum-blue-light)) 100%);
+  background: linear-gradient(135deg, hsl(var(--atp-teal)) 0%, hsl(var(--atp-teal-light)) 100%);
 }
 
 .atp-gradient-secondary {
-  background: linear-gradient(135deg, hsl(var(--atp-electric-cyan)) 0%, hsl(var(--atp-electric-cyan-light)) 100%);
+  background: linear-gradient(135deg, hsl(var(--atp-teal-light)) 0%, hsl(var(--atp-teal)) 100%);
 }
 
 .atp-gradient-accent {
-  background: linear-gradient(135deg, hsl(var(--atp-quantum-blue)) 0%, hsl(var(--atp-electric-cyan)) 100%);
+  background: linear-gradient(135deg, hsl(var(--atp-teal)) 0%, hsl(var(--atp-teal-light)) 100%);
 }
 
-  /* Generic gradient used by Button variant="atp" */
-  .atp-gradient {
-    background: linear-gradient(135deg, hsl(var(--atp-quantum-blue)) 0%, hsl(var(--atp-electric-cyan)) 100%);
-  }
+.atp-gradient {
+  background: linear-gradient(135deg, hsl(var(--atp-teal)) 0%, hsl(var(--atp-teal-light)) 100%);
+}
 
 .atp-gradient-text {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--atp-teal-light)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Trust & Security Indicators */
+/* ─── Trust Level Classes ─── */
 .atp-trust-high {
-  background: linear-gradient(135deg, hsl(var(--atp-emerald)) 0%, rgb(34, 197, 94) 100%);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-  color: #fff !important;
-  -webkit-text-fill-color: #fff !important;
+  background: hsl(var(--atp-success) / 0.12);
+  color: hsl(var(--atp-success));
+  border-color: hsl(var(--atp-success) / 0.3);
 }
 
 .atp-trust-medium {
-  background: linear-gradient(135deg, hsl(var(--atp-amber)) 0%, rgb(251, 191, 36) 100%);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-  color: #1a1a2e !important;
-  -webkit-text-fill-color: #1a1a2e !important;
+  background: hsl(var(--atp-amber) / 0.12);
+  color: hsl(var(--atp-amber));
+  border-color: hsl(var(--atp-amber) / 0.3);
 }
 
 .atp-trust-low {
-  background: linear-gradient(135deg, hsl(var(--atp-crimson)) 0%, rgb(239, 68, 68) 100%);
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
-  color: #fff !important;
-  -webkit-text-fill-color: #fff !important;
+  background: hsl(var(--atp-crimson) / 0.12);
+  color: hsl(var(--atp-crimson));
+  border-color: hsl(var(--atp-crimson) / 0.3);
 }
 
-/* Quantum Glow Effects */
-.atp-quantum-glow {
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-  transition: box-shadow 0.3s ease;
+/* Trust level badge system */
+.trust-quantum {
+  background: hsl(var(--atp-teal) / 0.12);
+  color: hsl(var(--atp-teal));
+  border: 1px solid hsl(var(--atp-teal) / 0.25);
 }
 
-.atp-quantum-glow:hover {
-  box-shadow: 0 0 30px rgba(0, 217, 255, 0.5), 0 0 60px rgba(0, 217, 255, 0.2);
+.trust-enterprise {
+  background: hsl(var(--atp-success) / 0.12);
+  color: hsl(var(--atp-success));
+  border: 1px solid hsl(var(--atp-success) / 0.25);
 }
 
-/* Interactive Trust Indicator */
+.trust-verified {
+  background: hsl(var(--atp-teal-light) / 0.15);
+  color: hsl(var(--atp-teal-light));
+  border: 1px solid hsl(var(--atp-teal-light) / 0.25);
+}
+
+.trust-basic {
+  background: hsl(var(--atp-amber) / 0.12);
+  color: hsl(var(--atp-amber));
+  border: 1px solid hsl(var(--atp-amber) / 0.25);
+}
+
+.trust-unverified {
+  background: hsl(var(--atp-crimson) / 0.12);
+  color: hsl(var(--atp-crimson));
+  border: 1px solid hsl(var(--atp-crimson) / 0.25);
+}
+
+/* Trust level indicator (atp-theme.css compat) */
+.atp-trust-enterprise { color: hsl(var(--atp-trust-enterprise)); background: hsl(var(--atp-trust-enterprise) / 0.1); border-color: hsl(var(--atp-trust-enterprise) / 0.25); }
+.atp-trust-premium    { color: hsl(var(--atp-trust-premium)); background: hsl(var(--atp-trust-premium) / 0.1); border-color: hsl(var(--atp-trust-premium) / 0.25); }
+.atp-trust-verified   { color: hsl(var(--atp-trust-verified)); background: hsl(var(--atp-trust-verified) / 0.1); border-color: hsl(var(--atp-trust-verified) / 0.25); }
+.atp-trust-basic      { color: hsl(var(--atp-trust-basic)); background: hsl(var(--atp-trust-basic) / 0.1); border-color: hsl(var(--atp-trust-basic) / 0.25); }
+.atp-trust-untrusted  { color: hsl(var(--atp-trust-untrusted)); background: hsl(var(--atp-trust-untrusted) / 0.1); border-color: hsl(var(--atp-trust-untrusted) / 0.25); }
+
+/* ─── Interaction & Hover ─── */
 .atp-trust-indicator {
   position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  transition: all 0.3s ease;
-}
-
-.atp-trust-indicator::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.atp-trust-indicator:hover::before {
-  left: 100%;
+  border: 1px solid hsl(var(--border));
+  transition: all 0.2s ease;
 }
 
 .atp-trust-indicator:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 217, 255, 0.2);
-  border-color: rgba(0, 217, 255, 0.5);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: hsl(var(--primary) / 0.4);
 }
 
-/* Secure Connection Animation */
-.atp-secure-pulse {
-  animation: secure-pulse 2s ease-in-out infinite;
+.atp-quantum-glow {
+  box-shadow: 0 0 16px hsl(var(--primary) / 0.2);
+  transition: box-shadow 0.2s ease;
 }
 
-@keyframes secure-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
-  }
+.atp-quantum-glow:hover {
+  box-shadow: 0 0 24px hsl(var(--primary) / 0.3);
 }
 
-/* Quantum Loading Animations */
-@keyframes quantum-spin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-
-@keyframes quantum-particles {
-  0% {
-    transform: rotate(0deg) translateX(20px) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(360deg) translateX(20px) rotate(-360deg);
-    opacity: 0.3;
-  }
-}
-
-@keyframes trust-verification {
-  0% { width: 0%; }
-  100% { width: 100%; }
-}
-
-@keyframes scan-line {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh);
-    opacity: 0;
-  }
-}
-
-@keyframes decrypt-reveal {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: scale(1);
-  }
-}
-
-@keyframes connection-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.7;
-  }
-}
-
-@keyframes icon-glow {
-  0%, 100% {
-    filter: drop-shadow(0 0 5px currentColor);
-  }
-  50% {
-    filter: drop-shadow(0 0 15px currentColor) drop-shadow(0 0 25px currentColor);
-  }
-}
-
-@keyframes icon-bounce-in {
-  0% {
-    transform: scale(0.3) rotate(-10deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.05) rotate(5deg);
-  }
-  70% {
-    transform: scale(0.9) rotate(-2deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-@keyframes icon-wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-3deg); }
-  75% { transform: rotate(3deg); }
-}
-
-@keyframes icon-breathe {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-}
-
-/* Animation Classes */
-.quantum-loading {
-  animation: quantum-spin 2s linear infinite;
-}
-
-.quantum-particles {
-  animation: quantum-particles 3s linear infinite;
-}
-
-.trust-verify {
-  animation: trust-verification 2s ease-out;
-}
-
-.scan-effect {
-  animation: scan-line 3s ease-in-out infinite;
-}
-
-.decrypt-reveal {
-  animation: decrypt-reveal 0.8s ease-out;
-}
-
-.connection-pulse {
-  animation: connection-pulse 2s ease-in-out infinite;
-}
-
-.icon-glow {
-  animation: icon-glow 2s ease-in-out infinite;
-}
-
-.icon-bounce-in {
-  animation: icon-bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.icon-wiggle {
-  animation: icon-wiggle 1s ease-in-out;
-}
-
-.icon-breathe {
-  animation: icon-breathe 3s ease-in-out infinite;
-}
-
-/* Icon Hover Effects */
-.icon-hover-lift {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-hover-lift:hover {
-  transform: translateY(-2px) scale(1.05);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-}
-
-.icon-hover-glow:hover {
-  filter: drop-shadow(0 0 8px currentColor);
-  transition: filter 0.3s ease;
-}
-
-.icon-hover-spin:hover {
-  animation: quantum-spin 0.6s ease-in-out;
-}
-
-/* Icon Gradient Effects */
+/* Icon utilities */
 .icon-gradient-primary {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--atp-teal-light)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .icon-gradient-success {
-  background: linear-gradient(135deg, hsl(var(--atp-emerald)), #22c55e);
+  background: linear-gradient(135deg, hsl(var(--atp-success)), hsl(142 60% 50%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .icon-gradient-warning {
-  background: linear-gradient(135deg, hsl(var(--atp-amber)), #f59e0b);
+  background: linear-gradient(135deg, hsl(var(--atp-amber)), hsl(38 90% 60%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Trust Level System */
-.trust-quantum {
-  background: linear-gradient(135deg, hsl(var(--atp-quantum-blue)) 0%, hsl(var(--atp-electric-cyan)) 100%);
-  color: white;
-  box-shadow: 0 0 25px rgba(10, 36, 99, 0.4);
+.icon-hover-lift {
+  transition: all 0.2s ease;
 }
 
-.trust-enterprise {
-  background: linear-gradient(135deg, hsl(var(--atp-emerald)) 0%, rgb(34, 197, 94) 100%);
-  color: white;
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+.icon-hover-lift:hover {
+  transform: translateY(-1px);
 }
 
-.trust-verified {
-  background: linear-gradient(135deg, hsl(var(--atp-electric-cyan)) 0%, rgb(14, 165, 233) 100%);
-  color: white;
-  box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+.icon-hover-glow:hover {
+  filter: drop-shadow(0 0 6px currentColor);
+  transition: filter 0.2s ease;
 }
 
-.trust-basic {
-  background: linear-gradient(135deg, hsl(var(--atp-amber)) 0%, rgb(251, 191, 36) 100%);
-  color: rgb(92, 57, 15);
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+/* ─── Animations ─── */
+@keyframes secure-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--atp-success) / 0.3); }
+  50%       { box-shadow: 0 0 0 12px hsl(var(--atp-success) / 0); }
 }
 
-.trust-unverified {
-  background: linear-gradient(135deg, hsl(var(--atp-crimson)) 0%, rgb(239, 68, 68) 100%);
-  color: white;
-  box-shadow: 0 0 25px rgba(220, 38, 38, 0.4);
+@keyframes connection-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.15); opacity: 0.7; }
 }
 
-/* Professional Enterprise Color Utilities */
-.atp-professional-primary {
-  background: linear-gradient(135deg, hsl(var(--atp-quantum-blue)) 0%, hsl(var(--atp-slate)) 100%);
-  color: white;
+@keyframes quantum-spin {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
 }
 
-.atp-professional-secondary {
-  background: linear-gradient(135deg, hsl(var(--atp-electric-cyan)) 0%, hsl(var(--atp-steel)) 100%);
-  color: white;
+@keyframes decrypt-reveal {
+  0%   { opacity: 0; filter: blur(8px); transform: scale(0.95); }
+  100% { opacity: 1; filter: blur(0); transform: scale(1); }
 }
 
-.atp-professional-accent {
-  background: linear-gradient(135deg, hsl(var(--atp-emerald)) 0%, hsl(var(--atp-slate)) 100%);
-  color: white;
+@keyframes trust-verification {
+  0%   { width: 0%; }
+  100% { width: 100%; }
 }
 
-.atp-professional-border {
-  border-color: hsl(var(--atp-slate));
+@keyframes icon-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+  50%       { filter: drop-shadow(0 0 10px currentColor); }
 }
 
-.atp-professional-text {
-  color: hsl(var(--atp-quantum-blue));
+@keyframes icon-bounce-in {
+  0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+  60%  { transform: scale(1.04) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-.atp-professional-muted {
-  color: hsl(var(--atp-steel));
+@keyframes icon-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-3deg); }
+  75%       { transform: rotate(3deg); }
 }
 
-/* Responsive Mobile-First Design */
+@keyframes icon-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50%       { transform: scale(1.08); opacity: 1; }
+}
+
+/* Animation classes */
+.atp-secure-pulse   { animation: secure-pulse 2s ease-in-out infinite; }
+.connection-pulse   { animation: connection-pulse 2s ease-in-out infinite; }
+.quantum-loading    { animation: quantum-spin 2s linear infinite; }
+.decrypt-reveal     { animation: decrypt-reveal 0.6s ease-out; }
+.trust-verify       { animation: trust-verification 2s ease-out; }
+.icon-glow          { animation: icon-glow 2s ease-in-out infinite; }
+.icon-bounce-in     { animation: icon-bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.icon-wiggle        { animation: icon-wiggle 1s ease-in-out; }
+.icon-breathe       { animation: icon-breathe 3s ease-in-out infinite; }
+.icon-hover-spin:hover { animation: quantum-spin 0.5s ease-in-out; }
+
+/* ─── Responsive ─── */
 @media (max-width: 640px) {
-  .atp-mobile-stack {
-    @apply flex-col space-y-4 space-x-0;
-  }
-  
-  .atp-mobile-full {
-    @apply w-full;
-  }
-  
-  .atp-mobile-center {
-    @apply text-center;
-  }
-  
-  h1 {
-    font-size: clamp(2rem, 8vw, 2.5rem);
-  }
-  
-  .glass {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
+  .atp-mobile-stack  { @apply flex-col space-y-4 space-x-0; }
+  .atp-mobile-full   { @apply w-full; }
+  .atp-mobile-center { @apply text-center; }
 }
 
 @media (max-width: 768px) {
-  .atp-tablet-stack {
-    @apply flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4;
-  }
-  
-  .atp-tablet-full {
-    @apply w-full lg:w-auto;
-  }
+  .atp-tablet-stack { @apply flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4; }
+  .atp-tablet-full  { @apply w-full lg:w-auto; }
 }
 
 @media (max-width: 1024px) {
-  .atp-desktop-collapse {
-    @apply hidden lg:block;
-  }
+  .atp-desktop-collapse { @apply hidden lg:block; }
 }
 
-/* Touch Optimizations */
+/* Touch targets */
 @media (hover: none) and (pointer: coarse) {
-  .atp-trust-indicator:hover {
-    transform: none;
-  }
-  
-  .atp-quantum-glow:hover {
-    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-  }
-  
-  /* Larger touch targets */
-  button, .btn, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
+  button, .btn, [role="button"] { min-height: 44px; min-width: 44px; }
+  .atp-trust-indicator:hover  { transform: none; }
+  .atp-quantum-glow:hover     { box-shadow: 0 0 16px hsl(var(--primary) / 0.2); }
 }
 
-/* Reduced Motion Support */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .quantum-loading,
-  .quantum-particles,
-  .trust-verify,
-  .scan-effect,
-  .decrypt-reveal,
-  .connection-pulse,
-  .atp-secure-pulse,
-  .icon-glow,
-  .icon-bounce-in,
-  .icon-wiggle,
-  .icon-breathe {
+  .atp-secure-pulse, .connection-pulse, .quantum-loading, .decrypt-reveal,
+  .trust-verify, .icon-glow, .icon-bounce-in, .icon-wiggle, .icon-breathe {
     animation: none;
   }
-  
-  .atp-trust-indicator::before {
-    transition: none;
-  }
-  
-  .atp-trust-indicator:hover,
-  .icon-hover-lift:hover,
-  .icon-hover-spin:hover {
+  .atp-trust-indicator:hover, .icon-hover-lift:hover, .icon-hover-spin:hover {
     transform: none;
     animation: none;
   }
-  
-  .icon-hover-glow:hover {
-    filter: none;
-  }
+  .icon-hover-glow:hover { filter: none; }
 }
 
-/* High Contrast Mode */
+/* High contrast */
 @media (prefers-contrast: high) {
   .glass {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid hsl(var(--atp-electric-cyan));
+    background: hsl(var(--card));
+    border: 2px solid hsl(var(--primary));
   }
-  
   .atp-gradient-text {
-    -webkit-text-fill-color: hsl(var(--atp-electric-cyan));
+    -webkit-text-fill-color: hsl(var(--primary));
     background: none;
   }
 }
