@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Copy, Key, Shield, Zap, Users, Loader2 } from 'lucide-react';
+import { AppShell } from '@/components/layout/AppShell';
+import { ProductNav } from '@/components/layout/ProductNav';
 
 interface APIKeyData {
   id: string;
@@ -211,7 +213,8 @@ function PortalContent() {
     : '0.0';
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <AppShell sidebar={<ProductNav />}>
+      <div>
       {/* Header */}
       <div className="mb-8 flex justify-between items-start">
         <div>
@@ -484,7 +487,8 @@ function PortalContent() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AppShell>
   );
 }
 

@@ -2,28 +2,28 @@
 
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+import { AppShell } from '@/components/layout/AppShell';
+import { ProductNav } from '@/components/layout/ProductNav';
 
 const MonitoringDashboard = dynamic(
   () => import('@/components/atp/monitoring-dashboard').then(mod => ({ default: mod.MonitoringDashboard })),
   {
     ssr: false,
     loading: () => (
-      <div className="container mx-auto px-4 py-8">
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground">Loading monitoring dashboard...</p>
-          </div>
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Loading monitoring dashboard...</p>
         </div>
       </div>
-    )
+    ),
   }
 );
 
 export default function MonitoringPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <AppShell sidebar={<ProductNav />}>
       <MonitoringDashboard />
-    </div>
+    </AppShell>
   );
 }

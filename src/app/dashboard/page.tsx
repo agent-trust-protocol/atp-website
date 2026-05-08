@@ -1,48 +1,18 @@
 'use client';
 
 import { SimpleDemoDashboard } from '@/components/atp/demo-dashboard-simple';
-import { Subnav } from '@/components/ui/subnav';
+import { AppShell } from '@/components/layout/AppShell';
+import { ProductNav } from '@/components/layout/ProductNav';
 import { Button } from '@/components/ui/button';
-import { Activity, Shield, Building2 } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const router = useRouter();
-  // Only show basic tabs for demo - hide premium features
-  const dashboardTabs = [
-    {
-      id: 'overview',
-      label: 'Overview',
-      href: '/dashboard',
-      icon: <Activity className="h-4 w-4" />
-    },
-    {
-      id: 'enterprise',
-      label: 'Enterprise',
-      href: '/enterprise',
-      icon: <Building2 className="h-4 w-4" />
-    }
-  ];
-
-  // Premium features require authentication - hidden from competitors
-  // These would be shown only after login:
-  // - View Policies (/policies)
-  // - Create Policy (/policy-editor)
-  // - Test Policies (/policy-testing)
-  // - Workflows (/dashboard/workflows)
-
-  const breadcrumbs = [
-    { label: 'Dashboard', href: '/dashboard' }
-  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Subnav
-        tabs={dashboardTabs}
-        breadcrumbs={breadcrumbs}
-        variant="both"
-      />
-      <div className="container mx-auto px-4 py-8">
+    <AppShell sidebar={<ProductNav />}>
+      <div>
         {/* Demo Mode Banner */}
         <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
           <div className="flex items-center justify-between">
@@ -98,6 +68,6 @@ export default function DashboardPage() {
         {/* Demo Dashboard - replacing live data */}
         <SimpleDemoDashboard />
       </div>
-    </div>
+    </AppShell>
   );
 }
