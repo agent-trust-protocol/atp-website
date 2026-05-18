@@ -39,9 +39,10 @@ const publicRoutes = [
   '/sales-guide', // Sales materials - publicly accessible
   '/onboard', // Onboarding wizard — public, no auth required
   '/api/preflight', // Onboarding environment checks
+  '/api/test-magic-link', // Local email smoke test; route returns 404 in production
   '/dashboard', // Demo dashboard — publicly explorable (synthetic data only)
   '/admin', // Admin protected client-side via layout session check
-  '/api/admin', // Admin API routes
+  '/api/admin' // Admin API routes
 ];
 
 function isPublicRoute(pathname: string): boolean {
@@ -125,6 +126,6 @@ export const config = {
      * - files with extensions (images, etc.)
      */
     // eslint-disable-next-line max-len
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)'
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*[.](?:svg|png|jpg|jpeg|gif|webp|ico)$).*)'
   ]
 };

@@ -12,8 +12,8 @@ const sections = [
       { label: 'Demos', href: '/demos' },
       { label: 'Examples', href: '/examples' },
       { label: 'Sales Guide', href: '/sales-guide' },
-      { label: 'Maintenance', href: '/maintenance' },
-    ],
+      { label: 'Maintenance', href: '/maintenance' }
+    ]
   },
   {
     title: 'Docs & Developer',
@@ -26,8 +26,8 @@ const sections = [
       { label: 'Examples', href: '/examples' },
       { label: 'LangChain Integration', href: '/integrations/langchain' },
       { label: 'MCP Integration', href: '/integrations/mcp' },
-      { label: 'OpenClaw Integration', href: '/integrations/openclaw' },
-    ],
+      { label: 'OpenClaw Integration', href: '/integrations/openclaw' }
+    ]
   },
   {
     title: 'Cloud',
@@ -37,8 +37,8 @@ const sections = [
       { label: 'Analytics', href: '/cloud/analytics' },
       { label: 'Services', href: '/cloud/services' },
       { label: 'Tenants', href: '/cloud/tenants' },
-      { label: 'Monitoring', href: '/monitoring' },
-    ],
+      { label: 'Monitoring', href: '/monitoring' }
+    ]
   },
   {
     title: 'Policies / Legal',
@@ -48,8 +48,8 @@ const sections = [
       { label: 'Policy Editor', href: '/policy-editor' },
       { label: 'Policy Testing', href: '/policy-testing' },
       { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
-    ],
+      { label: 'Terms of Service', href: '/terms' }
+    ]
   },
   {
     title: 'Auth',
@@ -59,8 +59,8 @@ const sections = [
       { label: 'Sign Up', href: '/signup' },
       { label: 'Reset Password', href: '/reset-password' },
       { label: 'Verify Email', href: '/verify-email' },
-      { label: 'Request Access', href: '/request-access' },
-    ],
+      { label: 'Request Access', href: '/request-access' }
+    ]
   },
   {
     title: 'Dashboard',
@@ -73,8 +73,8 @@ const sections = [
       { label: 'Workflow Designer', href: '/dashboard/workflows/designer' },
       { label: 'Executions', href: '/dashboard/workflows/executions' },
       { label: 'Workflow Health', href: '/dashboard/workflows/health' },
-      { label: 'Nodes', href: '/dashboard/workflows/nodes' },
-    ],
+      { label: 'Nodes', href: '/dashboard/workflows/nodes' }
+    ]
   },
   {
     title: 'Onboarding',
@@ -84,16 +84,16 @@ const sections = [
       { label: 'New Account', href: '/onboard/new' },
       { label: 'Existing Account', href: '/onboard/existing' },
       { label: 'Agent Setup', href: '/onboard/agent' },
-      { label: 'Dashboard Only', href: '/onboard/dashboard-only' },
-    ],
+      { label: 'Dashboard Only', href: '/onboard/dashboard-only' }
+    ]
   },
   {
     title: 'Portal',
     color: 'yellow',
     pages: [
-      { label: 'Developer Portal', href: '/portal' },
-    ],
-  },
+      { label: 'Developer Portal', href: '/portal' }
+    ]
+  }
 ];
 
 const colorMap: Record<string, string> = {
@@ -104,7 +104,7 @@ const colorMap: Record<string, string> = {
   orange: 'border-orange-500/30 bg-orange-500/5',
   green:  'border-green-500/30 bg-green-500/5',
   pink:   'border-pink-500/30 bg-pink-500/5',
-  yellow: 'border-yellow-500/30 bg-yellow-500/5',
+  yellow: 'border-yellow-500/30 bg-yellow-500/5'
 };
 
 const labelColorMap: Record<string, string> = {
@@ -115,7 +115,7 @@ const labelColorMap: Record<string, string> = {
   orange: 'text-orange-400',
   green:  'text-green-400',
   pink:   'text-pink-400',
-  yellow: 'text-yellow-400',
+  yellow: 'text-yellow-400'
 };
 
 export const metadata = { title: 'Founder Testing Hub — ATP' };

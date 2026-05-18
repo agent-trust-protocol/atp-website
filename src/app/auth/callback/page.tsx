@@ -6,6 +6,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 
+function getSafeReturnTo(returnTo: string | null) {
+  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+    return '/portal';
+  }
+
+  return returnTo;
+}
+
+const magicLinkErrors: Record<string, string> = {
+  INVALID_TOKEN: 'This magic link is invalid or has already been used. Please request a new link.',
+  EXPIRED_TOKEN: 'This magic link has expired. Please request a new link.',
+  ATTEMPTS_EXCEEDED: 'This magic link has already been used. Please request a new link.',
+  failed_to_create_user: 'We could not create your account. Please try again or contact support.',
+  failed_to_create_session: 'We could not create your session. Please try again.',
+  new_user_signup_disabled: 'New account creation is disabled for this email.'
+};
+
 export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
@@ -27,16 +44,16 @@ function AuthCallbackContent() {
   useEffect(() => {
     const processCallback = async () => {
       try {
-        // Better Auth handles magic link token verification at /api/auth/magic-link/verify
-        // and OAuth callbacks at /api/auth/callback/*
-        // By the time the user lands here, the session cookie should already be set.
-        // We just need to verify the session exists and redirect.
+        // Magic links should reach this page only after Better Auth verifies
+        // /api/auth/magic-link/verify and sets the session cookie.
 
         // Check for error param (OAuth failures)
         const error = searchParams?.get('error');
         if (error) {
           setStatus('error');
-          setMessage(`Authentication failed: ${error}. Please try again.`);
+          setMessage(
+            magicLinkErrors[error] ?? `Authentication failed: ${error}. Please try again.`
+          );
           return;
         }
 
@@ -57,7 +74,7 @@ function AuthCallbackContent() {
               setStatus('success');
               setMessage('Authentication successful! Redirecting...');
 
-              const returnTo = searchParams?.get('returnTo') || '/portal';
+              const returnTo = getSafeReturnTo(searchParams?.get('returnTo') ?? null);
               setTimeout(() => {
                 router.push(returnTo);
               }, 1000);

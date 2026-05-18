@@ -17,7 +17,7 @@ export default function AdminLoginClient() {
     try {
       const result = await authClient.signIn.email({
         email,
-        password,
+        password
         // No callbackURL — we handle navigation ourselves so the
         // session cookie is fully committed before we navigate.
       });

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 export const metadata = {
   title: 'Integrations — Agent Trust Protocol',
-  description: 'Connect ATP with your existing AI stack. Native integrations for LangChain, MCP, OpenClaw, and more.',
+  description: 'Connect ATP with your existing AI stack. Native integrations for LangChain, MCP, OpenClaw, and more.'
 };
 
 const integrations = [
@@ -18,7 +18,7 @@ const integrations = [
     badges: ['Python', 'Quantum-Safe', 'AI Agents'],
     badgeColors: ['bg-yellow-500/10 text-yellow-400 border-yellow-500/20', 'bg-blue-500/10 text-blue-400 border-blue-500/20', 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'],
     color: 'from-yellow-500/20 to-yellow-600/5',
-    border: 'border-yellow-500/20',
+    border: 'border-yellow-500/20'
   },
   {
     name: 'Model Context Protocol',
@@ -28,7 +28,7 @@ const integrations = [
     badges: ['TypeScript', 'Zero-Trust', 'Serverless'],
     badgeColors: ['bg-blue-500/10 text-blue-400 border-blue-500/20', 'bg-purple-500/10 text-purple-400 border-purple-500/20', 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'],
     color: 'from-blue-500/20 to-blue-600/5',
-    border: 'border-blue-500/20',
+    border: 'border-blue-500/20'
   },
   {
     name: 'OpenClaw',
@@ -38,8 +38,8 @@ const integrations = [
     badges: ['Enterprise', 'REST API', 'Multi-Agent'],
     badgeColors: ['bg-purple-500/10 text-purple-400 border-purple-500/20', 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', 'bg-orange-500/10 text-orange-400 border-orange-500/20'],
     color: 'from-purple-500/20 to-purple-600/5',
-    border: 'border-purple-500/20',
-  },
+    border: 'border-purple-500/20'
+  }
 ];
 
 export default function IntegrationsPage() {

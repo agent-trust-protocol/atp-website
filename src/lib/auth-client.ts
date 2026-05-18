@@ -33,12 +33,24 @@ export const signInWithGithub = () => {
   return authClient.signIn.social({ provider: 'github' });
 };
 
-// Magic link sign-in — routes through /auth/callback so the session confirmation
-// screen shows before the browser lands on the protected destination.
+function getSafeReturnTo(returnTo?: string) {
+  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+    return '/portal';
+  }
+
+  return returnTo;
+}
+
+// Magic link sign-in — Better Auth first verifies the token at
+// /api/auth/magic-link/verify, then redirects here after the session cookie is set.
 export const signInWithMagicLink = (email: string, returnTo?: string) => {
-  const dest = returnTo || '/portal';
+  const dest = getSafeReturnTo(returnTo);
   const callbackURL = `/auth/callback?returnTo=${encodeURIComponent(dest)}`;
-  return authClient.signIn.magicLink({ email, callbackURL });
+  return authClient.signIn.magicLink({
+    email,
+    callbackURL,
+    errorCallbackURL: callbackURL
+  });
 };
 
 // Helper hooks for common auth operations

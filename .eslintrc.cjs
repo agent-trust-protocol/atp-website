@@ -75,6 +75,7 @@ module.exports = {
     }
   ],
   ignorePatterns: [
+    'src/workflow-engine/**',
     'dist/',
     'node_modules/',
     'coverage/',

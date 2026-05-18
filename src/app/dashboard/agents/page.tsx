@@ -26,7 +26,7 @@ const DEMO_AGENTS: Agent[] = [
     organization: 'Acme Corp',
     trustLevel: 'enterprise',
     status: 'active',
-    lastSeen: '2 minutes ago',
+    lastSeen: '2 minutes ago'
   },
   {
     id: '2',
@@ -35,7 +35,7 @@ const DEMO_AGENTS: Agent[] = [
     organization: 'DataOps Inc',
     trustLevel: 'verified',
     status: 'active',
-    lastSeen: '18 minutes ago',
+    lastSeen: '18 minutes ago'
   },
   {
     id: '3',
@@ -44,7 +44,7 @@ const DEMO_AGENTS: Agent[] = [
     organization: '',
     trustLevel: 'basic',
     status: 'inactive',
-    lastSeen: '3 days ago',
+    lastSeen: '3 days ago'
   },
   {
     id: '4',
@@ -53,8 +53,8 @@ const DEMO_AGENTS: Agent[] = [
     organization: 'SRE Team',
     trustLevel: 'premium',
     status: 'active',
-    lastSeen: '5 minutes ago',
-  },
+    lastSeen: '5 minutes ago'
+  }
 ];
 
 function trustLevelIcon(level: string) {

@@ -1,0 +1,1227 @@
+{
+  "/Users/jacklu/Documents/atp-website/tailwind.config.js": {
+    "mtime": 1779116977.1059802,
+    "ast_hash": "2e0d128eab30e3f79b1e9845d657bb89",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/vercel.json": {
+    "mtime": 1779116977.106115,
+    "ast_hash": "18153b8758b7af7abcfe5056eda29969",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/next.config.js": {
+    "mtime": 1779116976.9279618,
+    "ast_hash": "97d74558e7b389a486d7e4705df49176",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/next-env.d.ts": {
+    "mtime": 1779116976.9278762,
+    "ast_hash": "3d7a37ab27b6abb660752aa3bd94b2b8",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/package.json": {
+    "mtime": 1779116976.9317122,
+    "ast_hash": "2cd39c473edd4441efce893f35c93276",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/components.json": {
+    "mtime": 1779116976.923747,
+    "ast_hash": "cbdcc1bb25b8814b5d32d7a292894aca",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/tsconfig.json": {
+    "mtime": 1779116977.1060452,
+    "ast_hash": "5c18ca0933eaef6da5b65af895d4b8b2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/playwright.config.ts": {
+    "mtime": 1779116976.9317975,
+    "ast_hash": "e05c9b2332e69f8df9756663af378271",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/eslint.config.js": {
+    "mtime": 1779119320.4300044,
+    "ast_hash": "507bd7b900f4eaf97e36daf4f9c09d16",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/postcss.config.js": {
+    "mtime": 1779116976.931925,
+    "ast_hash": "ef6e40de3eeede34ff3cfe3949778384",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/demo/server.js": {
+    "mtime": 1779116976.9268253,
+    "ast_hash": "06997c8af1f9650325426b1d0a55c274",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/demo/demo.js": {
+    "mtime": 1779116976.9256654,
+    "ast_hash": "3dfe00fd8d491d64b5863923cce7d54f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/install.sh": {
+    "mtime": 1779116977.0327682,
+    "ast_hash": "981b5e2df665b585d367bee118c95420",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/install.ps1": {
+    "mtime": 1779116977.0325546,
+    "ast_hash": "c12ec6a113c86415387511d5c0179620",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/e2e/onboarding.spec.ts": {
+    "mtime": 1779116976.927076,
+    "ast_hash": "cc4ae4e8e2878b56c3566e0b9426cb76",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/middleware.ts": {
+    "mtime": 1779119320.4346087,
+    "ast_hash": "5c93dc4a7f1d87213e3c99b48dffcb7a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/index.ts": {
+    "mtime": 1779116977.1036816,
+    "ast_hash": "e66ebffdbb64d6f6dbe4c4953e5782ee",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/database/schema.ts": {
+    "mtime": 1779116977.1036057,
+    "ast_hash": "2e6d1911756e42bf82ad5495117ff844",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/database/repository.ts": {
+    "mtime": 1779116977.103533,
+    "ast_hash": "b44a3a6d28a2c2733827b45ddb440383",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/database/connection.ts": {
+    "mtime": 1779116977.1028912,
+    "ast_hash": "32e0e87492856661fd6a40e71e5e2a25",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/types/WorkflowTypes.ts": {
+    "mtime": 1779116977.1057167,
+    "ast_hash": "3e20a61ec8a7605e0e0fe61e337877d9",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/core/WorkflowEngine.ts": {
+    "mtime": 1779116977.1022937,
+    "ast_hash": "b047b566ff9b2e5d9a0db8caafba3cdc",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/core/NodeRegistry.ts": {
+    "mtime": 1779116977.1007447,
+    "ast_hash": "a19bf93bbf790ecdada5cd28bb1396ee",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/config/WorkflowConfig.ts": {
+    "mtime": 1779116977.1006343,
+    "ast_hash": "98411f2678bb729a6478db6baf341c92",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/nodes/atp/TrustNodes.tsx": {
+    "mtime": 1779116977.104577,
+    "ast_hash": "26a6bd0c699c9de1b775279ede23e6b3",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/nodes/atp/PolicyNodes.tsx": {
+    "mtime": 1779116977.1044014,
+    "ast_hash": "dadb3103a2adc9f8a460faaac5cb057e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/nodes/atp/MonitoringNodes.tsx": {
+    "mtime": 1779116977.104203,
+    "ast_hash": "09e61f249dfefd59516ce829dfabc01b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/integration/ATPIntegration.ts": {
+    "mtime": 1779116977.1039035,
+    "ast_hash": "14554572c7b2251ed34869c1d2ebf539",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/utils/ErrorHandler.ts": {
+    "mtime": 1779116977.1059022,
+    "ast_hash": "94a96f24558dad6ce6c02db1440223d3",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/__tests__/NodeRegistry.test.ts": {
+    "mtime": 1779116977.0994446,
+    "ast_hash": "a79c7d20415fbce76e95a7ec646907e3",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/__tests__/WorkflowStore.test.ts": {
+    "mtime": 1779116977.0999212,
+    "ast_hash": "7f4af2d6fc4a5c076d186f870dd7f9fb",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/__tests__/WorkflowEngine.test.ts": {
+    "mtime": 1779116977.099564,
+    "ast_hash": "36f75ff06be8b4252692639395eccbdf",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/__tests__/integration.test.ts": {
+    "mtime": 1779116977.100128,
+    "ast_hash": "dce2701a0f7c001d83f484bf3bc52c75",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/api/routes.ts": {
+    "mtime": 1779116977.100321,
+    "ast_hash": "a0b38e94660e039a23ddf558ae96e7e0",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/api/server.ts": {
+    "mtime": 1779116977.1004262,
+    "ast_hash": "2ef1a12f565552f7367a8caab8cf5b61",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/services/WorkflowScheduler.ts": {
+    "mtime": 1779116977.1050718,
+    "ast_hash": "43b4e7f43be3c4a50b1d34d438601008",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/services/WorkflowEventService.ts": {
+    "mtime": 1779116977.104885,
+    "ast_hash": "a4153f6897f2798c753d5d6a6210fe13",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/workflow-engine/store/WorkflowStore.ts": {
+    "mtime": 1779116977.1054726,
+    "ast_hash": "b151cafb2ae213eb7e1f7fe954dbd8a9",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/layout.tsx": {
+    "mtime": 1779116977.0741339,
+    "ast_hash": "2baf71a8db42ea5654c7aca045523c01",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/error.tsx": {
+    "mtime": 1779116977.0715334,
+    "ast_hash": "4cf6560c611df0eb2aa319187aa3009b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/page.tsx": {
+    "mtime": 1779116977.0760555,
+    "ast_hash": "96857ee1436475d3bf7a65236c074651",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/global-error.tsx": {
+    "mtime": 1779116977.072187,
+    "ast_hash": "0b2bbfb2fb95a9b60b885e6c67ec0fce",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/not-found.tsx": {
+    "mtime": 1779116977.074778,
+    "ast_hash": "d4a76953698eff39c613d5bfac03116f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/contact/page.tsx": {
+    "mtime": 1779116977.0679507,
+    "ast_hash": "02bce33e0cd8fc8710d966b4be5d0089",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/portal/page.tsx": {
+    "mtime": 1779116977.0788157,
+    "ast_hash": "e1a872e12f70f512ef294c196cbbfc7f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/portal/client-page.tsx": {
+    "mtime": 1779116977.0787463,
+    "ast_hash": "3ecc9643ba91835df215f199b7f13e2d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/privacy/page.tsx": {
+    "mtime": 1779116977.0793207,
+    "ast_hash": "1fae230acd436dfa4984844a63720ec8",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/playground/page.tsx": {
+    "mtime": 1779116977.0771153,
+    "ast_hash": "2e334807c7098a34ea17705a62942706",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/enterprise/page.tsx": {
+    "mtime": 1779116977.0714517,
+    "ast_hash": "ee284127829512ecbfb6c236644f7782",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/enterprise/contact/page.tsx": {
+    "mtime": 1779116977.0707896,
+    "ast_hash": "fd3eb5a261e29919c7a17b62c5547876",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/policy-editor/page.tsx": {
+    "mtime": 1779116977.0779803,
+    "ast_hash": "caa857db291cf4b9032a1b4405573e54",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/auth/callback/page.tsx": {
+    "mtime": 1779117781.7423062,
+    "ast_hash": "2ed13c8eae6b8ef465b180dffe5c4093",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/signup/page.tsx": {
+    "mtime": 1779116977.0804749,
+    "ast_hash": "1439b86b3188b594fe431c7d24f6f038",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/signup/client-page.tsx": {
+    "mtime": 1779116977.080408,
+    "ast_hash": "e51427a039c6e83e59a129fe336289fc",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api-reference/gated.tsx": {
+    "mtime": 1779116977.0600286,
+    "ast_hash": "307371530f48ddcc5efe295ab11d9a74",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api-reference/page.tsx": {
+    "mtime": 1779116977.0603814,
+    "ast_hash": "d8462c1cae5211ffd591639a1c73249b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/terms/page.tsx": {
+    "mtime": 1779116977.0805905,
+    "ast_hash": "fa7e21dd4300ae8bdc6a18982b089dc6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/admin/layout.tsx": {
+    "mtime": 1779116977.0595462,
+    "ast_hash": "801570839cd6536a2a20811045d133a5",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/admin/page.tsx": {
+    "mtime": 1779119292.4541442,
+    "ast_hash": "910ee6d9a5583d294f35ab5ba5a769bd",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/admin/login/page.tsx": {
+    "mtime": 1779116977.0597498,
+    "ast_hash": "9e3d7b3124418eae721e52f4b8b63b74",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/admin/login/client-page.tsx": {
+    "mtime": 1779119292.4538012,
+    "ast_hash": "7198702bd3683025d133be512c621ac6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/request-access/page.tsx": {
+    "mtime": 1779116977.07952,
+    "ast_hash": "addd77edbc18dfef6c6112b0ed57af8b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/docs/page.tsx": {
+    "mtime": 1779116977.0704658,
+    "ast_hash": "9a3559eeb8d1569ccf6308adaeb49442",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/onboard/page.tsx": {
+    "mtime": 1779116977.075619,
+    "ast_hash": "e9e15d8bb3403f1f4e26e1ac0e076ec2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/onboard/agent/page.tsx": {
+    "mtime": 1779116977.075123,
+    "ast_hash": "8ff9bee20e04bfe6049bea213ba07003",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/onboard/agent/client-page.tsx": {
+    "mtime": 1779116977.0750504,
+    "ast_hash": "a28279b796f27cdd31c96865a87bb397",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/onboard/new/page.tsx": {
+    "mtime": 1779116977.075515,
+    "ast_hash": "31c95ab033f6e2f6add8cea5c8077cf8",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/onboard/existing/page.tsx": {
+    "mtime": 1779116977.0753694,
+    "ast_hash": "7eefddac6a43371e03f77b714bb9f9e6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/onboard/dashboard-only/page.tsx": {
+    "mtime": 1779116977.0752366,
+    "ast_hash": "c386cd145f4de5e1ba5c1910109e5c7e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/policies/page.tsx": {
+    "mtime": 1779116977.0772476,
+    "ast_hash": "1c83bcf6680d123c8a21184c403ae36a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/policy-testing/layout.tsx": {
+    "mtime": 1779116977.0780916,
+    "ast_hash": "848a48029465874ccdca85183a4f4e7f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/policy-testing/page.tsx": {
+    "mtime": 1779116977.0785494,
+    "ast_hash": "ae4911f344715d41e901c69f4f8ad542",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/page.tsx": {
+    "mtime": 1779116977.0684953,
+    "ast_hash": "cda3465d524f2e618d79d6688152fe6d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/layout.tsx": {
+    "mtime": 1779116977.0690165,
+    "ast_hash": "2867ea5aa1f3ddce5130e59c146235b4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/page.tsx": {
+    "mtime": 1779116977.0693305,
+    "ast_hash": "c6dc4bb8bc51795089d2dc243076e4f1",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/nodes/page.tsx": {
+    "mtime": 1779116977.0692453,
+    "ast_hash": "98a372c422c388f95473f3bb9bd461c6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/health/page.tsx": {
+    "mtime": 1779116977.0689464,
+    "ast_hash": "e118efdb0ac06ebea552cf7a7af0df4c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/executions/page.tsx": {
+    "mtime": 1779116977.068834,
+    "ast_hash": "4348ed4ad8b3a549323cd5912e975a2a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/designer/layout.tsx": {
+    "mtime": 1779116977.0686548,
+    "ast_hash": "64c86e66c057536a1228d66adbae35a6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/workflows/designer/page.tsx": {
+    "mtime": 1779116977.0687263,
+    "ast_hash": "49df13aa789b276463be5b2a2419e8ec",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/agents/page.tsx": {
+    "mtime": 1779119430.324732,
+    "ast_hash": "32fe9c5c733874418e053c3d6057f943",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/dashboard/agents/new/page.tsx": {
+    "mtime": 1779116977.068307,
+    "ast_hash": "3c29bc725d4dad321855ad0db7b97755",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/integrations/page.tsx": {
+    "mtime": 1779119430.3851707,
+    "ast_hash": "e7a7dfca04f036c79d68fd3277a2df0c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/integrations/openclaw/page.tsx": {
+    "mtime": 1779116977.073933,
+    "ast_hash": "342da67fad264ee73b788c25e8d9e345",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/integrations/openclaw/agents/page.tsx": {
+    "mtime": 1779116977.0732024,
+    "ast_hash": "333767919242a3031178d3aa9ccdfc0c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/integrations/langchain/page.tsx": {
+    "mtime": 1779116977.0725758,
+    "ast_hash": "a9573532cde94794ec0f645f8f79b874",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/integrations/mcp/page.tsx": {
+    "mtime": 1779116977.0730143,
+    "ast_hash": "e6895cd8039af0400c4cf55ad0a61ebd",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/verify-email/page.tsx": {
+    "mtime": 1779116977.0806952,
+    "ast_hash": "deeec32a5c3b4d690bfc0937d380009f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/sales-guide/page.tsx": {
+    "mtime": 1779116977.0800858,
+    "ast_hash": "e81e1854a95df2630f65583af10014ba",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/examples/page.tsx": {
+    "mtime": 1779116977.0720785,
+    "ast_hash": "5165ef315b8945a827ec108f0b639ec5",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/cloud/layout.tsx": {
+    "mtime": 1779116977.067056,
+    "ast_hash": "1eaa07e9e5de3add9e0cdce5a8ee35af",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/cloud/page.tsx": {
+    "mtime": 1779116977.067307,
+    "ast_hash": "8b0006a3070643b07b59fa2225b4c38f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/cloud/tenants/page.tsx": {
+    "mtime": 1779116977.0676143,
+    "ast_hash": "c303d3918d7736420f2c1aa145166f59",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/cloud/services/page.tsx": {
+    "mtime": 1779116977.0674849,
+    "ast_hash": "260a8b64d2c9a0e25215224aaa2bc090",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/cloud/analytics/page.tsx": {
+    "mtime": 1779116977.0667574,
+    "ast_hash": "cb07a6800c82f8ff01be1ec432a840b2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/test-magic-link/route.ts": {
+    "mtime": 1779117781.6777627,
+    "ast_hash": "ca4a7a298b218fe73019c1768743b1d6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/middleware/rate-limit.ts": {
+    "mtime": 1779116977.0630226,
+    "ast_hash": "e626c2ea11745768c0f7d1add2f4a785",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/crypto/generate-signature/route.ts": {
+    "mtime": 1779116977.0618181,
+    "ast_hash": "43843f9ac87262c94a929dbe441fab52",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/crypto/verify-signature/route.ts": {
+    "mtime": 1779116977.062015,
+    "ast_hash": "306aace838b9666de5cd6e9de5fef2d1",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/contact/route.ts": {
+    "mtime": 1779116977.061651,
+    "ast_hash": "b67688fe8a21dee27876d05ee9ea6070",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/enterprise/contact/route.ts": {
+    "mtime": 1779116977.0621912,
+    "ast_hash": "73f9276cd04848def0508afa8e18a96d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/auth/[...all]/route.ts": {
+    "mtime": 1779116977.0611413,
+    "ast_hash": "398609b356930d40063f8e64b6b15321",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/auth/verify-email/route.ts": {
+    "mtime": 1779116977.0612733,
+    "ast_hash": "1454e3487257b77ac2c0ebc78603868a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/health/route.ts": {
+    "mtime": 1779116977.062504,
+    "ast_hash": "aa27d36e3c6bb0741d0986887bf99d23",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/admin/setup/route.ts": {
+    "mtime": 1779119292.4538825,
+    "ast_hash": "143404e03facca411995531545be6017",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/workflows/route.ts": {
+    "mtime": 1779116977.0662606,
+    "ast_hash": "a86875c609b841539a22ed464b8d2683",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/workflows/nodes/route.ts": {
+    "mtime": 1779116977.0661821,
+    "ast_hash": "6838cdd32b1d56e43d4616aeaf52b813",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/workflows/health/route.ts": {
+    "mtime": 1779116977.066077,
+    "ast_hash": "9450409c68dc51aff0dd1797f1f89710",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/workflows/executions/active/route.ts": {
+    "mtime": 1779116977.0659764,
+    "ast_hash": "e1686839c2e55508e5cc6fb2f4f6ba55",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/agents/onboard/route.ts": {
+    "mtime": 1779116977.0607936,
+    "ast_hash": "cf118c6023e32159bca8e663b9044fdc",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/request-access/route.ts": {
+    "mtime": 1779116977.065162,
+    "ast_hash": "4ea6f44e5f469eb6166000b7ebd5dec5",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/policies/validate/route.ts": {
+    "mtime": 1779116977.064874,
+    "ast_hash": "8e9fc058670244d6231ce9b6a63fe2b2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/policies/evaluate/route.ts": {
+    "mtime": 1779116977.0640862,
+    "ast_hash": "de0caf3939b7b1c4b26fa8ac40878eb1",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/approve-access/route.ts": {
+    "mtime": 1779116977.0609243,
+    "ast_hash": "a24a40f9b0b672aa6ca75ee5c206f609",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/github/stats/route.ts": {
+    "mtime": 1779116977.0623646,
+    "ast_hash": "bcbda7ac3e2da93285042bcfac247f69",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/sdk/metrics/route.ts": {
+    "mtime": 1779116977.0656774,
+    "ast_hash": "0d00c2d1eca617602310bbe046a33f46",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/sdk/health/route.ts": {
+    "mtime": 1779116977.065312,
+    "ast_hash": "f3a2a2a2b75f6abde14a656eb1ca2f6a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/sdk/keys/route.ts": {
+    "mtime": 1779116977.0654402,
+    "ast_hash": "6c6054e7eac9d71f4cc8d33335512c75",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/cloud/access-request/route.ts": {
+    "mtime": 1779116977.061513,
+    "ast_hash": "e9e96c69831e917a1e9ebcd6c65f8906",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/monitoring/route.ts": {
+    "mtime": 1779116977.0635078,
+    "ast_hash": "1d0e10ccc56d93757fe21bb3702f618e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/monitoring/metrics/route.ts": {
+    "mtime": 1779116977.06342,
+    "ast_hash": "61fef5c4554848484a7d872ae52a6e0f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/monitoring/alerts/route.ts": {
+    "mtime": 1779116977.0632517,
+    "ast_hash": "cc735e02de667e46e749df885f6efe89",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/monitoring/services/route.ts": {
+    "mtime": 1779116977.0636456,
+    "ast_hash": "87670404242ad97194cab893f6848bc4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/invites/validate/route.ts": {
+    "mtime": 1779116977.0628695,
+    "ast_hash": "295218350d443fb073519a4bd32f9be0",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/invites/consume/route.ts": {
+    "mtime": 1779116977.0627122,
+    "ast_hash": "6260b8830a31b5348cdb3da47b783873",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/npm/stats/route.ts": {
+    "mtime": 1779116977.063831,
+    "ast_hash": "544989fe86af1f6988289be23657227e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/api/preflight/route.ts": {
+    "mtime": 1779116977.065006,
+    "ast_hash": "601a3809030665a797f35b87a31fea78",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/reset-password/page.tsx": {
+    "mtime": 1779116977.0796487,
+    "ast_hash": "ba2943cc020651944382bcdcee23c87d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/maintenance/page.tsx": {
+    "mtime": 1779116977.074496,
+    "ast_hash": "ddc8d44ac5b43f5de6044fc70c1b2406",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/monitoring/layout.tsx": {
+    "mtime": 1779116977.0746088,
+    "ast_hash": "abdfb30cc778159cb19c1c37da2520b2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/monitoring/page.tsx": {
+    "mtime": 1779116977.074695,
+    "ast_hash": "bb30d64a07bed2bd6ece45043515972d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/pricing/pricing-toggle.tsx": {
+    "mtime": 1779116977.0792122,
+    "ast_hash": "943914c51ce402d057bee68a582d0209",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/pricing/pricing-calculator.tsx": {
+    "mtime": 1779116977.0791466,
+    "ast_hash": "7e2ec12a55f25795fa3d3d014ca5d0e7",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/pricing/page.tsx": {
+    "mtime": 1779116977.079057,
+    "ast_hash": "22281135bb898f51a139fa6bd2c91006",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/demos/page.tsx": {
+    "mtime": 1779116977.0695012,
+    "ast_hash": "2dfbe89869dfb0efb01d005aed0fefb0",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/login/page.tsx": {
+    "mtime": 1779116977.0743833,
+    "ast_hash": "7e61e8b536c88c0530f4f2a7462e1646",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/login/client-page.tsx": {
+    "mtime": 1779116977.0743022,
+    "ast_hash": "0392afe61ebd629a4e924ca8165c8181",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/app/developers/page.tsx": {
+    "mtime": 1779116977.0699282,
+    "ast_hash": "fbefd64ad69dadb1dd3c6cfb6092b55d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/theme-provider.tsx": {
+    "mtime": 1779116977.0912366,
+    "ast_hash": "854eaaf65670dadd9ac417f96499338e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/clerk-error-boundary.tsx": {
+    "mtime": 1779116977.09042,
+    "ast_hash": "9ed4dec76c43f9b23d9252b9819ef6d4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/contact-form.tsx": {
+    "mtime": 1779116977.090516,
+    "ast_hash": "d2c2d6b62a02ecb8e3815afc449cf31e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/navbar.tsx": {
+    "mtime": 1779116977.094404,
+    "ast_hash": "824fc5db4c23b07da949c70187629142",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/tabs.tsx": {
+    "mtime": 1779116977.0955615,
+    "ast_hash": "efcc0342d591fc287f63aa378064d0e4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/card.tsx": {
+    "mtime": 1779116977.0930963,
+    "ast_hash": "97a24b27a584d24532b9eeae78456984",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/hydration-safe.tsx": {
+    "mtime": 1779116977.0939958,
+    "ast_hash": "0d4d1d6deda5e83ba7c3237a2f4c8d7f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/progress.tsx": {
+    "mtime": 1779116977.0944777,
+    "ast_hash": "6082e2fa1708e911036562497acb7af2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/animated-icon.tsx": {
+    "mtime": 1779116977.091621,
+    "ast_hash": "170ca4c1e1bb13daaf6912f3e508e99c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/brand-logo.tsx": {
+    "mtime": 1779116977.0923846,
+    "ast_hash": "faa353c27d0d31ece1771f8c510448ae",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/scroll-area.tsx": {
+    "mtime": 1779116977.0946708,
+    "ast_hash": "b2482ba5aeb60a125fce669f106b5a13",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/label.tsx": {
+    "mtime": 1779116977.0943177,
+    "ast_hash": "bed87fdbcca76a7e807847e366cc30f0",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/accordion.tsx": {
+    "mtime": 1779116977.09143,
+    "ast_hash": "24c2397925fe5e5491491e231a289254",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/tooltip.tsx": {
+    "mtime": 1779116977.09578,
+    "ast_hash": "d961b90335e60df71464c34ec37f5ae6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/alert.tsx": {
+    "mtime": 1779116977.0915148,
+    "ast_hash": "0eee8f32e5be0abb1b0ef84e54553518",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/subnav.tsx": {
+    "mtime": 1779116977.0951824,
+    "ast_hash": "6b24531da2011b90d6ca81a4c1d0204e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/quick-access.tsx": {
+    "mtime": 1779116977.0945482,
+    "ast_hash": "992f2b882b2b2f01cd79ef83ccf79e7a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/footer.tsx": {
+    "mtime": 1779116977.0939078,
+    "ast_hash": "94a96161b836fff3324e45bc99209b6b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/switch.tsx": {
+    "mtime": 1779116977.0952544,
+    "ast_hash": "c3346e06aa8aba19157444321ed201be",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/dialog.tsx": {
+    "mtime": 1779116977.0935905,
+    "ast_hash": "7fa07df94e001a1eac09e65fcded91ac",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/badge.tsx": {
+    "mtime": 1779116977.0920205,
+    "ast_hash": "659bb49e70ce40dff273534798533f96",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/table.tsx": {
+    "mtime": 1779116977.0954537,
+    "ast_hash": "db294a52087fe8945d897582e260637c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/separator.tsx": {
+    "mtime": 1779116977.0949354,
+    "ast_hash": "195b9f8bad0ffa298712ea81b7c20eef",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/atp-icons.tsx": {
+    "mtime": 1779116977.0917697,
+    "ast_hash": "f0ce9a771ae3ae18759e16a1c60c033d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/button.tsx": {
+    "mtime": 1779116977.0928068,
+    "ast_hash": "3b2a32f8f1a5763454ccf38a33432a40",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/theme-toggle.tsx": {
+    "mtime": 1779116977.0957053,
+    "ast_hash": "6c48cede574c9db795238f4b70d64d2c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/checkbox.tsx": {
+    "mtime": 1779116977.0932987,
+    "ast_hash": "d2646cea4b228401556d97a98a7fcb7f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/dropdown-menu.tsx": {
+    "mtime": 1779116977.0937257,
+    "ast_hash": "a310ec532b1e31165282e8561fccaefc",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/select.tsx": {
+    "mtime": 1779116977.094809,
+    "ast_hash": "fc70548649f64f2d9a94b49ed50befb5",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/textarea.tsx": {
+    "mtime": 1779116977.0956306,
+    "ast_hash": "1b76da3fee66abecada6e78d73642311",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/input.tsx": {
+    "mtime": 1779116977.09408,
+    "ast_hash": "27ade286c004ad5d2c2a8ca4333d3ef7",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/ui/skeleton.tsx": {
+    "mtime": 1779116977.0950937,
+    "ast_hash": "7fe7150f3314c29752b6a95d7ccbc322",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/auth/RequireAuth.tsx": {
+    "mtime": 1779116977.0902514,
+    "ast_hash": "139512113307ffad0d65ce21941aed4b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/auth/CloudAccessGate.tsx": {
+    "mtime": 1779116977.0898666,
+    "ast_hash": "ecdc2f664198d8dc8fdc90d150fbf550",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/WorkflowDashboard.tsx": {
+    "mtime": 1779116977.0810401,
+    "ast_hash": "e551770d1750f83498d5ab348945de31",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/demo-dashboard.tsx": {
+    "mtime": 1779116977.084574,
+    "ast_hash": "11224bcae9858163cae7edd8a6455e35",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/quantum-safe-signature-demo.tsx": {
+    "mtime": 1779116977.0872114,
+    "ast_hash": "83beb2ff4dbe1d72dc0812c43d30b974",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/performance-metrics-preview.tsx": {
+    "mtime": 1779116977.0862958,
+    "ast_hash": "874cee9ecb491f8d47b3cde756b497b7",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/WorkflowDesigner.tsx": {
+    "mtime": 1779116977.0818822,
+    "ast_hash": "3bd12b65ad41d041f9b6e7dbcbf149f4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/enterprise-dashboard.tsx": {
+    "mtime": 1779116977.0850775,
+    "ast_hash": "d171ec349fe72787446e00294bb04ebb",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/advanced-metrics.tsx": {
+    "mtime": 1779116977.0841196,
+    "ast_hash": "b9ae387d9d8cea1fe7a2a6e90640b148",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/animated-counter.tsx": {
+    "mtime": 1779116977.0842004,
+    "ast_hash": "8aaecb7c6fcf7ad082a015c8a7db0e22",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/WorkflowExecutionHistory.tsx": {
+    "mtime": 1779116977.0820286,
+    "ast_hash": "160f636655aee6eccb347f4359a94d6d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/policy-management.tsx": {
+    "mtime": 1779116977.0867288,
+    "ast_hash": "8b24240220fb8da7b5c1b9e1ccd0906e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/policy-testing-framework.tsx": {
+    "mtime": 1779116977.08689,
+    "ast_hash": "4ae9b4cb6a47df9f684148feb97f5abd",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/enhanced-dashboard.tsx": {
+    "mtime": 1779116977.0846987,
+    "ast_hash": "9329119b11dba48aceb202650970ae0f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/WorkflowNodesCatalog.tsx": {
+    "mtime": 1779116977.0824146,
+    "ast_hash": "ff1ed2fc8a072ddc7c6bb4318d53d6bd",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/demo-dashboard-simple.tsx": {
+    "mtime": 1779116977.0844333,
+    "ast_hash": "da7c1d62b21abcee67ae897e37ae5720",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/enhanced-workflow-designer.tsx": {
+    "mtime": 1779116977.0849094,
+    "ast_hash": "e508cd5931a180e8f96272bb4be24794",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/dashboard-stats.tsx": {
+    "mtime": 1779116977.084349,
+    "ast_hash": "841dad610544ff9d4a863b325448b6b7",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/WorkflowSystemHealth.tsx": {
+    "mtime": 1779116977.0834737,
+    "ast_hash": "5e6c26ab7f32408906d1c14dbed0cdae",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/visual-policy-editor-demo.tsx": {
+    "mtime": 1779116977.088471,
+    "ast_hash": "85fb5b57fa53614eaa6e8d780ce975ca",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/live-agent-dashboard.tsx": {
+    "mtime": 1779116977.0851703,
+    "ast_hash": "3c88dbbb9365b5faecd6233753ebedac",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/quantum-signature-demo.tsx": {
+    "mtime": 1779116977.0872874,
+    "ast_hash": "8b9fe8302e7496cf8742b8e6c2864f64",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/monitoring-dashboard.tsx": {
+    "mtime": 1779116977.0858996,
+    "ast_hash": "f515e3c850c104cb675bae72968ea912",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/monitoring-demo.tsx": {
+    "mtime": 1779116977.086019,
+    "ast_hash": "d9a3840a24004c6fbb65bd8bc9c91048",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/trust-level-demo.tsx": {
+    "mtime": 1779116977.0874453,
+    "ast_hash": "80257cbfd1f180d39f8c3b6d3df99ab2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/code-playground.tsx": {
+    "mtime": 1779116977.084283,
+    "ast_hash": "5e84b024a9fd622008f8c7bbef499255",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/trust-level-management-demo.tsx": {
+    "mtime": 1779116977.0876238,
+    "ast_hash": "e83973e4f7aef5b29725944ac4b74031",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/live-policy-dashboard.tsx": {
+    "mtime": 1779116977.085703,
+    "ast_hash": "7990915037b1f392a82d343f110a8c1c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/user-management.tsx": {
+    "mtime": 1779116977.0877566,
+    "ast_hash": "d4a1939c58e7b47bdeb0f7b14a34b254",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/workflow-designer-layout.tsx": {
+    "mtime": 1779116977.0895143,
+    "ast_hash": "788ebbf4a4a4ec48b523a30918dae723",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/quantum-safe-signature-demo-gated.tsx": {
+    "mtime": 1779116977.086971,
+    "ast_hash": "746b729e518ea8d297879fd1293d52b6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/quantum-safe-signature-demo-lite.tsx": {
+    "mtime": 1779116977.0870435,
+    "ast_hash": "8144c17714b97f09ca43217d9b76b578",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/atp/visual-policy-editor.tsx": {
+    "mtime": 1779116977.0891185,
+    "ast_hash": "63541fdf921e7e291619f0898db0ab40",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/onboard/ExecutionLog.tsx": {
+    "mtime": 1779116977.0909123,
+    "ast_hash": "5a155a0f7885c8a851f77435ad181b23",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/components/onboard/PreflightCheck.tsx": {
+    "mtime": 1779116977.0911481,
+    "ast_hash": "3b3a7eb1f6fcd0599cbcaac006360d5b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/hooks/use-performance.ts": {
+    "mtime": 1779116977.095932,
+    "ast_hash": "9e36b8c943eefaf177a44ce69b9af593",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/hooks/use-sdk-metrics.ts": {
+    "mtime": 1779116977.0960152,
+    "ast_hash": "9ae2c2a67604865642d55696747e1f1f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/hooks/useHydrationSafe.ts": {
+    "mtime": 1779116977.0960886,
+    "ast_hash": "74f15126c57cacf1b100475103730ebb",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/performance.ts": {
+    "mtime": 1779116977.097679,
+    "ast_hash": "1272d5f3db7498f410c556092142fbd7",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/api-auth.ts": {
+    "mtime": 1779116977.096256,
+    "ast_hash": "963093d38c21d6a46d2738cb80d15151",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/email.ts": {
+    "mtime": 1779117111.9897337,
+    "ast_hash": "3055e239d34ee42f13eee89c73a39b65",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/utils.ts": {
+    "mtime": 1779116977.0980608,
+    "ast_hash": "45c84aaf6a64436ca92df6f79f12fea5",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/rate-limiter.ts": {
+    "mtime": 1779116977.097772,
+    "ast_hash": "da30e89c2a1eb5e5a1fd763c05d60877",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/geo-blocking.ts": {
+    "mtime": 1779116977.0972033,
+    "ast_hash": "3bfc9c7d9429b86cd48b4f8a3e1ace8f",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/auth-logger.ts": {
+    "mtime": 1779116977.096558,
+    "ast_hash": "74029537d437b60a314a064ffafdbce5",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/log-storage.ts": {
+    "mtime": 1779116977.0974958,
+    "ast_hash": "81dbccb3c3fb177be2d9a6dd87947846",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/db.ts": {
+    "mtime": 1779116977.0968497,
+    "ast_hash": "c022bf4c38880b3b91e0aa7624acb06a",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/auth.ts": {
+    "mtime": 1779119430.4579167,
+    "ast_hash": "568c0f9ee8accd820881978747c24957",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/lib/auth-client.ts": {
+    "mtime": 1779117111.7779691,
+    "ast_hash": "3cfd8c406883dbcdb64458f097eaae41",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/pages/_error.tsx": {
+    "mtime": 1779116977.098513,
+    "ast_hash": "415a0011193be45d8c66a1cd1a50c140",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/pages/_document.tsx": {
+    "mtime": 1779116977.0984385,
+    "ast_hash": "c3c44878298ff55610fa467ac45b798e",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/quantum/quantum-safe-base-server.js": {
+    "mtime": 1779116977.0988889,
+    "ast_hash": "15fcb1b9f2f40133deba10f725fbd49b",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/quantum/quantum-safe-server-improved-v2.js": {
+    "mtime": 1779116977.098985,
+    "ast_hash": "a6eafbf7306f57d219fb78781e86ac01",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/quantum/quantum-crypto-utils.js": {
+    "mtime": 1779116977.098685,
+    "ast_hash": "f03882dc5f05ca53b9c17c7e26912747",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/src/quantum/quantum-safe-server-standalone.js": {
+    "mtime": 1779116977.099087,
+    "ast_hash": "ae82776d80a781e6ebf113c346ef2962",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/README.md": {
+    "mtime": 1779116976.8409567,
+    "ast_hash": "aaa0cafd8cbcdceb5b9905481bdff4a9",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/VERCEL_DEPLOYMENT.md": {
+    "mtime": 1779117112.1946084,
+    "ast_hash": "4bfcaf99e0cadce93c68e9defb5b28a2",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/demo/index.html": {
+    "mtime": 1779116976.9260762,
+    "ast_hash": "a555cd7cc1f6714c26a730e04f4aac94",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/demo/docker-compose.demo.yml": {
+    "mtime": 1779116976.9258504,
+    "ast_hash": "3da5a433c732185374a5a2b9bde4024d",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/demo/README.md": {
+    "mtime": 1779116976.9250846,
+    "ast_hash": "f1e78a1aa5014e9384ae5ad6b6c81ce6",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/demo/DEMO-DEPLOYMENT-GUIDE.md": {
+    "mtime": 1779116976.9239006,
+    "ast_hash": "125089938c25c0709511aa1d73de4368",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/500.html": {
+    "mtime": 1779116976.9323072,
+    "ast_hash": "8d52ddf0a0f2a6bfed2d37f08fad1117",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/404.html": {
+    "mtime": 1779116976.9322305,
+    "ast_hash": "2539f9931309b0888f7784a4c4e65179",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/brand/README.txt": {
+    "mtime": 1779116976.9447906,
+    "ast_hash": "4717e2e71ae96ee452a193410be73d54",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/whitepaper/atp-whitepaper.pdf": {
+    "mtime": 1779116977.0564733,
+    "ast_hash": "475eabbf065b04216cad28ef8c8d9558",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/atp-logo.png": {
+    "mtime": 1779116976.9443216,
+    "ast_hash": "11e981f53f4db73bf33bda0bb3fc259c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/atp-logo.svg": {
+    "mtime": 1779116976.9446778,
+    "ast_hash": "2b66dfaf3646e611178bc3999e8d4398",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/brand/atp-shield-mark.png": {
+    "mtime": 1779116977.0015354,
+    "ast_hash": "b75eef2603f9e8c0d9f0d6c8208087af",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/brand/atp-lockup-light.png": {
+    "mtime": 1779116976.9691732,
+    "ast_hash": "877a6ee6291d80047918f0d7f90c0026",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/brand/atp-favicon-logo-agent-new.png": {
+    "mtime": 1779116976.9561646,
+    "ast_hash": "b75eef2603f9e8c0d9f0d6c8208087af",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/brand/atp-lockup.png": {
+    "mtime": 1779116976.9818327,
+    "ast_hash": "7fcc37a7aba247684de30061999d3ef4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/public/brand/atp-officical-logo-new.png": {
+    "mtime": 1779116976.9922688,
+    "ast_hash": "7fcc37a7aba247684de30061999d3ef4",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/assets/images/atp-shield-favicon-icon.png": {
+    "mtime": 1779116976.9038424,
+    "ast_hash": "e4d51d82c0ddcb156c67c85618628a35",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/assets/images/atp-officical-logo.png": {
+    "mtime": 1779116976.8788671,
+    "ast_hash": "11e981f53f4db73bf33bda0bb3fc259c",
+    "semantic_hash": ""
+  },
+  "/Users/jacklu/Documents/atp-website/assets/images/atp-favicon-logo-agent.png": {
+    "mtime": 1779116976.8582873,
+    "ast_hash": "877a6ee6291d80047918f0d7f90c0026",
+    "semantic_hash": ""
+  }
+}

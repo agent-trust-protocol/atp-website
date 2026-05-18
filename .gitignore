@@ -150,6 +150,8 @@ collections/
 tmp/
 temp/
 .cache/
+graphify-out/cache/
+graphify-out/.graphify_root
 .eslintcache
 .rts2_cache_*/
 .nyc_output/

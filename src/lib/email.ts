@@ -14,6 +14,8 @@ class EmailService {
   private resend: Resend | null = null;
   private fromEmail: string;
   private fromName: string;
+  private provider: string;
+  private isProduction: boolean;
 
   constructor() {
     // Configure email service
@@ -22,6 +24,8 @@ class EmailService {
     const emailProvider = configuredProvider ?? (process.env.RESEND_API_KEY ? 'resend' : 'smtp');
 
     const isDevelopment = process.env.NODE_ENV !== 'production';
+    this.isProduction = !isDevelopment;
+    this.provider = emailProvider;
     this.fromEmail = process.env.EMAIL_FROM || (isDevelopment ? 'onboarding@resend.dev' : 'noreply@agenttrustprotocol.com');
 
     if (emailProvider === 'resend' && !process.env.EMAIL_FROM) {
@@ -67,9 +71,25 @@ class EmailService {
     }
   }
 
+  getStatus() {
+    return {
+      configured: Boolean(this.transporter || this.resend),
+      provider: this.resend ? 'resend' : this.transporter ? this.provider : 'console',
+      fromEmail: this.fromEmail,
+      production: this.isProduction
+    };
+  }
+
   async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
       if (!this.transporter && !this.resend) {
+        if (this.isProduction) {
+          console.error(
+            '❌ Email delivery is not configured in production. Set EMAIL_PROVIDER=resend, RESEND_API_KEY, and EMAIL_FROM to a verified sender.'
+          );
+          return false;
+        }
+
         // Log email clearly for development/testing
         console.log(`\n${  '='.repeat(60)}`);
         console.log('📧 EMAIL (Development Mode - No email provider configured)');
@@ -456,4 +476,3 @@ class EmailService {
 
 // Export singleton instance
 export const emailService = new EmailService();
-

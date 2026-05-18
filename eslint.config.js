@@ -3,7 +3,7 @@ import typescriptParser from '@typescript-eslint/parser';
 import js from '@eslint/js';
 
 export default [
-  { ignores: ['src/workflow-engine/**', 'node_modules/**', 'dist/**', 'coverage/**', '.next/**'] },
+  { ignores: ['src/workflow-engine/**', 'src/workflow-engine/**/*', 'node_modules/**', 'dist/**', 'coverage/**', '.next/**'] },
   js.configs.recommended,
   {
     files: ['src/**/*.ts', 'src/**/*.tsx'],
@@ -23,7 +23,11 @@ export default [
         module: 'readonly',
         require: 'readonly',
         exports: 'readonly',
-        global: 'readonly'
+        global: 'readonly',
+        fetch: 'readonly',
+        window: 'readonly',
+        React: 'readonly',
+        setTimeout: 'readonly'
       }
     },
     plugins: {
@@ -72,6 +76,8 @@ export default [
     ignores: [
       'dist/**',
       'node_modules/**',
+      'src/workflow-engine/**',
+      'src/workflow-engine/**/*',
       'coverage/**',
       '*.js',
       '*.mjs',

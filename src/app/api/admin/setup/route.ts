@@ -41,13 +41,13 @@ export async function POST(req: NextRequest) {
       body: {
         email: founderEmail,
         password,
-        name: name || 'Founder',
-      },
+        name: name || 'Founder'
+      }
     });
 
     return NextResponse.json({
       success: true,
-      message: `Founder account created for ${founderEmail}. You can now log in at /admin/login.`,
+      message: `Founder account created for ${founderEmail}. You can now log in at /admin/login.`
     });
   } catch (err: any) {
     const message = err?.message || 'Setup failed.';
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     if (message.toLowerCase().includes('already') || message.toLowerCase().includes('exists') || message.toLowerCase().includes('duplicate')) {
       return NextResponse.json({
         success: true,
-        message: `Account for ${founderEmail} already exists. Log in at /admin/login.`,
+        message: `Account for ${founderEmail} already exists. Log in at /admin/login.`
       });
     }
     return NextResponse.json({ error: message }, { status: 400 });

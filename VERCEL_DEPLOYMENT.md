@@ -1,11 +1,11 @@
-# Vercel Deployment Guide — ATP Core
+# Vercel Deployment Guide — ATP Website
 
-This guide covers deploying the ATP Core Next.js frontend to Vercel.
+This guide covers deploying the ATP Website Next.js app to Vercel.
 
 ## Quick Start
 
 1. **Connect the repository** to Vercel (https://vercel.com/new)
-   - Select `atp-core` from GitHub
+   - Select `atp-website` from GitHub
    - Vercel auto-detects Next.js
    
 2. **Set environment variables** (see table below)
@@ -23,7 +23,7 @@ This guide covers deploying the ATP Core Next.js frontend to Vercel.
 |-----|--------|---------|-----------|
 | `BETTER_AUTH_SECRET` | `src/lib/auth.ts` | Auth secret for session signing | Generate: `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | `src/lib/auth.ts` | Public auth callback URL | Use your Vercel domain: `https://your-domain.vercel.app` |
-| `DATABASE_URL` | Better Auth & email | PostgreSQL connection | See "Set up PostgreSQL" section below |
+| `DATABASE_URL` | Better Auth & app tables | PostgreSQL connection | Use your Supabase Postgres connection string or another PostgreSQL provider |
 
 ### Recommended (features won't work without these)
 
@@ -85,8 +85,14 @@ Save this value. You'll paste it as `BETTER_AUTH_SECRET` in Vercel Settings → 
 
 **Choose one:**
 
+- **Supabase Postgres** (recommended if Supabase is already connected)
+  1. In Supabase, open Project Settings → Database
+  2. Copy the pooled or direct Postgres connection string
+  3. Set it as `DATABASE_URL` in Vercel
+  4. This uses Supabase as the database only; magic-link emails are still sent by the app through Resend
+
 - **Vercel Postgres** (recommended — built-in, simplest)
-  1. In Vercel dashboard, go to your `atp-core` project
+  1. In Vercel dashboard, go to your `atp-website` project
   2. Settings → Storage → Create Database → Postgres
   3. Copy the connection string
   4. Set as `DATABASE_URL` in Environment Variables
@@ -104,16 +110,18 @@ Save this value. You'll paste it as `BETTER_AUTH_SECRET` in Vercel Settings → 
 
 ### 3. Set up email
 
-**Resend** (recommended — simplest, free tier):
+**Resend** (recommended — app-owned auth and transactional email):
 1. Sign up at https://resend.com
-2. Verify your domain (or use `onboarding@resend.dev` for testing)
+2. Verify your domain and sender address
 3. Get API key from https://resend.com/api-keys
 4. In Vercel Environment Variables, set:
    - `EMAIL_PROVIDER`: `resend`
    - `RESEND_API_KEY`: `re_xxxxxxxxxxxxx`
-   - `EMAIL_FROM`: `noreply@yourdomain.com`
+   - `EMAIL_FROM`: `noreply@agenttrustprotocol.com` or another verified sender
    - `EMAIL_FROM_NAME`: `Agent Trust Protocol`
    - `ADMIN_EMAIL`: Your email for alerts
+
+Supabase being connected does not configure Resend for this app. Better Auth calls `src/lib/email.ts`, so Vercel must have the Resend variables above.
 
 **SendGrid** (alternative):
 1. Sign up at https://sendgrid.com
@@ -210,12 +218,22 @@ These are configured in `vercel.json`.
 
 ### Emails not sending
 
-**Cause:** `RESEND_API_KEY` not set or sender not verified.
+**Cause:** `RESEND_API_KEY` not set, `EMAIL_PROVIDER` not set to `resend`, or `EMAIL_FROM` is not a verified Resend sender.
 
 **Fix:**
-1. Set `RESEND_API_KEY` in Vercel env vars
-2. In Resend dashboard, verify your sender email
-3. For testing, use `onboarding@resend.dev`
+1. Set `EMAIL_PROVIDER=resend` in Vercel env vars
+2. Set `RESEND_API_KEY` in Vercel env vars
+3. Set `EMAIL_FROM` to a verified sender in Resend
+4. Redeploy after changing environment variables
+
+### Magic link reaches callback but does not sign in
+
+**Cause:** The email link must go through Better Auth's verification endpoint first.
+
+**Fix:**
+1. The emailed link should start with `/api/auth/magic-link/verify`
+2. Its `callbackURL` should point to `/auth/callback`
+3. `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, and the production domain should use the same canonical origin
 
 ## Local Development
 

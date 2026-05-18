@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const { email } = await request.json();
 
@@ -16,21 +20,24 @@ export async function POST(request: NextRequest) {
     // Import and use the email service
     const { emailService } = await import('@/lib/email');
 
-    // Generate a test token (in real flow, Better Auth does this)
-    const testToken = `test_${  Math.random().toString(36).substring(2, 15)}`;
-    const testUrl = `http://localhost:3000/api/auth/callback?token=${testToken}`;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ??
+      process.env.BETTER_AUTH_URL ??
+      'http://localhost:3000';
+    const testUrl = new URL('/api/auth/magic-link/verify', baseUrl);
+    testUrl.searchParams.set('token', 'test-token');
+    testUrl.searchParams.set('callbackURL', '/auth/callback');
 
-    console.log('🔗 Test URL:', testUrl);
+    console.log('🔗 Test URL:', testUrl.toString());
 
-    const result = await emailService.sendMagicLinkEmail(email, testUrl);
+    const result = await emailService.sendMagicLinkEmail(email, testUrl.toString());
 
     if (result) {
       console.log('✅ TEST PASSED: Magic link email sent successfully');
       return NextResponse.json({
         success: true,
         message: 'Magic link email sent successfully',
-        email,
-        testUrl
+        email
       });
     } else {
       console.log('❌ TEST FAILED: Email service returned false');
