@@ -37,6 +37,7 @@ const publicRoutes = [
   '/sales-guide', // Sales materials - publicly accessible
   '/onboard', // Onboarding wizard — public, no auth required
   '/api/preflight', // Onboarding environment checks
+  '/api/contact', // Public contact form submission
   '/dashboard' // Demo dashboard — publicly explorable (synthetic data only)
 ];
 
@@ -57,7 +58,9 @@ export function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') ?? '';
 
   // Domain-based routing: agenttrust.dev → /developers
-  if (hostname.includes('agenttrust.dev') && pathname === '/') {
+  const normalizedHost = hostname.split(':')[0];
+
+  if ((normalizedHost === 'agenttrust.dev' || normalizedHost.endsWith('.agenttrust.dev')) && pathname === '/') {
     return NextResponse.redirect(new URL('/developers', request.url));
   }
 
