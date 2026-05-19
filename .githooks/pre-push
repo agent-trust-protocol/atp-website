@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Runs the same checks CI runs, so a `git push` that would fail CI fails here
+# instead. Skip with `git push --no-verify` if you really need to.
+set -e
+
+echo "[pre-push] running preflight (lint:errors → type-check → build)…"
+npm run preflight
