@@ -28,19 +28,27 @@ export default function NewAgentPage() {
     description: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // In a real app, you would make an API call here
-    console.log('Creating agent:', formData);
-
-    setIsSubmitting(false);
-    router.push('/dashboard');
+    setError(null);
+    try {
+      const res = await fetch('/api/agents/onboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error ?? `Request failed (${res.status})`);
+      }
+      router.push(`/dashboard/agents/${data.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create agent.');
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: keyof AgentFormData, value: string) => {
@@ -179,6 +187,15 @@ export default function NewAgentPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
                 />
               </div>
+
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-400"
+                >
+                  {error}
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="flex items-center gap-4 pt-4">

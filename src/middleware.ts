@@ -40,6 +40,7 @@ const publicRoutes = [
   '/onboard', // Onboarding wizard — public, no auth required
   '/api/preflight', // Onboarding environment checks
   '/api/test-magic-link', // Local email smoke test; route returns 404 in production
+  '/api/agents', // Demo dashboard agent CRUD (synthetic data only)
   '/dashboard', // Demo dashboard — publicly explorable (synthetic data only)
   '/admin', // Admin protected client-side via layout session check
   '/api/admin', // Admin API routes

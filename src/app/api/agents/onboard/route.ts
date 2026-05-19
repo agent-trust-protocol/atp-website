@@ -1,47 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAgent, type TrustTier } from '@/lib/demo-agents';
+
+const VALID_TIERS: TrustTier[] = ['untrusted', 'basic', 'verified', 'premium', 'enterprise'];
 
 /**
  * POST /api/agents/onboard
  *
- * Registers a new agent with ATP, assigns the chosen security profile,
- * and returns the agent ID + DID.
+ * Creates a new agent in the demo dashboard's in-memory store and
+ * returns the created record.
  */
 export async function POST(req: NextRequest) {
+  let body: Record<string, unknown>;
   try {
-    const body = await req.json();
-    const { runtime, name, environment, profileId } = body;
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
-    if (!runtime || !name || !profileId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: runtime, name, profileId' },
-        { status: 400 }
-      );
-    }
-
-    // Generate a deterministic agent ID and placeholder DID.
-    // In production this would call ATPClient.identity.registerDID().
-    const agentId = `agent-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString(36)}`;
-    const did = `did:atp:${agentId}`;
-
-    // TODO: Wire up to ATPClient for real DID registration + profile persistence
-    // const client = new ATPClient(config);
-    // client.setProfile(profileId);
-    // const identity = await client.identity.registerDID({ ... });
-
-    return NextResponse.json({
-      id: agentId,
-      agentId,
-      did,
-      name,
-      runtime,
-      environment,
-      profileId,
-      createdAt: new Date().toISOString()
-    });
-  } catch (err: any) {
+  const name = typeof body.name === 'string' ? body.name.trim() : '';
+  if (!name) {
     return NextResponse.json(
-      { error: err.message || 'Internal server error' },
-      { status: 500 }
+      { error: 'name is required' },
+      { status: 400 }
     );
   }
+
+  const trustLevel =
+    typeof body.trustLevel === 'string' && (VALID_TIERS as string[]).includes(body.trustLevel)
+      ? (body.trustLevel as TrustTier)
+      : undefined;
+
+  const agent = createAgent({
+    name,
+    did: typeof body.did === 'string' ? body.did : undefined,
+    organization: typeof body.organization === 'string' ? body.organization : undefined,
+    description: typeof body.description === 'string' ? body.description : undefined,
+    trustLevel
+  });
+
+  return NextResponse.json(agent, { status: 201 });
 }
