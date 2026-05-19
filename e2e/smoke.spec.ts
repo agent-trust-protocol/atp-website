@@ -58,9 +58,7 @@ test.fixme('homepage Quantum-Safe Signature demo produces visible output', async
   ).toBeVisible({ timeout: 15_000 });
 });
 
-test.fixme('whitepaper PDF is publicly downloadable', async ({ baseURL }) => {
-  // FIXME(item-2): middleware currently redirects this to Enterprise Portal.
-  // Unskip once /whitepaper/atp-whitepaper.pdf returns 200 without auth.
+test('whitepaper PDF is publicly downloadable', async ({ baseURL }) => {
   const ctx = await request.newContext({ baseURL });
   const res = await ctx.get('/whitepaper/atp-whitepaper.pdf', { maxRedirects: 0 });
   expect(res.status()).toBe(200);
