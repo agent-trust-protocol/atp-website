@@ -57,11 +57,15 @@ test.fixme('whitepaper PDF is publicly downloadable', async ({ baseURL }) => {
   expect(res.headers()['content-type']).toMatch(/pdf/);
 });
 
-test.fixme('homepage Quantum-Safe Signature demo produces output', async ({ page }) => {
-  // FIXME(item-1): button currently does nothing.
+test('homepage Quantum-Safe Signature demo produces visible output', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: /Generate Hybrid Signature/i }).click();
-  await expect(page.getByText(/signature|error|sign in/i).first()).toBeVisible({ timeout: 10_000 });
+  const button = page.getByRole('button', { name: /Generate Hybrid Signature/i });
+  await button.scrollIntoViewIfNeeded();
+  await button.click();
+  // Either the success block (Signature Generated) or the error alert must appear.
+  await expect(
+    page.getByText(/Signature Generated|Signature generation failed/i).first()
+  ).toBeVisible({ timeout: 10_000 });
 });
 
 test.fixme('/dashboard exposes agents + policy-editor navigation', async ({ page }) => {
