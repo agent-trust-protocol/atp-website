@@ -3,12 +3,11 @@
 import { SimpleDemoDashboard } from '@/components/atp/demo-dashboard-simple';
 import { Subnav } from '@/components/ui/subnav';
 import { Button } from '@/components/ui/button';
-import { Activity, Shield, Building2 } from 'lucide-react';
+import { Activity, Shield, Building2, Users, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const router = useRouter();
-  // Only show basic tabs for demo - hide premium features
   const dashboardTabs = [
     {
       id: 'overview',
@@ -17,19 +16,24 @@ export default function DashboardPage() {
       icon: <Activity className="h-4 w-4" />
     },
     {
+      id: 'agents',
+      label: 'Agents',
+      href: '/dashboard/agents',
+      icon: <Users className="h-4 w-4" />
+    },
+    {
+      id: 'policy-editor',
+      label: 'Policy Editor',
+      href: '/policy-editor',
+      icon: <FileText className="h-4 w-4" />
+    },
+    {
       id: 'enterprise',
       label: 'Enterprise',
       href: '/enterprise',
       icon: <Building2 className="h-4 w-4" />
     }
   ];
-
-  // Premium features require authentication - hidden from competitors
-  // These would be shown only after login:
-  // - View Policies (/policies)
-  // - Create Policy (/policy-editor)
-  // - Test Policies (/policy-testing)
-  // - Workflows (/dashboard/workflows)
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' }
