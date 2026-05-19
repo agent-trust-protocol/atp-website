@@ -102,7 +102,7 @@ async function checkServiceHealth(): Promise<SDKHealthStatus['services']> {
 
   // Identity Service
   const identityHealth = await checkEndpoint(
-    process.env.ATP_IDENTITY_URL || 'http://localhost:3001',
+    process.env.ATP_IDENTITY_URL,
     '/health'
   );
   services.push({
@@ -114,7 +114,7 @@ async function checkServiceHealth(): Promise<SDKHealthStatus['services']> {
 
   // Credentials Service
   const credentialsHealth = await checkEndpoint(
-    process.env.ATP_CREDENTIALS_URL || 'http://localhost:3002',
+    process.env.ATP_CREDENTIALS_URL,
     '/health'
   );
   services.push({
@@ -126,7 +126,7 @@ async function checkServiceHealth(): Promise<SDKHealthStatus['services']> {
 
   // Permissions Service
   const permissionsHealth = await checkEndpoint(
-    process.env.ATP_PERMISSIONS_URL || 'http://localhost:3003',
+    process.env.ATP_PERMISSIONS_URL,
     '/health'
   );
   services.push({
@@ -138,7 +138,7 @@ async function checkServiceHealth(): Promise<SDKHealthStatus['services']> {
 
   // Audit Service
   const auditHealth = await checkEndpoint(
-    process.env.ATP_AUDIT_URL || 'http://localhost:3006',
+    process.env.ATP_AUDIT_URL,
     '/health'
   );
   services.push({
@@ -150,7 +150,7 @@ async function checkServiceHealth(): Promise<SDKHealthStatus['services']> {
 
   // Payments Service
   const paymentsHealth = await checkEndpoint(
-    process.env.ATP_PAYMENTS_URL || 'http://localhost:3005',
+    process.env.ATP_PAYMENTS_URL,
     '/health'
   );
   services.push({
@@ -167,9 +167,10 @@ async function checkServiceHealth(): Promise<SDKHealthStatus['services']> {
  * Check a single endpoint's health
  */
 async function checkEndpoint(
-  baseUrl: string,
+  baseUrl: string | undefined,
   path: string
 ): Promise<{ status: 'up' | 'down' | 'degraded'; latency?: number }> {
+  if (!baseUrl) return { status: 'down' };
   const startTime = Date.now();
 
   try {

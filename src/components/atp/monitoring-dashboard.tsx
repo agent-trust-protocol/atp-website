@@ -69,7 +69,7 @@ export function MonitoringDashboard() {
 
   const fetchAuditData = useCallback(async () => {
     try {
-      const auditUrl = process.env.NEXT_PUBLIC_ATP_AUDIT_URL || 'http://localhost:3006';
+      const auditUrl = process.env.NEXT_PUBLIC_ATP_AUDIT_URL;
       let query = `${auditUrl}/audit/events?`;
       if (selectedTimeRange !== 'all') {
         const hours = selectedTimeRange === '1h' ? 1 : selectedTimeRange === '24h' ? 24 : 168;
