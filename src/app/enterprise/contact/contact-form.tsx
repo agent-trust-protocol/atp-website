@@ -21,7 +21,7 @@ export function EnterpriseContactForm() {
       // Route handler uses request.formData(); keep the wire format aligned.
       const res = await fetch('/api/enterprise/contact', {
         method: 'POST',
-        body: new FormData(form),
+        body: new FormData(form)
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
