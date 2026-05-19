@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Shield, Building, Star, Users, UserPlus, Search, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,45 +17,6 @@ interface Agent {
   status: 'active' | 'inactive' | 'suspended';
   lastSeen: string;
 }
-
-const DEMO_AGENTS: Agent[] = [
-  {
-    id: '1',
-    name: 'Enterprise Bot Alpha',
-    did: 'did:atp:enterprise:abc123',
-    organization: 'Acme Corp',
-    trustLevel: 'enterprise',
-    status: 'active',
-    lastSeen: '2 minutes ago'
-  },
-  {
-    id: '2',
-    name: 'Analytics Agent',
-    did: 'did:atp:verified:def456',
-    organization: 'DataOps Inc',
-    trustLevel: 'verified',
-    status: 'active',
-    lastSeen: '18 minutes ago'
-  },
-  {
-    id: '3',
-    name: 'Support Bot v2',
-    did: 'did:atp:basic:ghi789',
-    organization: '',
-    trustLevel: 'basic',
-    status: 'inactive',
-    lastSeen: '3 days ago'
-  },
-  {
-    id: '4',
-    name: 'Monitoring Agent',
-    did: 'did:atp:premium:jkl012',
-    organization: 'SRE Team',
-    trustLevel: 'premium',
-    status: 'active',
-    lastSeen: '5 minutes ago'
-  }
-];
 
 function trustLevelIcon(level: string) {
   switch (level) {
@@ -85,10 +46,47 @@ function statusColor(status: string) {
   }
 }
 
+function formatLastSeen(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
+}
+
 export default function AgentsPage() {
   const [search, setSearch] = useState('');
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const filtered = DEMO_AGENTS.filter(a =>
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/agents')
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`Request failed (${r.status})`);
+        return r.json();
+      })
+      .then((data: { agents: Array<Agent & { lastSeen: string }> }) => {
+        if (cancelled) return;
+        setAgents(
+          data.agents.map((a) => ({
+            ...a,
+            lastSeen: formatLastSeen(a.lastSeen)
+          }))
+        );
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setLoadError(err.message);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = agents.filter(a =>
     a.name.toLowerCase().includes(search.toLowerCase()) ||
     a.did.toLowerCase().includes(search.toLowerCase()) ||
     a.organization.toLowerCase().includes(search.toLowerCase())
@@ -124,7 +122,7 @@ export default function AgentsPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {(['enterprise', 'verified', 'premium', 'basic'] as const).map(level => {
-            const count = DEMO_AGENTS.filter(a => a.trustLevel === level).length;
+            const count = agents.filter(a => a.trustLevel === level).length;
             return (
               <Card key={level}>
                 <CardContent className="pt-4 pb-4">
@@ -159,13 +157,19 @@ export default function AgentsPage() {
             </div>
           </CardHeader>
           <CardContent>
+            {loadError && (
+              <p role="alert" className="text-center text-sm text-red-600 py-4">
+                Failed to load agents: {loadError}
+              </p>
+            )}
             {filtered.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">No agents found.</p>
             ) : (
               <div className="space-y-3">
                 {filtered.map(agent => (
-                  <div
+                  <Link
                     key={agent.id}
+                    href={`/dashboard/agents/${agent.id}`}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="space-y-1">
@@ -188,7 +192,7 @@ export default function AgentsPage() {
                       Last seen<br />
                       <span className="font-medium">{agent.lastSeen}</span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
