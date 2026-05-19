@@ -20,11 +20,11 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: `npm run start -- -p ${PORT}`,
+        command: `npx next start -p ${PORT}`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
-        stdout: 'ignore',
+        stdout: 'pipe',
         stderr: 'pipe'
       }
 });
