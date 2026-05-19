@@ -14,7 +14,7 @@ type PublicVar =
 const PUBLIC_URLS: Record<PublicVar, string | undefined> = {
   NEXT_PUBLIC_ATP_IDENTITY_URL: process.env.NEXT_PUBLIC_ATP_IDENTITY_URL,
   NEXT_PUBLIC_ATP_PERMISSION_URL: process.env.NEXT_PUBLIC_ATP_PERMISSION_URL,
-  NEXT_PUBLIC_ATP_AUDIT_URL: process.env.NEXT_PUBLIC_ATP_AUDIT_URL,
+  NEXT_PUBLIC_ATP_AUDIT_URL: process.env.NEXT_PUBLIC_ATP_AUDIT_URL
 };
 
 export function getAtpServiceUrl(name: PublicVar): string | null {
