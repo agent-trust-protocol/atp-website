@@ -12,7 +12,8 @@ import {
   CheckCircle,
   Copy,
   RefreshCw,
-  Atom
+  Atom,
+  AlertCircle
 } from 'lucide-react';
 
 function toHex(buffer: ArrayBuffer): string {
@@ -46,9 +47,18 @@ export function QuantumSafeSignatureDemoLite() {
   const [message, setMessage] = useState('Hello, ATP World! This message demonstrates quantum-safe cryptography.');
   const [isGenerating, setIsGenerating] = useState(false);
   const [signature, setSignature] = useState<SignatureResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const generateSignature = async () => {
     setIsGenerating(true);
+    setError(null);
+    setSignature(null);
     try {
+      if (typeof crypto === 'undefined' || !crypto.subtle) {
+        throw new Error(
+          'Web Crypto is unavailable. This demo needs a secure context (HTTPS or localhost).'
+        );
+      }
+
       const timestamp = new Date().toISOString();
 
       const keyPair = await crypto.subtle.generateKey(
@@ -73,6 +83,8 @@ export function QuantumSafeSignatureDemoLite() {
         timestamp,
         keyFingerprint
       });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate signature.');
     } finally {
       setIsGenerating(false);
     }
@@ -133,6 +145,20 @@ export function QuantumSafeSignatureDemoLite() {
             )}
           </Button>
 
+          <div aria-live="polite" aria-busy={isGenerating} className="space-y-4">
+          {error && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-400"
+            >
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <div>
+                <div className="font-medium">Signature generation failed</div>
+                <div className="text-xs opacity-90">{error}</div>
+              </div>
+            </div>
+          )}
+
           {signature && (
             <div className="space-y-3 pt-4 border-t">
               <div className="flex items-center justify-between">
@@ -176,6 +202,7 @@ export function QuantumSafeSignatureDemoLite() {
               </div>
             </div>
           )}
+          </div>
         </CardContent>
       </Card>
     </div>
