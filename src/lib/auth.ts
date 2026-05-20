@@ -21,10 +21,18 @@ if (!secret && !isNextBuild) {
 
 const authSecret = secret ?? 'dev-only-secret-not-for-production';
 
-// Authoritative source for the auth base URL. BETTER_AUTH_URL is the canonical
-// var; NEXT_PUBLIC_APP_URL remains as a single fallback so older deployments
-// keep working. The legacy NEXT_PUBLIC_BASE_URL has been removed.
-const baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+// Authoritative source for the auth base URL.
+// On Vercel preview deployments the canonical domain in BETTER_AUTH_URL does
+// not match the actual `*.vercel.app` host the browser is on, so Better Auth
+// would Set-Cookie for the wrong domain and the browser would silently drop
+// it (resulting in successful-looking logins that produce no session). When
+// VERCEL_ENV === 'preview' we use the per-deployment URL instead.
+// Production keeps using BETTER_AUTH_URL → NEXT_PUBLIC_APP_URL.
+const vercelUrl = process.env.VERCEL_URL;
+const isVercelPreview = process.env.VERCEL_ENV === 'preview' && !!vercelUrl;
+const baseURL = isVercelPreview
+  ? `https://${vercelUrl}`
+  : process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 // PostgreSQL connection for Better Auth. Required in production; build-phase
 // uses a no-pool placeholder so `next build` doesn't crash without DB creds.
@@ -59,6 +67,7 @@ export const auth = betterAuth({
     'http://localhost:3000',
     'https://agenttrustprotocol.com',
     'https://www.agenttrustprotocol.com',
+    vercelUrl ? `https://${vercelUrl}` : '',
     process.env.NEXT_PUBLIC_APP_DOMAIN || ''
   ].filter(Boolean),
   plugins: [
