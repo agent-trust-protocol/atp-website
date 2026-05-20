@@ -47,7 +47,7 @@ export default function OnboardPage() {
         <div className="text-center space-y-4">
           <div className="flex justify-center">
             <Image
-              src="/atp-logo.svg"
+              src="/brand/atp-favicon-logo-agent-new.png"
               alt="Agent Trust Protocol"
               width={56}
               height={56}
