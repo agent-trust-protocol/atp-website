@@ -42,47 +42,14 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to check service health',
         data: {
+          // url is intentionally null in the error payload — exposing the
+          // upstream service host to the client would leak infra topology.
           services: [
-            {
-              name: 'Identity Service',
-              status: 'unknown',
-              uptime: 0,
-              lastCheck: new Date().toISOString(),
-              responseTime: 0,
-              url: 'http://localhost:3001'
-            },
-            {
-              name: 'Credential Service',
-              status: 'unknown',
-              uptime: 0,
-              lastCheck: new Date().toISOString(),
-              responseTime: 0,
-              url: 'http://localhost:3002'
-            },
-            {
-              name: 'Permission Service',
-              status: 'unknown',
-              uptime: 0,
-              lastCheck: new Date().toISOString(),
-              responseTime: 0,
-              url: 'http://localhost:3003'
-            },
-            {
-              name: 'RPC Gateway',
-              status: 'unknown',
-              uptime: 0,
-              lastCheck: new Date().toISOString(),
-              responseTime: 0,
-              url: 'http://localhost:3000'
-            },
-            {
-              name: 'Audit Logger',
-              status: 'unknown',
-              uptime: 0,
-              lastCheck: new Date().toISOString(),
-              responseTime: 0,
-              url: 'http://localhost:3006'
-            }
+            { name: 'Identity Service', status: 'unknown', uptime: 0, lastCheck: new Date().toISOString(), responseTime: 0, url: null },
+            { name: 'Credential Service', status: 'unknown', uptime: 0, lastCheck: new Date().toISOString(), responseTime: 0, url: null },
+            { name: 'Permission Service', status: 'unknown', uptime: 0, lastCheck: new Date().toISOString(), responseTime: 0, url: null },
+            { name: 'RPC Gateway', status: 'unknown', uptime: 0, lastCheck: new Date().toISOString(), responseTime: 0, url: null },
+            { name: 'Audit Logger', status: 'unknown', uptime: 0, lastCheck: new Date().toISOString(), responseTime: 0, url: null }
           ],
           summary: {
             total: 5,

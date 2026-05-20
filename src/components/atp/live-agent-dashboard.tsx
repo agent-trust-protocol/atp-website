@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { HydrationSafe } from '@/components/ui/hydration-safe';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import {
   RefreshCw,
   Shield,
@@ -38,9 +39,13 @@ export function LiveAgentDashboard() {
   });
 
   const fetchAgentData = async () => {
+    const identityUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_IDENTITY_URL');
+    if (!identityUrl) {
+      setIsLoading(false);
+      return;
+    }
     try {
       setIsLoading(true);
-      const identityUrl = process.env.NEXT_PUBLIC_ATP_IDENTITY_URL || 'http://localhost:3001';
 
       // Get list of agent DIDs
       const listResponse = await fetch(`${identityUrl}/identity`);
@@ -124,6 +129,20 @@ export function LiveAgentDashboard() {
         return <XCircle className="h-4 w-4 text-red-600" />;
     }
   };
+
+  if (!getAtpServiceUrl('NEXT_PUBLIC_ATP_IDENTITY_URL')) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Live Agent Dashboard</CardTitle>
+          <CardDescription>
+            Identity service is not configured for this environment.
+            Set <code>NEXT_PUBLIC_ATP_IDENTITY_URL</code> to enable live data.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">

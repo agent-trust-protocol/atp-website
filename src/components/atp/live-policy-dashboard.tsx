@@ -50,7 +50,7 @@ export function LivePolicyDashboard() {
   const fetchPolicyData = async () => {
     try {
       setIsLoading(true);
-      const permissionUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+      const permissionUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
 
       const response = await fetch(`${permissionUrl}/policies`);
       const data = await response.json();

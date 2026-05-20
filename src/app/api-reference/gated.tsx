@@ -24,13 +24,21 @@ export function GatedAPIReference({ children }: GatedAPIReferenceProps) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check server-side authentication
+    // Better Auth catch-all lives at /api/auth/[...all]; the session is
+    // surfaced by /api/auth/get-session, NOT /api/auth/verify (which
+    // doesn't exist and 404'd every request). A 200 with a non-null
+    // session body means the user is signed in.
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/verify', {
+        const response = await fetch('/api/auth/get-session', {
           credentials: 'include'
         });
-        setIsAuthenticated(response.ok);
+        if (!response.ok) {
+          setIsAuthenticated(false);
+          return;
+        }
+        const data = await response.json().catch(() => null);
+        setIsAuthenticated(Boolean(data && data.user));
       } catch (_error) {
         setIsAuthenticated(false);
       } finally {

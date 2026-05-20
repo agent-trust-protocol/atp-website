@@ -197,7 +197,7 @@ export function PolicyManagement() {
       try {
         setIsLoading(true);
         setApiError(null);
-        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
         const res = await fetch(`${baseUrl}/policies`);
         if (!res.ok) return;
         const data = await res.json();
@@ -235,7 +235,7 @@ export function PolicyManagement() {
     const sync = async () => {
       if (!selectedPolicy) return;
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
         const body = {
           document: {
             id: selectedPolicy.id,
@@ -329,7 +329,7 @@ export function PolicyManagement() {
   const deletePolicy = async (policyId: string) => {
     setPolicies(prev => prev.filter(p => p.id !== policyId));
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+      const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
       await fetch(`${baseUrl}/policies/${encodeURIComponent(policyId)}`, { method: 'DELETE' });
     } catch (err) {
       setApiError('Failed to delete policy on service');

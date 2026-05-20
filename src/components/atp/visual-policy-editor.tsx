@@ -272,7 +272,7 @@ function PolicyEditor() {
 
   // Using secure server-side policy building for snapshots
   const saveVersionSnapshot = useCallback(async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
     const snapshot = {
       id: `v-${Date.now()}`,
       name: policyName,
@@ -647,7 +647,7 @@ function PolicyEditor() {
   const savePolicy = async () => {
     const policy = await buildPolicyObject();
     if (!policy) return;
-    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
     try {
       const res = await fetch(`${baseUrl}/policies`, {
         method: 'POST',
@@ -755,7 +755,7 @@ function PolicyEditor() {
   };
 
   const loadPolicies = async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
     try {
       const res = await fetch(`${baseUrl}/policies`);
       if (!res.ok) throw new Error(`Load failed: ${res.status}`);

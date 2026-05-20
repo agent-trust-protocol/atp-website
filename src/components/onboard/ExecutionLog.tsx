@@ -160,17 +160,19 @@ export function ExecutionLog({ command, onComplete }: ExecutionLogProps) {
           <code className="block text-sm font-mono bg-black/40 rounded px-3 py-2 text-green-300">
             npm start
           </code>
-          <p className="text-xs text-muted-foreground">
-            Or open the dashboard at{' '}
-            <a
-              href="http://localhost:3456"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline"
-            >
-              http://localhost:3456
-            </a>
-          </p>
+          {process.env.NEXT_PUBLIC_ONBOARD_EXECUTION_URL && (
+            <p className="text-xs text-muted-foreground">
+              Or open the dashboard at{' '}
+              <a
+                href={process.env.NEXT_PUBLIC_ONBOARD_EXECUTION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                {process.env.NEXT_PUBLIC_ONBOARD_EXECUTION_URL}
+              </a>
+            </p>
+          )}
         </div>
       )}
 

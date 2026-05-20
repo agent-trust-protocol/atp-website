@@ -88,7 +88,7 @@ export default function PolicyTestingPage() {
   const fetchPolicies = useCallback(async () => {
     try {
       setIsLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+      const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
       const response = await fetch(`${baseUrl}/policies`);
       const data = await response.json();
 
@@ -113,7 +113,7 @@ export default function PolicyTestingPage() {
       throw new Error('No policy selected for testing');
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || 'http://localhost:3003';
+    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
 
     const results: TestResult[] = [];
 
