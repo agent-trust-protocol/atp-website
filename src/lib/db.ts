@@ -146,6 +146,26 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_invites_code ON invites(code);
     CREATE INDEX IF NOT EXISTS idx_invites_email ON invites(email);
+
+    CREATE TABLE IF NOT EXISTS agents (
+      id            TEXT PRIMARY KEY,
+      owner_user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
+      name          TEXT NOT NULL,
+      did           TEXT NOT NULL,
+      organization  TEXT NOT NULL DEFAULT '',
+      description   TEXT NOT NULL DEFAULT '',
+      trust_level   TEXT NOT NULL DEFAULT 'basic',
+      trust_score   DOUBLE PRECISION NOT NULL DEFAULT 0,
+      status        TEXT NOT NULL DEFAULT 'active',
+      risk_factors  TEXT[] NOT NULL DEFAULT '{}',
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT valid_trust_level CHECK (trust_level IN ('untrusted','basic','verified','premium','enterprise')),
+      CONSTRAINT valid_agent_status CHECK (status IN ('active','inactive','suspended'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_agents_owner ON agents(owner_user_id);
+    CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
   `);
 }
 
