@@ -191,12 +191,15 @@ console.log(await agent.getTrustScore('did:atp:other'));`;
         <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 relative">
           <div className="text-center mb-12 lg:mb-16 max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6 animate-fade-in-up">
-              <div className="relative w-24 h-24 mb-4 atp-quantum-glow rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/20">
-                <Code2 size={48} className="text-primary animate-in zoom-in-50 duration-1000" />
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-4 atp-quantum-glow rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/20">
+                <Code2 className="text-primary animate-in zoom-in-50 duration-1000 h-10 w-10 sm:h-12 sm:w-12" />
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent via-cyan-400/10 to-blue-500/10 pointer-events-none" />
               </div>
             </div>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-extralight mb-6 animate-fade-in-up">
+            {/* `pb-2` + `leading-[1.1]` prevents the gradient text's descenders
+                from being clipped by `overflow-hidden` on the hero wrapper at
+                mobile widths, where the ascender/descender bounds tighten. */}
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight mb-6 leading-[1.1] pb-2 animate-fade-in-up">
               <span className="atp-gradient-text">For Developers</span>
             </h1>
             <p className="text-xl sm:text-2xl text-foreground/80 mb-8 leading-relaxed animate-fade-in-up">

@@ -180,9 +180,16 @@ export function PerformanceMetricsPreview() {
           <BarChart3 className="h-8 w-8 text-green-500" />
           <h2 className="text-3xl font-bold">Performance Metrics Preview</h2>
         </div>
+        <div className="flex justify-center">
+          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/40">
+            Sample data — not live telemetry
+          </Badge>
+        </div>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Real-time system performance, connection metrics, and health monitoring.
-          See how ATP performs under load with quantum-safe operations.
+          Illustrative numbers showing the kinds of system performance,
+          connection, and health metrics ATP surfaces. Live telemetry from a
+          connected ATP deployment will replace these once the monitoring
+          backend is wired up.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
