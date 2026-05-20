@@ -191,6 +191,147 @@ export async function initializeAppTables(): Promise<void> {
     );
 
     CREATE INDEX IF NOT EXISTS idx_user_tenants_tenant ON user_tenants(tenant_id);
+
+    -- Workflow engine tables (typed via Drizzle in src/workflow-engine/database/schema.ts).
+    -- Raw SQL matches the convention used by every other table in this file; introducing
+    -- drizzle-kit migrations is deferred until we have a migration story for Vercel.
+    CREATE TABLE IF NOT EXISTS workflows (
+      id          UUID PRIMARY KEY,
+      name        VARCHAR(255) NOT NULL,
+      description TEXT,
+      version     VARCHAR(50) NOT NULL DEFAULT '1.0.0',
+      definition  JSONB NOT NULL,
+      status      VARCHAR(50) NOT NULL DEFAULT 'draft',
+      created_by  VARCHAR(255),
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      is_template BOOLEAN NOT NULL DEFAULT FALSE,
+      category    VARCHAR(100),
+      tags        JSONB DEFAULT '[]'::jsonb
+    );
+    CREATE INDEX IF NOT EXISTS idx_workflows_created_by ON workflows(created_by);
+    CREATE INDEX IF NOT EXISTS idx_workflows_status ON workflows(status);
+
+    CREATE TABLE IF NOT EXISTS workflow_executions (
+      id              UUID PRIMARY KEY,
+      workflow_id     UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      workflow_version VARCHAR(50) NOT NULL,
+      status          VARCHAR(50) NOT NULL,
+      start_time      TIMESTAMPTZ NOT NULL,
+      end_time        TIMESTAMPTZ,
+      duration        INTEGER,
+      triggered_by    VARCHAR(255),
+      trigger_type    VARCHAR(100),
+      input_data      JSONB,
+      output_data     JSONB,
+      error_message   TEXT,
+      metadata        JSONB
+    );
+    CREATE INDEX IF NOT EXISTS idx_workflow_executions_workflow ON workflow_executions(workflow_id);
+    CREATE INDEX IF NOT EXISTS idx_workflow_executions_status ON workflow_executions(status);
+
+    CREATE TABLE IF NOT EXISTS node_executions (
+      id            UUID PRIMARY KEY,
+      execution_id  UUID NOT NULL REFERENCES workflow_executions(id) ON DELETE CASCADE,
+      node_id       VARCHAR(255) NOT NULL,
+      node_type     VARCHAR(100) NOT NULL,
+      status        VARCHAR(50) NOT NULL,
+      start_time    TIMESTAMPTZ NOT NULL,
+      end_time      TIMESTAMPTZ,
+      duration      INTEGER,
+      input_data    JSONB,
+      output_data   JSONB,
+      error_message TEXT,
+      retry_count   INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE INDEX IF NOT EXISTS idx_node_executions_execution ON node_executions(execution_id);
+
+    CREATE TABLE IF NOT EXISTS workflow_variables (
+      id          UUID PRIMARY KEY,
+      workflow_id UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      name        VARCHAR(255) NOT NULL,
+      type        VARCHAR(50) NOT NULL,
+      value       JSONB,
+      is_secret   BOOLEAN NOT NULL DEFAULT FALSE,
+      description TEXT,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS workflow_triggers (
+      id             UUID PRIMARY KEY,
+      workflow_id    UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      type           VARCHAR(100) NOT NULL,
+      name           VARCHAR(255) NOT NULL,
+      configuration  JSONB NOT NULL,
+      is_enabled     BOOLEAN NOT NULL DEFAULT TRUE,
+      last_triggered TIMESTAMPTZ,
+      trigger_count  INTEGER NOT NULL DEFAULT 0,
+      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS workflow_stats (
+      id                    UUID PRIMARY KEY,
+      workflow_id           UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      total_executions      INTEGER NOT NULL DEFAULT 0,
+      successful_executions INTEGER NOT NULL DEFAULT 0,
+      failed_executions     INTEGER NOT NULL DEFAULT 0,
+      average_duration      NUMERIC(10, 2),
+      last_execution_time   TIMESTAMPTZ,
+      created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS node_stats (
+      id                    UUID PRIMARY KEY,
+      workflow_id           UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      node_id               VARCHAR(255) NOT NULL,
+      node_type             VARCHAR(100) NOT NULL,
+      total_executions      INTEGER NOT NULL DEFAULT 0,
+      successful_executions INTEGER NOT NULL DEFAULT 0,
+      failed_executions     INTEGER NOT NULL DEFAULT 0,
+      average_duration      NUMERIC(10, 2),
+      last_execution_time   TIMESTAMPTZ,
+      created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS audit_logs (
+      id          UUID PRIMARY KEY,
+      entity_type VARCHAR(100) NOT NULL,
+      entity_id   UUID NOT NULL,
+      action      VARCHAR(100) NOT NULL,
+      user_id     VARCHAR(255),
+      user_name   VARCHAR(255),
+      changes     JSONB,
+      metadata    JSONB,
+      ip_address  VARCHAR(45),
+      user_agent  TEXT,
+      timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS policy_workflows (
+      id            UUID PRIMARY KEY,
+      policy_id     VARCHAR(255) NOT NULL,
+      workflow_id   UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      trigger_event VARCHAR(100) NOT NULL,
+      is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+      priority      INTEGER NOT NULL DEFAULT 0,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS trust_workflows (
+      id            UUID PRIMARY KEY,
+      agent_did     VARCHAR(500),
+      workflow_id   UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      trigger_event VARCHAR(100) NOT NULL,
+      thresholds    JSONB,
+      is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
   `);
 }
 

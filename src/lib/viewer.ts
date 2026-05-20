@@ -1,7 +1,11 @@
 import { headers as nextHeaders } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
-import type { Viewer } from './store';
+
+export interface Viewer {
+  userId: string | null;
+  isFounder: boolean;
+}
 
 /**
  * Resolve the current viewer (user + founder flag) from Better Auth, working

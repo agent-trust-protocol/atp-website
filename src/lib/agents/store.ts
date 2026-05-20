@@ -12,6 +12,9 @@
  */
 
 import { query, queryOne, execute, initializeAppTables } from '@/lib/db';
+import type { Viewer } from '@/lib/viewer';
+
+export type { Viewer };
 
 export type TrustTier =
   | 'untrusted'
@@ -32,11 +35,6 @@ export interface DemoAgent {
   riskFactors: string[];
   createdAt: string;
   lastSeen: string;
-}
-
-export interface Viewer {
-  userId: string | null;
-  isFounder: boolean;
 }
 
 const TRUST_SCORES: Record<TrustTier, number> = {
