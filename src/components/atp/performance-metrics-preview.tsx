@@ -24,6 +24,40 @@ import {
   RefreshCw,
   BarChart3
 } from 'lucide-react';
+import { useMe } from '@/hooks/use-me';
+
+type MetricsShape = {
+  activeConnections: MetricData
+  signaturesGenerated: MetricData
+  responseTime: MetricData
+  uptime: MetricData
+  errorRate: MetricData
+  throughput: MetricData
+}
+
+// Maps the monitoring proxy's response (see
+// src/app/api/monitoring/metrics/route.ts → upstream ATP_MONITORING_URL) onto
+// the component's display shape. Returns null when the proxy didn't include
+// usable telemetry (env unset, upstream down, or anonymous demo response).
+function mapLiveMetrics(json: unknown, previous: MetricsShape): MetricsShape | null {
+  const perf = (json as { data?: { performance?: Record<string, number> } } | null)?.data?.performance;
+  if (!perf || typeof perf !== 'object') return null;
+  const delta = (next: number, prev: number) => Math.round((next - prev) * 100) / 100;
+  const trend = (d: number): MetricData['trend'] => (d > 0 ? 'up' : d < 0 ? 'down' : 'stable');
+  const live = (key: keyof MetricsShape, raw: number, unit: string): MetricData => {
+    const prev = previous[key].value;
+    const change = delta(raw, prev);
+    return { value: raw, change, trend: trend(change), unit };
+  };
+  return {
+    activeConnections: live('activeConnections', perf.activeConnections ?? 0, ''),
+    signaturesGenerated: live('signaturesGenerated', perf.signaturesGenerated ?? 0, '/hour'),
+    responseTime: live('responseTime', perf.avgResponseTime ?? 0, 'ms'),
+    uptime: live('uptime', Math.max(0, 100 - (perf.errorRate ?? 0)), '%'),
+    errorRate: live('errorRate', perf.errorRate ?? 0, '%'),
+    throughput: live('throughput', (perf.requestsPerSecond ?? 0) * 60, 'req/min')
+  };
+}
 
 interface MetricData {
   value: number
@@ -41,11 +75,16 @@ interface SystemStatus {
 
 export function PerformanceMetricsPreview() {
   const router = useRouter();
+  const me = useMe();
   const [isLive, setIsLive] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  // When the monitoring proxy returns real data, this holds it and takes
+  // priority over the sample numbers below. `null` = no live data yet (env
+  // unset, upstream down, or user not authorized), so we render sample.
+  const [liveMetrics, setLiveMetrics] = useState<MetricsShape | null>(null);
 
-  // Demo metrics that update periodically
-  const [metrics, setMetrics] = useState({
+  // Sample metrics — illustrative only, used when liveMetrics is null.
+  const [metrics, setMetrics] = useState<MetricsShape>({
     activeConnections: { value: 1247, change: 12, trend: 'up' as const, unit: '' },
     signaturesGenerated: { value: 23567, change: 234, trend: 'up' as const, unit: '/hour' },
     responseTime: { value: 23, change: -2, trend: 'down' as const, unit: 'ms' },
@@ -115,6 +154,38 @@ export function PerformanceMetricsPreview() {
     return () => clearInterval(interval);
   }, [isLive]);
 
+  // Live telemetry: poll the monitoring proxy when the viewer is authenticated
+  // (the upstream endpoint is auth-gated; founder is treated as authenticated
+  // by /api/me). One initial fetch + 5s polling while "Live" is engaged.
+  useEffect(() => {
+    if (!me.authenticated && !me.isFounder) {
+      setLiveMetrics(null);
+      return;
+    }
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const r = await fetch('/api/monitoring/metrics', { cache: 'no-store', credentials: 'include' });
+        if (!r.ok || cancelled) return;
+        const json = await r.json().catch(() => null);
+        setLiveMetrics((prev) => mapLiveMetrics(json, prev ?? metrics) ?? prev);
+        if (!cancelled) setLastUpdate(new Date());
+      } catch {
+        // Network/parse error — keep whatever we had, fall through to sample.
+      }
+    };
+    tick();
+    if (!isLive) return () => { cancelled = true; };
+    const id = setInterval(tick, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [isLive, me.authenticated, me.isFounder, metrics]);
+
+  const displayMetrics = liveMetrics ?? metrics;
+  const dataSource: 'live' | 'sample' = liveMetrics ? 'live' : 'sample';
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy': return 'bg-green-500/10 text-green-500 border-green-500/20';
@@ -181,15 +252,21 @@ export function PerformanceMetricsPreview() {
           <h2 className="text-3xl font-bold">Performance Metrics Preview</h2>
         </div>
         <div className="flex justify-center">
-          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/40">
-            Sample data — not live telemetry
-          </Badge>
+          {dataSource === 'live' ? (
+            <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/40">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              Live telemetry
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/40">
+              Sample data — not live telemetry
+            </Badge>
+          )}
         </div>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Illustrative numbers showing the kinds of system performance,
-          connection, and health metrics ATP surfaces. Live telemetry from a
-          connected ATP deployment will replace these once the monitoring
-          backend is wired up.
+          {dataSource === 'live'
+            ? 'Live system performance, connection, and health metrics from the connected ATP monitoring service.'
+            : 'Illustrative numbers showing the kinds of system performance, connection, and health metrics ATP surfaces. Live telemetry from a connected ATP deployment will replace these once the monitoring backend is wired up.'}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
@@ -244,37 +321,37 @@ export function PerformanceMetricsPreview() {
             <MetricCard
               title="Active Connections"
               icon={Network}
-              metric={metrics.activeConnections}
+              metric={displayMetrics.activeConnections}
               description="Concurrent agent connections"
             />
             <MetricCard
               title="Signatures Generated"
               icon={Shield}
-              metric={metrics.signaturesGenerated}
+              metric={displayMetrics.signaturesGenerated}
               description="Quantum-safe signatures per hour"
             />
             <MetricCard
               title="Response Time"
               icon={Clock}
-              metric={metrics.responseTime}
+              metric={displayMetrics.responseTime}
               description="Average API response time"
             />
             <MetricCard
               title="System Uptime"
               icon={Activity}
-              metric={metrics.uptime}
+              metric={displayMetrics.uptime}
               description="Overall system availability"
             />
             <MetricCard
               title="Error Rate"
               icon={AlertTriangle}
-              metric={metrics.errorRate}
+              metric={displayMetrics.errorRate}
               description="Failed operations percentage"
             />
             <MetricCard
               title="Throughput"
               icon={Zap}
-              metric={metrics.throughput}
+              metric={displayMetrics.throughput}
               description="Requests processed per minute"
             />
           </div>
