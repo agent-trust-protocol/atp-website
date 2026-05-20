@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Lock, Loader2 } from 'lucide-react';
+import { useMe } from '@/hooks/use-me';
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -13,34 +13,11 @@ interface RequireAuthProps {
 }
 
 export function RequireAuth({ children, tier = 'startup', feature }: RequireAuthProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const me = useMe();
   const router = useRouter();
-
-  useEffect(() => {
-    // Check for authentication token in cookies or localStorage
-    const checkAuth = async () => {
-      try {
-        // Check for token in cookie
-        const cookies = document.cookie.split(';');
-        const tokenCookie = cookies.find(c => c.trim().startsWith('atp_token='));
-
-        if (tokenCookie) {
-          // Token exists, verify it (in production, validate with backend)
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const isLoading = me.loading;
+  // Founder bypasses every gate so the live product can be QA'd end-to-end.
+  const isAuthenticated = me.authenticated || me.isFounder;
 
   if (isLoading) {
     return (

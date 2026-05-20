@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,41 +12,19 @@ import {
   FileCode,
   Webhook
 } from 'lucide-react';
+import { useMe } from '@/hooks/use-me';
 
 interface GatedAPIReferenceProps {
   children: React.ReactNode
 }
 
 export function GatedAPIReference({ children }: GatedAPIReferenceProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // /api/me wraps Better Auth session + founder check. Founder bypasses
+  // every gate so the live product can be QA'd end-to-end.
+  const me = useMe();
   const router = useRouter();
-
-  useEffect(() => {
-    // Better Auth catch-all lives at /api/auth/[...all]; the session is
-    // surfaced by /api/auth/get-session, NOT /api/auth/verify (which
-    // doesn't exist and 404'd every request). A 200 with a non-null
-    // session body means the user is signed in.
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/get-session', {
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          setIsAuthenticated(false);
-          return;
-        }
-        const data = await response.json().catch(() => null);
-        setIsAuthenticated(Boolean(data && data.user));
-      } catch (_error) {
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const isLoading = me.loading;
+  const isAuthenticated = me.authenticated || me.isFounder;
 
   const handleLoginRedirect = () => {
     const returnUrl = encodeURIComponent(window.location.pathname);
