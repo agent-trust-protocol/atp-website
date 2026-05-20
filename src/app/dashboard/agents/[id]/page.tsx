@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getAgent } from '@/lib/agents/store';
-import { getViewer } from '@/lib/agents/viewer';
+import { getViewer } from '@/lib/viewer';
 
 export const dynamic = 'force-dynamic';
 

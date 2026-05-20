@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAgent, type TrustTier } from '@/lib/agents/store';
-import { getViewer } from '@/lib/agents/viewer';
+import { getViewer } from '@/lib/viewer';
 
 const VALID_TIERS: TrustTier[] = ['untrusted', 'basic', 'verified', 'premium', 'enterprise'];
 

@@ -1,50 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkApiAuth, createDemoResponse } from '@/lib/api-auth';
+import { getViewer } from '@/lib/viewer';
+import { listActiveExecutions } from '@/lib/workflows/db';
 
-// Mock active executions
-const mockActiveExecutions = [
-  {
-    executionId: 'exec-running-1',
-    workflowId: 'workflow-1',
-    workflowName: 'Policy Validation Workflow',
-    state: 'running',
-    startTime: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
-    progress: 65,
-    currentStep: 'Validating policy syntax',
-    estimatedTimeRemaining: 45000
-  },
-  {
-    executionId: 'exec-running-2',
-    workflowId: 'workflow-2',
-    workflowName: 'Trust Score Monitoring',
-    state: 'running',
-    startTime: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
-    progress: 90,
-    currentStep: 'Generating trust report',
-    estimatedTimeRemaining: 15000
-  }
-];
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
+const NO_STORE = { 'Cache-Control': 'no-store' } as const;
 
 export async function GET(request: NextRequest) {
+  const viewer = await getViewer(request.headers);
   try {
-    // Check authentication - workflow execution data contains sensitive operational information
-    const authResult = await checkApiAuth(request);
-    if (!authResult.isAuthenticated) {
-      return authResult.error || createDemoResponse('active-executions');
-    }
-
-    return NextResponse.json({
-      executions: mockActiveExecutions,
-      count: mockActiveExecutions.length,
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
+    const executions = await listActiveExecutions(viewer);
     return NextResponse.json(
-      {
-        error: 'Failed to fetch active executions',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
+      { executions, count: executions.length, timestamp: new Date().toISOString() },
+      { headers: NO_STORE }
+    );
+  } catch (error) {
+    console.error('[api/workflows/executions/active]', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch active executions', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500, headers: NO_STORE }
     );
   }
 }

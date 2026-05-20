@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMe } from '@/hooks/use-me';
 import ReactFlow, {
   Node,
   Edge,
@@ -209,19 +210,32 @@ function WorkflowDesignerContent() {
     setSelectedNode(node);
   }, []);
 
-  const saveWorkflow = () => {
-    const workflow = {
-      name: workflowName,
-      nodes,
-      edges,
-      timestamp: new Date().toISOString()
-    };
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-    // Save to localStorage for demo purposes
-    localStorage.setItem(`workflow-${Date.now()}`, JSON.stringify(workflow));
-
-    // In a real app, this would save to the backend
-    alert(`Workflow "${workflowName}" saved successfully!`);
+  const saveWorkflow = async () => {
+    setSaveState('saving');
+    setSaveError(null);
+    try {
+      const res = await fetch('/api/workflows', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: workflowName,
+          definition: { nodes, edges }
+        })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || `Save failed (${res.status})`);
+      }
+      setSaveState('saved');
+      setTimeout(() => setSaveState('idle'), 2500);
+    } catch (err) {
+      setSaveState('error');
+      setSaveError(err instanceof Error ? err.message : 'Unknown error');
+    }
   };
 
   const resetWorkflow = () => {
@@ -231,22 +245,19 @@ function WorkflowDesignerContent() {
     setSelectedNode(null);
   };
 
-  // Client-side auth check (after all hooks)
+  // Better Auth session (via /api/me) is the canonical gate. The previous
+  // implementation checked an `atp_token` cookie that nothing in the stack
+  // sets, so the designer rendered the "Authenticating..." placeholder for
+  // every visitor. Founder bypasses unconditionally.
+  const me = useMe();
   useEffect(() => {
-    const checkAuth = () => {
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('atp_token='));
-
-      if (!token) {
-        router.push('/login?returnTo=/dashboard/workflows/designer&feature=workflow-designer&tier=startup');
-      } else {
-        setIsAuthenticated(true);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
+    if (me.loading) return;
+    if (!me.authenticated && !me.isFounder) {
+      router.push('/login?returnTo=/dashboard/workflows/designer&feature=workflow-designer&tier=startup');
+      return;
+    }
+    setIsAuthenticated(true);
+  }, [me.loading, me.authenticated, me.isFounder, router]);
 
   if (!isAuthenticated) {
     return (
@@ -308,13 +319,23 @@ function WorkflowDesignerContent() {
               />
             </div>
             <div className="flex items-center gap-2">
+              {saveState === 'saved' && (
+                <span className="text-xs text-green-600 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" /> Saved
+                </span>
+              )}
+              {saveState === 'error' && (
+                <span className="text-xs text-red-600 flex items-center gap-1" title={saveError ?? ''}>
+                  <AlertTriangle className="h-3 w-3" /> {saveError ?? 'Save failed'}
+                </span>
+              )}
               <Button size="sm" variant="outline" onClick={resetWorkflow}>
                 <RotateCcw className="h-4 w-4 mr-1" />
                 Reset
               </Button>
-              <Button size="sm" onClick={saveWorkflow}>
+              <Button size="sm" onClick={saveWorkflow} disabled={saveState === 'saving'}>
                 <Save className="h-4 w-4 mr-1" />
-                Save
+                {saveState === 'saving' ? 'Saving…' : 'Save'}
               </Button>
               <Button size="sm" variant="outline">
                 <Play className="h-4 w-4 mr-1" />

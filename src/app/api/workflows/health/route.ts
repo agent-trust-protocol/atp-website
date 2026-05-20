@@ -1,32 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkApiAuth, createDemoResponse } from '@/lib/api-auth';
+import { getViewer } from '@/lib/viewer';
+import { getWorkflowEngineHealth } from '@/lib/workflows/db';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
+const NO_STORE = { 'Cache-Control': 'no-store' } as const;
 
 export async function GET(request: NextRequest) {
+  const viewer = await getViewer(request.headers);
   try {
-    // Check authentication - workflow engine details contain valuable IP
-    const authResult = await checkApiAuth(request);
-    if (!authResult.isAuthenticated) {
-      return authResult.error || createDemoResponse('workflow-engine');
-    }
-
-    return NextResponse.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      service: 'workflow-engine',
-      version: '1.0.0',
-      features: {
-        nodeRegistry: 'available',
-        workflowEngine: 'available',
-        database: 'optional'
-      }
-    });
+    const health = await getWorkflowEngineHealth(viewer);
+    return NextResponse.json(
+      {
+        ...health,
+        service: 'workflow-engine',
+        version: '1.0.0',
+        timestamp: new Date().toISOString()
+      },
+      { headers: NO_STORE }
+    );
   } catch (error) {
+    console.error('[api/workflows/health]', error);
     return NextResponse.json(
       {
         status: 'unhealthy',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
       },
-      { status: 500 }
+      { status: 500, headers: NO_STORE }
     );
   }
 }

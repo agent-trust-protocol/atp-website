@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listAgents } from '@/lib/agents/store';
-import { getViewer } from '@/lib/agents/viewer';
+import { getViewer } from '@/lib/viewer';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
