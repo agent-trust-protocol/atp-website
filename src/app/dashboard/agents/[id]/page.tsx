@@ -4,7 +4,8 @@ import { ArrowLeft, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getAgent } from '@/lib/demo-agents';
+import { getAgent } from '@/lib/agents/store';
+import { getViewer } from '@/lib/agents/viewer';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,8 +23,9 @@ const STATUS_BADGE: Record<string, string> = {
   suspended: 'bg-red-100 text-red-800 border-red-200'
 };
 
-export default function AgentDetailPage({ params }: { params: { id: string } }) {
-  const agent = getAgent(params.id);
+export default async function AgentDetailPage({ params }: { params: { id: string } }) {
+  const viewer = await getViewer();
+  const agent = await getAgent(params.id, viewer);
   if (!agent) notFound();
 
   const scorePct = Math.round(agent.trustScore * 100);
