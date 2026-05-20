@@ -363,7 +363,7 @@ export default function OnboardAgentClient() {
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex justify-center">
             <Image
-              src="/atp-logo.svg"
+              src="/brand/atp-favicon-logo-agent-new.png"
               alt="Agent Trust Protocol logo"
               width={64}
               height={64}

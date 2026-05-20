@@ -32,7 +32,7 @@ export function BrandLogo({
   showPlate = false
 }: BrandLogoProps) {
   const [src, setSrc] = useState<string>(
-    variant === 'lockup' ? '/brand/atp-lockup.png' : '/brand/atp-shield-mark.png'
+    variant === 'lockup' ? '/brand/atp-lockup.png' : '/brand/atp-favicon-logo-agent-new.png'
   );
   const [isDarkMode, setIsDarkMode] = useState(false);
 
