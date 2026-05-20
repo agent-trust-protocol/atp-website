@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Shield,
-  Key,
   Lock,
   AlertCircle,
   LogIn,
@@ -14,35 +12,19 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { QuantumSafeSignatureDemo } from './quantum-safe-signature-demo';
+import { useMe } from '@/hooks/use-me';
 
 interface QuantumSafeSignatureDemoGatedProps {
   showPreview?: boolean
 }
 
 export function QuantumSafeSignatureDemoGated({ showPreview = true }: QuantumSafeSignatureDemoGatedProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Source of truth is the Better Auth session via /api/me; founder
+  // bypasses every gate. The previous implementation polled an `atp_token`
+  // cookie that was never set, so this gate was never opening for anyone.
+  const me = useMe();
 
-  // Check if user has auth token
-  const checkAuth = () => {
-    if (typeof document !== 'undefined') {
-      const token = document.cookie.split('; ').find(row => row.startsWith('atp_token='));
-      if (token) {
-        setIsAuthenticated(true);
-        return true;
-      }
-    }
-    setIsAuthenticated(false);
-    return false;
-  };
-
-  // Check auth on mount and periodically
-  useEffect(() => {
-    checkAuth();
-    const interval = setInterval(checkAuth, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (isAuthenticated) {
+  if (me.authenticated || me.isFounder) {
     return <QuantumSafeSignatureDemo />;
   }
 
