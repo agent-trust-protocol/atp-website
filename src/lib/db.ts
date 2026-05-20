@@ -166,6 +166,31 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_agents_owner ON agents(owner_user_id);
     CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
+
+    -- Tenants (Phase 3): lightweight 1:1 model — one tenant per user via
+    -- the user_tenants join. The join is created up front so multi-user
+    -- support later is a permissions change, not a schema rewrite.
+    CREATE TABLE IF NOT EXISTS tenants (
+      id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name       TEXT NOT NULL,
+      slug       TEXT NOT NULL UNIQUE,
+      plan       TEXT NOT NULL DEFAULT 'free',
+      status     TEXT NOT NULL DEFAULT 'active',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT valid_tenant_status CHECK (status IN ('active','suspended','archived'))
+    );
+
+    CREATE TABLE IF NOT EXISTS user_tenants (
+      user_id   TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+      role      TEXT NOT NULL DEFAULT 'owner',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (user_id, tenant_id),
+      CONSTRAINT valid_tenant_role CHECK (role IN ('owner','admin','member'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_user_tenants_tenant ON user_tenants(tenant_id);
   `);
 }
 
