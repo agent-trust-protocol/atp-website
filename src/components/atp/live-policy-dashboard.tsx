@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { HydrationSafe } from '@/components/ui/hydration-safe';
@@ -51,22 +50,21 @@ export function LivePolicyDashboard() {
   const fetchPolicyData = async () => {
     try {
       setIsLoading(true);
-      const permissionUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-      if (!permissionUrl) {
-        // Permission backend not deployed — render empty stats instead of
-        // firing `undefined/policies` and erroring the entire dashboard.
-        setIsLoading(false);
-        return;
-      }
-      const response = await fetch(`${permissionUrl}/policies`);
+      const response = await fetch(`/api/policies`, { credentials: 'include' });
       const data = await response.json();
 
       if (data.policies) {
-        // Normalize incoming data to avoid runtime errors when optional fields are missing
+        // The /api/policies endpoint stores the full policy IR inside
+        // `document`; rules live there in the new shape. Fall through to
+        // top-level p.rules for any legacy callers.
         const normalizedPolicies: PolicyData[] = data.policies.map((p: any) => ({
           ...p,
           tags: Array.isArray(p?.tags) ? p.tags : [],
-          rules: Array.isArray(p?.rules) ? p.rules : []
+          rules: Array.isArray(p?.rules)
+            ? p.rules
+            : Array.isArray(p?.document?.rules)
+              ? p.document.rules
+              : []
         }));
 
         setPolicies(normalizedPolicies);

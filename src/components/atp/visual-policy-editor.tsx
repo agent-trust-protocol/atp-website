@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import ReactFlow, {
   Node,
   Edge,
@@ -295,18 +294,13 @@ function PolicyEditor() {
       version: policyVersion,
       tags: Array.from(new Set([...(policy.tags || []), `version:${policyVersion}`]))
     };
-    // Local snapshot is preserved above; remote persistence only runs when
-    // the backend is configured. Avoids `undefined/policies` crashes when
-    // NEXT_PUBLIC_ATP_PERMISSION_URL is unset.
-    const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-    if (!baseUrl) {
-      setInvalidHint(`Snapshot v${policyVersion} saved locally. Server persistence pending — set NEXT_PUBLIC_ATP_PERMISSION_URL or wait for Phase 4.`);
-      setTimeout(() => setInvalidHint(null), 5000);
-      return;
-    }
+    // Persists the snapshot via the local Postgres-backed endpoint
+    // (Phase 4). Returns the snapshot itself unchanged on failure so the
+    // local versions list still reflects the user's work.
     try {
-      const res = await fetch(`${baseUrl}/policies`, {
+      const res = await fetch(`/api/policies`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: versionedPolicy.name,
@@ -656,31 +650,27 @@ function PolicyEditor() {
   const savePolicy = async () => {
     const policy = await buildPolicyObject();
     if (!policy) return;
-    const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-    if (!baseUrl) {
-      // Honest degradation: the permission backend isn't deployed yet. Show
-      // an inline message instead of firing a request to `undefined/policies`
-      // and crashing the editor. Persistence lands in Phase 4 (`/api/policies`).
-      setInvalidHint('Policy backend not configured — set NEXT_PUBLIC_ATP_PERMISSION_URL or wait for Phase 4 server-side persistence.');
-      setTimeout(() => setInvalidHint(null), 5000);
-      return;
-    }
     try {
-      const res = await fetch(`${baseUrl}/policies`, {
+      const res = await fetch(`/api/policies`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: policyName,
           description: policyDescription,
-          document: policy,
-          organizationId: 'org-demo'
+          document: policy
         })
       });
+      if (res.status === 401) {
+        setInvalidHint('Sign in to save policies.');
+        setTimeout(() => setInvalidHint(null), 2500);
+        return;
+      }
       if (!res.ok) throw new Error(`Save failed: ${res.status}`);
       setInvalidHint('Policy saved successfully');
       setTimeout(() => setInvalidHint(null), 1500);
     } catch (err) {
-      setInvalidHint('Save failed. Check backend API');
+      setInvalidHint('Save failed. Check the server logs.');
       setTimeout(() => setInvalidHint(null), 2000);
     }
   };
@@ -772,17 +762,8 @@ function PolicyEditor() {
   };
 
   const loadPolicies = async () => {
-    const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-    if (!baseUrl) {
-      // Honest degradation: the permission backend isn't deployed yet. Show
-      // an inline message instead of firing a request to `undefined/policies`
-      // and crashing the editor. Persistence lands in Phase 4 (`/api/policies`).
-      setInvalidHint('Policy backend not configured — set NEXT_PUBLIC_ATP_PERMISSION_URL or wait for Phase 4 server-side persistence.');
-      setTimeout(() => setInvalidHint(null), 5000);
-      return;
-    }
     try {
-      const res = await fetch(`${baseUrl}/policies`);
+      const res = await fetch(`/api/policies`, { credentials: 'include' });
       if (!res.ok) throw new Error(`Load failed: ${res.status}`);
       const data = await res.json();
 

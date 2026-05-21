@@ -192,6 +192,25 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_user_tenants_tenant ON user_tenants(tenant_id);
 
+    -- Policies (Phase 4): replaces the previous reliance on an external
+    -- atp-permission service. The full policy IR (nodes, edges, rules,
+    -- tags) lives in the document JSONB column; everything else is
+    -- metadata for the dashboard list view.
+    CREATE TABLE IF NOT EXISTS policies (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      owner_user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE,
+      name          TEXT NOT NULL,
+      description   TEXT NOT NULL DEFAULT '',
+      version       TEXT NOT NULL DEFAULT '1.0.0',
+      document      JSONB NOT NULL,
+      enabled       BOOLEAN NOT NULL DEFAULT TRUE,
+      tags          JSONB NOT NULL DEFAULT '[]'::jsonb,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_policies_owner ON policies(owner_user_id);
+    CREATE INDEX IF NOT EXISTS idx_policies_enabled ON policies(enabled);
+
     -- Workflow engine tables (typed via Drizzle in src/workflow-engine/database/schema.ts).
     -- Raw SQL matches the convention used by every other table in this file; introducing
     -- drizzle-kit migrations is deferred until we have a migration story for Vercel.
