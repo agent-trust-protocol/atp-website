@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import {
   FolderOpen,
   Save,
@@ -197,7 +198,8 @@ export function PolicyManagement() {
       try {
         setIsLoading(true);
         setApiError(null);
-        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
+        const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
+        if (!baseUrl) { setIsLoading(false); return; }
         const res = await fetch(`${baseUrl}/policies`);
         if (!res.ok) return;
         const data = await res.json();
@@ -235,7 +237,8 @@ export function PolicyManagement() {
     const sync = async () => {
       if (!selectedPolicy) return;
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
+        const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
+        if (!baseUrl) { setIsLoading(false); return; }
         const body = {
           document: {
             id: selectedPolicy.id,
@@ -329,7 +332,8 @@ export function PolicyManagement() {
   const deletePolicy = async (policyId: string) => {
     setPolicies(prev => prev.filter(p => p.id !== policyId));
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
+      const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
+      if (!baseUrl) return; // Local delete already applied above; no backend to sync.
       await fetch(`${baseUrl}/policies/${encodeURIComponent(policyId)}`, { method: 'DELETE' });
     } catch (err) {
       setApiError('Failed to delete policy on service');
