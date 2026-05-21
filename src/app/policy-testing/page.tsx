@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import { PolicyTestingFramework } from '@/components/atp/policy-testing-framework';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -88,7 +89,11 @@ export default function PolicyTestingPage() {
   const fetchPolicies = useCallback(async () => {
     try {
       setIsLoading(true);
-      const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
+      const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
+      if (!baseUrl) {
+        setIsLoading(false);
+        return;
+      }
       const response = await fetch(`${baseUrl}/policies`);
       const data = await response.json();
 
@@ -113,7 +118,10 @@ export default function PolicyTestingPage() {
       throw new Error('No policy selected for testing');
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
+    const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
+    if (!baseUrl) {
+      throw new Error('Policy backend not configured (NEXT_PUBLIC_ATP_PERMISSION_URL unset).');
+    }
 
     const results: TestResult[] = [];
 

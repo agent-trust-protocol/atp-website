@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { HydrationSafe } from '@/components/ui/hydration-safe';
@@ -50,8 +51,13 @@ export function LivePolicyDashboard() {
   const fetchPolicyData = async () => {
     try {
       setIsLoading(true);
-      const permissionUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
-
+      const permissionUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
+      if (!permissionUrl) {
+        // Permission backend not deployed — render empty stats instead of
+        // firing `undefined/policies` and erroring the entire dashboard.
+        setIsLoading(false);
+        return;
+      }
       const response = await fetch(`${permissionUrl}/policies`);
       const data = await response.json();
 
