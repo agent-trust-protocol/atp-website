@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,26 +42,28 @@ interface ExecutionSummary {
   progress?: number;
 }
 
-const WORKFLOW_ENGINE_API = '/api/health?type=workflows';
-
 export function WorkflowDashboard() {
+  const router = useRouter();
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
   const [executions, setExecutions] = useState<ExecutionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [engineStatus, setEngineStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');
+  const [runningId, setRunningId] = useState<string | null>(null);
 
+  // The previous version pointed at a fictional /api/health?type=workflows
+  // endpoint family. Phase 2 stood up real /api/workflows* routes; this
+  // component now hits those directly.
   useEffect(() => {
-    checkEngineStatus();
-    if (engineStatus === 'connected') {
-      loadWorkflows();
-      loadExecutions();
-    }
-  }, [engineStatus]);
+    void checkEngineStatus();
+    void loadWorkflows();
+    void loadExecutions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const checkEngineStatus = async () => {
     try {
-      const response = await fetch('/api/health?type=workflows&action=health');
+      const response = await fetch('/api/workflows/health', { credentials: 'include' });
       if (response.ok) {
         setEngineStatus('connected');
         setError(null);
@@ -68,26 +71,25 @@ export function WorkflowDashboard() {
         setEngineStatus('disconnected');
         setError('Workflow engine is not responding');
       }
-    } catch (err) {
+    } catch {
       setEngineStatus('disconnected');
-      setError('Cannot connect to workflow engine. The Next.js server may be having issues.');
+      setError('Cannot connect to workflow engine.');
     }
   };
 
   const loadWorkflows = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${WORKFLOW_ENGINE_API  }&action=list`);
+      const response = await fetch('/api/workflows', { credentials: 'include', cache: 'no-store' });
       if (response.ok) {
         const data = await response.json();
-        // Transform workflow data to summary format
-        const summaries: WorkflowSummary[] = data.workflows?.map((w: any) => ({
+        const summaries: WorkflowSummary[] = (data.workflows ?? []).map((w: any) => ({
           id: w.id,
           name: w.name,
           status: w.status || 'draft',
-          nodeCount: w.nodes?.length || 0,
-          schedule: w.triggers?.find((t: any) => t.type === 'schedule')?.config?.schedule
-        })) || [];
+          nodeCount: Array.isArray(w.definition?.nodes) ? w.definition.nodes.length : 0,
+          schedule: undefined // Per-workflow schedule lands with PR #41 (triggers)
+        }));
         setWorkflows(summaries);
       }
     } catch (err) {
@@ -100,16 +102,16 @@ export function WorkflowDashboard() {
 
   const loadExecutions = async () => {
     try {
-      const response = await fetch(`${WORKFLOW_ENGINE_API}&action=executions`);
+      const response = await fetch('/api/workflows/executions/active', { credentials: 'include', cache: 'no-store' });
       if (response.ok) {
         const data = await response.json();
-        const summaries: ExecutionSummary[] = data.executions?.map((e: any) => ({
-          id: e.executionId,
-          workflowName: e.workflowId, // Would need to map to actual name
-          status: e.state,
+        const summaries: ExecutionSummary[] = (data.executions ?? []).map((e: any) => ({
+          id: e.id,
+          workflowName: e.workflowName ?? e.workflowId,
+          status: e.status,
           startTime: e.startTime,
-          progress: Math.random() * 100 // Placeholder
-        })) || [];
+          progress: 0
+        }));
         setExecutions(summaries);
       }
     } catch (err) {
@@ -118,20 +120,25 @@ export function WorkflowDashboard() {
   };
 
   const executeWorkflow = async (workflowId: string) => {
+    setRunningId(workflowId);
+    setError(null);
     try {
-      const response = await fetch(`${WORKFLOW_ENGINE_API}/${workflowId}/execute`, {
+      const response = await fetch(`/api/workflows/${workflowId}/execute`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ initialData: {} })
+        body: JSON.stringify({})
       });
-
-      if (response.ok) {
-        await loadExecutions(); // Refresh executions
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data.executionId) {
+        router.push(`/dashboard/workflows/executions/${data.executionId}`);
       } else {
-        setError('Failed to execute workflow');
+        setError(data.error || `Failed to execute workflow (${response.status})`);
       }
     } catch (err) {
-      setError('Failed to execute workflow');
+      setError(err instanceof Error ? err.message : 'Failed to execute workflow');
+    } finally {
+      setRunningId(null);
     }
   };
 
@@ -373,17 +380,17 @@ export function WorkflowDashboard() {
                         <Button
                           size="sm"
                           onClick={() => executeWorkflow(workflow.id)}
-                          disabled={workflow.status !== 'active'}
+                          disabled={runningId === workflow.id}
                         >
                           <Play className="h-3 w-3 mr-1" />
-                          Run
+                          {runningId === workflow.id ? 'Running…' : 'Run'}
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => alert(`Workflow details: ${  workflow.name}`)}
+                          onClick={() => router.push('/dashboard/workflows/executions')}
                         >
-                          View
+                          History
                         </Button>
                       </div>
                     </div>
