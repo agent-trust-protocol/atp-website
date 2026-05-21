@@ -89,12 +89,7 @@ export default function PolicyTestingPage() {
   const fetchPolicies = useCallback(async () => {
     try {
       setIsLoading(true);
-      const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-      if (!baseUrl) {
-        setIsLoading(false);
-        return;
-      }
-      const response = await fetch(`${baseUrl}/policies`);
+      const response = await fetch(`/api/policies`, { credentials: 'include' });
       const data = await response.json();
 
       if (data.policies) {

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import {
   FolderOpen,
   Save,
@@ -198,9 +197,7 @@ export function PolicyManagement() {
       try {
         setIsLoading(true);
         setApiError(null);
-        const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-        if (!baseUrl) { setIsLoading(false); return; }
-        const res = await fetch(`${baseUrl}/policies`);
+        const res = await fetch(`/api/policies`, { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
         if (!data || !Array.isArray(data.policies)) return;
@@ -237,38 +234,33 @@ export function PolicyManagement() {
     const sync = async () => {
       if (!selectedPolicy) return;
       try {
-        const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-        if (!baseUrl) { setIsLoading(false); return; }
         const body = {
-          document: {
-            id: selectedPolicy.id,
-            name: selectedPolicy.name,
-            description: selectedPolicy.description,
-            organizationId: 'default',
-            nodes: selectedPolicy.nodes || [],
-            edges: selectedPolicy.edges || [],
-            tags: selectedPolicy.tags || [],
-            category: 'operational'
-          },
           name: selectedPolicy.name,
           description: selectedPolicy.description,
-          createdBy: selectedPolicy.author
+          document: {
+            id: selectedPolicy.id,
+            nodes: selectedPolicy.nodes || [],
+            edges: selectedPolicy.edges || []
+          },
+          tags: selectedPolicy.tags || []
         };
-        // Try PUT first; if 404, try POST
-        const putRes = await fetch(`${baseUrl}/policies/${encodeURIComponent(selectedPolicy.id)}`, {
+        // Try PUT first; if the policy isn't on the server yet (404), POST instead.
+        const putRes = await fetch(`/api/policies/${encodeURIComponent(selectedPolicy.id)}`, {
           method: 'PUT',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
-        if (!putRes.ok) {
-          await fetch(`${baseUrl}/policies`, {
+        if (putRes.status === 404) {
+          await fetch(`/api/policies`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
           });
         }
       } catch (err) {
-        setApiError('Failed to persist policy to service (will remain local)');
+        setApiError('Failed to persist policy (will remain local)');
       }
     };
     sync();
@@ -332,11 +324,12 @@ export function PolicyManagement() {
   const deletePolicy = async (policyId: string) => {
     setPolicies(prev => prev.filter(p => p.id !== policyId));
     try {
-      const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-      if (!baseUrl) return; // Local delete already applied above; no backend to sync.
-      await fetch(`${baseUrl}/policies/${encodeURIComponent(policyId)}`, { method: 'DELETE' });
+      await fetch(`/api/policies/${encodeURIComponent(policyId)}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
     } catch (err) {
-      setApiError('Failed to delete policy on service');
+      setApiError('Failed to delete policy on server');
     }
   };
 
