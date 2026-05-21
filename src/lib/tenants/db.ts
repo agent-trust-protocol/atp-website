@@ -176,6 +176,25 @@ export async function getOrCreateTenantForUser(
   }
 }
 
+/**
+ * Returns the viewer's role on a specific tenant, or null if they aren't a
+ * member. Used by detail pages to decide whether to allow edit actions.
+ * Founder is treated as `owner` to keep the bypass consistent.
+ */
+export async function getViewerRoleOnTenant(
+  tenantId: string,
+  viewer: Viewer
+): Promise<'owner' | 'admin' | 'member' | null> {
+  await ensureInit();
+  if (viewer.isFounder) return 'owner';
+  if (!viewer.userId) return null;
+  const row = await queryOne<{ role: 'owner' | 'admin' | 'member' }>(
+    `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [tenantId, viewer.userId]
+  );
+  return row?.role ?? null;
+}
+
 export async function renameTenant(
   id: string,
   name: string,
