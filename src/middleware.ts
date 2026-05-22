@@ -8,6 +8,7 @@ const publicRoutes = [
   '/api/request-access',
   '/api/invites/validate',
   '/api/webhooks',
+  '/api/workflows/cron', // Vercel cron — gated by CRON_SECRET in the route
   '/api/auth', // Better Auth endpoints
   '/api/admin/setup', // Founder setup endpoint
   '/api/npm/stats', // Community stats for developers page
