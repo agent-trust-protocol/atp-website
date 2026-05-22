@@ -5,13 +5,20 @@ import { listDueScheduleTriggers, markTriggerFired } from '@/lib/workflows/trigg
 export const dynamic = 'force-dynamic';
 
 /**
- * Vercel cron entry-point. Fires every minute (see vercel.json `crons`),
- * finds schedule triggers whose interval has elapsed, and runs each one
- * sequentially. Capped at 50 firings per tick to bound cold-start cost.
+ * Cron entry-point. Finds schedule triggers whose interval has elapsed
+ * and runs each one sequentially. Capped at 50 firings per tick.
  *
- * Authentication: Vercel sends `Authorization: Bearer ${CRON_SECRET}` to
- * cron paths when CRON_SECRET is set on the project. We require it in
- * production; dev runs without the header for local testing.
+ * Invocation: Vercel Hobby caps cron frequency to once-per-day, which is
+ * useless for sub-daily schedule triggers. So Vercel auto-cron is OFF by
+ * default — invoke this endpoint from any external scheduler instead:
+ *
+ *   - cron-job.org / EasyCron / GitHub Actions schedule workflow
+ *   - On Vercel Pro, add to vercel.json:
+ *       "crons": [{ "path": "/api/workflows/cron", "schedule": "* * * * *" }]
+ *
+ * Auth: `Authorization: Bearer ${CRON_SECRET}` required in production
+ * (Vercel cron sends this automatically; external schedulers must set it).
+ * Dev runs without the header.
  */
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
