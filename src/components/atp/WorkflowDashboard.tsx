@@ -388,9 +388,9 @@ export function WorkflowDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => router.push('/dashboard/workflows/executions')}
+                          onClick={() => router.push(`/dashboard/workflows/${workflow.id}`)}
                         >
-                          History
+                          Manage
                         </Button>
                       </div>
                     </div>
