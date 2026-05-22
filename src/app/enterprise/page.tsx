@@ -189,7 +189,7 @@ export default function EnterprisePage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Clock size={14} className="text-blue-500 flex-shrink-0" />
-                  Compliance reporting tools (Coming Soon)
+                  Compliance reporting (SOC 2, HIPAA, GDPR) — on the roadmap
                 </li>
               </ul>
             </CardContent>
