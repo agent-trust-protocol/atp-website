@@ -619,12 +619,17 @@ export function EnterpriseDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>System Analytics</CardTitle>
-              <CardDescription>Advanced analytics and insights</CardDescription>
+              <CardDescription>Tenant-level analytics, performance, and trust telemetry.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4" />
-                <p>Advanced analytics dashboard coming soon...</p>
+              <div className="text-center py-10 space-y-4">
+                <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground" />
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  The full analytics surface lives in the Cloud dashboard.
+                </p>
+                <Button asChild>
+                  <a href="/cloud/analytics">Open Cloud Analytics</a>
+                </Button>
               </div>
             </CardContent>
           </Card>
