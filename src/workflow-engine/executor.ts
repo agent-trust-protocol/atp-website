@@ -38,11 +38,23 @@ export interface WorkflowDefinition {
   edges?: RfEdge[];
 }
 
+export interface NodeRuntime {
+  /** Workflow row id. */
+  workflowId: string;
+  /** This run's workflow_executions row id. */
+  executionId: string;
+  /** The workflow's owner — handlers act AS this user for DB writes. */
+  ownerUserId: string | null;
+  ownerEmail: string | null;
+}
+
 export interface NodeRunContext {
   nodeId: string;
   nodeType: string;
   /** Merged inputs from upstream nodes, keyed by source-handle name. */
   inputs: Record<string, unknown>;
+  /** Per-run runtime, populated by the orchestrator. */
+  runtime: NodeRuntime;
 }
 
 export interface NodeRunResult {
@@ -68,8 +80,10 @@ export interface NodeRunRecord {
 }
 
 export interface ExecuteOptions {
-  /** Map of catalog nodeType → handler. Missing keys fall back to a no-op. */
+  /** Map of catalog nodeType → handler. Missing keys produce a failed node. */
   handlers: Record<string, NodeHandler>;
+  /** Per-run runtime info forwarded to every handler. */
+  runtime: NodeRuntime;
   /** Optional payload available to every node as inputs.__trigger. */
   triggerInput?: unknown;
 }
@@ -180,7 +194,7 @@ export async function executeWorkflow(
       runError = record.error;
     } else {
       try {
-        const result = await handler({ nodeId, nodeType, inputs });
+        const result = await handler({ nodeId, nodeType, inputs, runtime: opts.runtime });
         const endedAt = new Date();
         record = {
           nodeId,

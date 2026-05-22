@@ -10,8 +10,9 @@
 import { randomUUID } from 'node:crypto';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { getDb, schema } from '@/lib/workflows/db';
-import { executeWorkflow, type WorkflowDefinition } from '@/workflow-engine/executor';
-import { NODE_HANDLERS } from '@/workflow-engine/node-handlers';
+import { queryOne } from '@/lib/db';
+import { executeWorkflow, type NodeRuntime, type WorkflowDefinition } from '@/workflow-engine/executor';
+import { createNodeHandlers } from '@/workflow-engine/node-handlers';
 import type { Viewer } from '@/lib/viewer';
 
 const { workflows, workflowExecutions, nodeExecutions, workflowStats } = schema;
@@ -68,8 +69,23 @@ export async function runWorkflow(
     metadata: null
   });
 
+  // Resolve the workflow owner's email so action handlers (notably
+  // send-alert) can default to it. Better Auth's user table is named
+  // "user" (singular, quoted because user is a reserved word).
+  const ownerRow = wf.createdBy
+    ? await queryOne<{ email: string | null }>(`SELECT email FROM "user" WHERE id = $1`, [wf.createdBy])
+    : null;
+
+  const runtime: NodeRuntime = {
+    workflowId,
+    executionId,
+    ownerUserId: wf.createdBy ?? null,
+    ownerEmail: ownerRow?.email ?? null
+  };
+
   const result = await executeWorkflow(definition, {
-    handlers: NODE_HANDLERS,
+    handlers: createNodeHandlers(),
+    runtime,
     triggerInput: opts.triggerInput
   });
 
