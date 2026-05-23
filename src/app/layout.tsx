@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Navbar } from '@/components/ui/navbar';
 import { Footer } from '@/components/ui/footer';
+import { FounderModeIndicator } from '@/components/founder-mode-indicator';
 import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 import '@/styles/atp-theme.css';
@@ -82,6 +83,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <FounderModeIndicator />
         </ThemeProvider>
       </body>
     </html>
