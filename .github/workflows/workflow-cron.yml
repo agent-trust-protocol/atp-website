@@ -1,0 +1,64 @@
+# Pings /api/workflows/cron on a schedule so workflow schedule-triggers
+# actually fire. Vercel Hobby caps native crons at once per day; this
+# closes the gap by invoking our own cron endpoint every 5 minutes.
+#
+# 5 minutes is GitHub Actions' minimum supported interval (the cron field
+# is rate-limited at the platform level). If a workflow needs sub-5-minute
+# firing, run the worker on a dedicated host or upgrade Vercel.
+#
+# Auth: the route enforces `Authorization: Bearer ${CRON_SECRET}` in
+# production. Both `CRON_SECRET` and `SITE_URL` must be set as repo-level
+# secrets/variables in GitHub. The job no-ops cleanly when SITE_URL isn't
+# set (used by forks that don't deploy).
+name: workflow-cron
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # allow manual invocation from the Actions tab
+
+# Don't pile up if a tick runs long.
+concurrency:
+  group: workflow-cron
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Skip if SITE_URL is not configured
+        id: gate
+        run: |
+          if [ -z "${{ vars.SITE_URL }}" ]; then
+            echo "SITE_URL not configured; skipping. Set it in repo Settings → Variables → Actions."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Hit /api/workflows/cron
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::warning::CRON_SECRET secret is empty. The endpoint will reject the request in production."
+          fi
+          # `-w` prints the http_code; `-f` would fail on non-2xx but we
+          # want to *log* the failure rather than mark the whole workflow
+          # red so transient 5xx don't spam notifications.
+          status=$(curl -sS -o /tmp/cron-body.json -w '%{http_code}' \
+            -X GET \
+            -H "Authorization: Bearer ${CRON_SECRET:-}" \
+            -H "User-Agent: github-actions-workflow-cron" \
+            "${SITE_URL%/}/api/workflows/cron")
+          echo "HTTP $status"
+          echo "--- body ---"
+          cat /tmp/cron-body.json || true
+          echo
+          if [ "$status" != "200" ]; then
+            echo "::warning::Cron endpoint returned $status"
+          fi
