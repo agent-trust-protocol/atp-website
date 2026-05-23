@@ -211,6 +211,23 @@ export async function initializeAppTables(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_policies_owner ON policies(owner_user_id);
     CREATE INDEX IF NOT EXISTS idx_policies_enabled ON policies(enabled);
 
+    -- Policy evaluations (engine output). One row per evaluatePolicy() call
+    -- that the caller chose to persist; useful for audit + the testing UI.
+    CREATE TABLE IF NOT EXISTS policy_evaluations (
+      id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      policy_id           UUID NOT NULL REFERENCES policies(id) ON DELETE CASCADE,
+      decision            TEXT NOT NULL,
+      matched_rule_id     TEXT,
+      matched_rule_name   TEXT,
+      reason              TEXT,
+      context             JSONB,
+      evaluated_by        TEXT,
+      processing_time_ms  INTEGER NOT NULL DEFAULT 0,
+      evaluated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_policy_evaluations_policy ON policy_evaluations(policy_id);
+    CREATE INDEX IF NOT EXISTS idx_policy_evaluations_evaluated_at ON policy_evaluations(evaluated_at);
+
     -- Workflow engine tables (typed via Drizzle in src/workflow-engine/database/schema.ts).
     -- Raw SQL matches the convention used by every other table in this file; introducing
     -- drizzle-kit migrations is deferred until we have a migration story for Vercel.
