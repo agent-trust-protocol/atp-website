@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getAtpServiceUrl } from '@/lib/atp-service-url';
 import { PolicyTestingFramework } from '@/components/atp/policy-testing-framework';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -113,20 +112,20 @@ export default function PolicyTestingPage() {
       throw new Error('No policy selected for testing');
     }
 
-    const baseUrl = getAtpServiceUrl('NEXT_PUBLIC_ATP_PERMISSION_URL');
-    if (!baseUrl) {
-      throw new Error('Policy backend not configured (NEXT_PUBLIC_ATP_PERMISSION_URL unset).');
-    }
-
+    // Local policy engine via /api/policies/[id]/evaluate. Replaces the
+    // previous dependency on an external NEXT_PUBLIC_ATP_PERMISSION_URL
+    // that never existed in production. persist=false so the testing UI
+    // doesn't pollute policy_evaluations with scenario noise.
     const results: TestResult[] = [];
 
     for (const scenario of scenarios) {
       try {
-        const response = await fetch(`${baseUrl}/policies/simulate`, {
+        const response = await fetch(`/api/policies/${encodeURIComponent(selectedPolicyDoc.id)}/evaluate`, {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            policyDocument: selectedPolicyDoc,
+            persist: false,
             context: {
               ...scenario.context,
               credentials: [],
@@ -136,6 +135,9 @@ export default function PolicyTestingPage() {
         });
 
         const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || `HTTP ${response.status}`);
+        }
 
         results.push({
           scenarioId: scenario.id,
@@ -143,7 +145,7 @@ export default function PolicyTestingPage() {
           expectedResult: scenario.expectedResult,
           actualResult: result.decision,
           success: result.decision === scenario.expectedResult,
-          processingTime: result.processingTime,
+          processingTime: result.processingTimeMs ?? 0,
           reason: result.reason,
           matchedRule: result.matchedRule?.name,
           timestamp: new Date().toISOString()
@@ -156,7 +158,7 @@ export default function PolicyTestingPage() {
           actualResult: 'error',
           success: false,
           processingTime: 0,
-          reason: `Test execution failed: ${error}`,
+          reason: `Test execution failed: ${error instanceof Error ? error.message : String(error)}`,
           timestamp: new Date().toISOString()
         });
       }
