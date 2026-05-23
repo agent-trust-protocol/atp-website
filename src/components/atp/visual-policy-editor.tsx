@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { PolicyRulesEditor, type PolicyRule } from '@/components/atp/policy-rules-editor';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -237,6 +238,9 @@ function PolicyEditor() {
   const [policyName, setPolicyName] = useState('Enterprise Trust Policy');
   const [policyDescription, setPolicyDescription] = useState('');
   const [policyVersion, setPolicyVersion] = useState('1.0.0');
+  const [rules, setRules] = useState<PolicyRule[]>([]);
+  const [defaultDecision, setDefaultDecision] = useState<'allow' | 'deny' | 'throttle' | 'require_approval'>('deny');
+  const [rulesModalOpen, setRulesModalOpen] = useState(false);
   const [versions, setVersions] = useState<Array<{
     id: string
     name: string
@@ -590,38 +594,30 @@ function PolicyEditor() {
   const [previewJson, setPreviewJson] = useState<string>('');
 
   const buildPolicyObject = async () => {
-    try {
-      const response = await fetch('/api/policies/build', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nodes: getNodes(),
-          edges: getEdges(),
-          metadata: {
-            policyName,
-            policyDescription,
-            policyVersion,
-            organizationId: 'org-demo',
-            createdBy: 'visual-editor'
-          }
-        })
-      });
-
-      const result = await response.json();
-
-      if (!result.success) {
-        setInvalidHint(result.error || 'Failed to build policy');
-        setTimeout(() => setInvalidHint(null), 2000);
-        return null;
-      }
-
-      return result.policy;
-    } catch (error) {
-      const errorMsg = 'Policy build service unavailable';
-      setInvalidHint(errorMsg);
-      setTimeout(() => setInvalidHint(null), 2000);
-      return null;
-    }
+    // Assembled client-side. The previous version called a non-existent
+    // /api/policies/build endpoint that always 404'd, causing every save
+    // to silently no-op. The policy IR is just a plain object now;
+    // anything proprietary about validation lives in /api/policies/validate.
+    return {
+      id: `policy-${Date.now().toString(36)}`,
+      name: policyName,
+      description: policyDescription,
+      version: policyVersion,
+      organizationId: 'org-demo',
+      createdBy: 'visual-editor',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      enabled: true,
+      defaultAction: defaultDecision,
+      default: defaultDecision, // evaluator reads this key
+      evaluationMode: 'first_match',
+      nodes: getNodes(),
+      edges: getEdges(),
+      rules,
+      tags: [],
+      testCases: [],
+      auditLog: []
+    };
   };
 
   // SECURITY NOTE: Policy transformation algorithms moved to server-side for IP protection
@@ -769,13 +765,17 @@ function PolicyEditor() {
 
       if (data.policies && data.policies.length > 0) {
         const policy = data.policies[0]; // Load first policy as example
+        const doc = (policy.document ?? {}) as Record<string, unknown>;
         setPolicyName(policy.name);
         setPolicyDescription(policy.description || '');
         setPolicyVersion(policy.version || '1.0.0');
-
-        // Policy loading will be implemented with secure server-side conversion
-        setInvalidHint('Policy loading temporarily disabled for security');
-        setTimeout(() => setInvalidHint(null), 2000);
+        if (Array.isArray(doc.nodes)) setNodes(doc.nodes as Node[]);
+        if (Array.isArray(doc.edges)) setEdges(doc.edges as Edge[]);
+        if (Array.isArray(doc.rules)) setRules(doc.rules as PolicyRule[]);
+        const docDefault = (doc.default ?? doc.defaultAction) as string | undefined;
+        if (docDefault === 'allow' || docDefault === 'deny' || docDefault === 'throttle' || docDefault === 'require_approval') {
+          setDefaultDecision(docDefault);
+        }
         setInvalidHint(`Loaded policy: ${policy.name}`);
         setTimeout(() => setInvalidHint(null), 1500);
       }
@@ -833,6 +833,10 @@ function PolicyEditor() {
             <Button variant="outline" size="sm" onClick={loadPolicies}>
               <Upload className="h-4 w-4 mr-2" />
               Load
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setRulesModalOpen(true)}>
+              <FileText className="h-4 w-4 mr-2" />
+              Rules ({rules.length})
             </Button>
             <Button variant="outline" size="sm" onClick={savePolicy}>
               <Save className="h-4 w-4 mr-2" />
@@ -1154,6 +1158,25 @@ function PolicyEditor() {
           </ReactFlow>
         </div>
       </div>
+
+      <Dialog open={rulesModalOpen} onOpenChange={setRulesModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Policy rules</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground mb-2">
+            Rules are evaluated in priority order (highest first). The first
+            rule whose conditions all match decides the outcome. If no rule
+            matches, the default decision applies.
+          </p>
+          <PolicyRulesEditor
+            rules={rules}
+            onChange={setRules}
+            defaultDecision={defaultDecision}
+            onDefaultChange={setDefaultDecision}
+          />
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-3xl">
