@@ -1,91 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiAuth, createDemoResponse } from '@/lib/api-auth';
+import { computeMonitoringSnapshot } from '@/lib/monitoring/metrics';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
-const MONITORING_SERVICE_URL = process.env.ATP_MONITORING_URL ?? 'http://localhost:3007';
+const NO_STORE = {
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0'
+} as const;
 
+/**
+ * GET /api/monitoring/metrics
+ *
+ * Replaces the previous proxy to an external `ATP_MONITORING_URL` service
+ * that never existed in production. Aggregates real numbers from our own
+ * Postgres data (sessions, workflow_executions, agents, api_keys,
+ * audit_logs) into the same response shape the proxy advertised, so the
+ * existing `PerformanceMetricsPreview` keeps working with no client
+ * changes — the numbers are just real now.
+ */
 export async function GET(request: NextRequest) {
+  const authResult = await checkApiAuth(request);
+  if (!authResult.isAuthenticated) {
+    return authResult.error ?? createDemoResponse('metrics');
+  }
   try {
-    // Check authentication - metrics data contains sensitive operational information
-    const authResult = await checkApiAuth(request);
-    if (!authResult.isAuthenticated) {
-      return authResult.error ?? createDemoResponse('metrics');
-    }
-
-    const {searchParams} = request.nextUrl;
-
-    let monitoringUrl = `${MONITORING_SERVICE_URL}/api/monitoring/metrics`;
-
-    // Forward query parameters for history endpoint
-    if (searchParams.has('timeRange') || searchParams.has('services') || searchParams.has('limit')) {
-      monitoringUrl += '/history';
-      const params = new URLSearchParams();
-      if (searchParams.has('timeRange')) params.append('timeRange', searchParams.get('timeRange') ?? '');
-      if (searchParams.has('services')) params.append('services', searchParams.get('services') ?? '');
-      if (searchParams.has('limit')) params.append('limit', searchParams.get('limit') ?? '');
-
-      if (params.toString()) {
-        monitoringUrl += `?${params.toString()}`;
-      }
-    }
-
-    const response = await fetch(monitoringUrl, {
-      headers: {
-        'User-Agent': 'ATP-Website/1.0',
-        'Accept': 'application/json'
-      },
-      signal: AbortSignal.timeout(10000)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Monitoring service responded with ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return NextResponse.json(data, {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
+    const snapshot = await computeMonitoringSnapshot();
+    return NextResponse.json(snapshot, { headers: NO_STORE });
   } catch (error) {
-    console.error('Monitoring metrics API error:', error);
-
-    // Return fallback data if monitoring service is unavailable
+    console.error('[api/monitoring/metrics]', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Monitoring service unavailable',
-        data: {
-          timestamp: new Date().toISOString(),
-          services: [],
-          performance: {
-            activeConnections: 0,
-            signaturesGenerated: 0,
-            avgResponseTime: 0,
-            requestsPerSecond: 0,
-            errorRate: 0,
-            memoryUsage: 0,
-            cpuUsage: 0
-          },
-          security: {
-            trustTransactions: 0,
-            failedAuthentications: 0,
-            compromisedAgents: 0,
-            quantumThreats: 0
-          },
-          business: {
-            registeredAgents: 0,
-            activeAgents: 0,
-            credentialsIssued: 0,
-            auditEvents: 0
-          }
-        }
-      },
-      { status: 503 }
+      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500, headers: NO_STORE }
     );
   }
 }
