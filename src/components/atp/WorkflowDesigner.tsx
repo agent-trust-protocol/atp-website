@@ -126,6 +126,7 @@ const nodeTemplates = [
     category: 'Actions',
     nodes: [
       { type: 'action', label: 'Validate Policy', nodeType: 'validate-policy', icon: CheckCircle },
+      { type: 'action', label: 'Evaluate Policy', nodeType: 'evaluate-policy', icon: Shield },
       { type: 'action', label: 'Evaluate Trust', nodeType: 'evaluate-trust', icon: Activity },
       { type: 'action', label: 'Send Notification', nodeType: 'send-notification', icon: Mail },
       { type: 'action', label: 'Generate Report', nodeType: 'generate-report', icon: Database }

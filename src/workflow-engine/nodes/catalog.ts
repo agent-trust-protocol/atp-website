@@ -72,6 +72,23 @@ export const WORKFLOW_NODES: NodeDefinition[] = [
     outputs: [{ name: 'isValid', type: 'boolean' }, { name: 'errors', type: 'array' }]
   },
   {
+    type: 'evaluate-policy',
+    category: 'action',
+    label: 'Evaluate Policy',
+    description: 'Runs a saved policy against a context and returns the decision (allow/deny/throttle/require_approval).',
+    icon: '⚖️',
+    color: '#0EA5E9',
+    inputs: [
+      { name: 'policyId', type: 'string', required: true },
+      { name: 'context', type: 'object', required: true }
+    ],
+    outputs: [
+      { name: 'decision', type: 'string' },
+      { name: 'matchedRule', type: 'object' },
+      { name: 'reason', type: 'string' }
+    ]
+  },
+  {
     type: 'policy-valid',
     category: 'condition',
     label: 'Policy Valid?',
