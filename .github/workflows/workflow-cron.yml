@@ -47,10 +47,13 @@ jobs:
           if [ -z "${CRON_SECRET:-}" ]; then
             echo "::warning::CRON_SECRET secret is empty. The endpoint will reject the request in production."
           fi
-          # `-w` prints the http_code; `-f` would fail on non-2xx but we
-          # want to *log* the failure rather than mark the whole workflow
-          # red so transient 5xx don't spam notifications.
-          status=$(curl -sS -o /tmp/cron-body.json -w '%{http_code}' \
+          # `-L` follows redirects (Vercel typically 307s apex ↔ www, or to
+          # the canonical HTTPS host). `--location-trusted` keeps the
+          # Authorization header on the redirect — safe here because we
+          # only ever follow same-app Vercel redirects. `-w` prints the
+          # http_code; we log failures via ::warning:: rather than letting
+          # `-f` mark the whole run red on transient 5xx.
+          status=$(curl -sS -L --location-trusted -o /tmp/cron-body.json -w '%{http_code}' \
             -X GET \
             -H "Authorization: Bearer ${CRON_SECRET:-}" \
             -H "User-Agent: github-actions-workflow-cron" \
