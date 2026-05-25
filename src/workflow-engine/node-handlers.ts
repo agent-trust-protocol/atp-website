@@ -12,6 +12,8 @@
 import { randomUUID } from 'node:crypto';
 import { execute as runSql } from '@/lib/db';
 import { createPolicy, getPolicy } from '@/lib/policies/db';
+import { evaluateSavedPolicy, evaluateInlinePolicy } from '@/lib/policies/evaluate';
+import type { PolicyDocument } from '@/policy-engine/evaluator';
 import { getAgent } from '@/lib/agents/store';
 import { emailService } from '@/lib/email';
 import type { NodeHandler } from './executor';
@@ -69,6 +71,54 @@ const validatePolicyHandler: NodeHandler = async ({ inputs, runtime }) => {
   }
 
   return { output: { isValid: errors.length === 0, errors } };
+};
+
+const evaluatePolicyHandler: NodeHandler = async ({ inputs, runtime }) => {
+  // Accepts either inputs.policyId (preferred — runs a saved policy) or
+  // inputs.policy (an inline { rules, default } document for ad-hoc
+  // checks). Context is whatever the workflow passed in — pass the same
+  // shape used by /policy-testing scenarios for consistency.
+  const context = (inputs.context && typeof inputs.context === 'object') ? inputs.context : {};
+
+  const inlinePolicy = inputs.policy as PolicyDocument | undefined;
+  if (inlinePolicy && typeof inlinePolicy === 'object') {
+    const result = evaluateInlinePolicy(inlinePolicy, context);
+    return {
+      output: {
+        decision: result.decision,
+        matchedRule: result.matchedRule,
+        reason: result.reason,
+        processingTimeMs: result.processingTimeMs
+      },
+      branch: result.decision
+    };
+  }
+
+  const policyId = inputs.policyId as string | undefined;
+  if (!policyId) {
+    throw new Error('evaluate-policy requires either inputs.policyId or inputs.policy');
+  }
+  const result = await evaluateSavedPolicy(
+    policyId,
+    context,
+    { userId: runtime.ownerUserId, isFounder: false },
+    { persist: true }
+  );
+  if (!result) {
+    throw new Error(`Policy ${policyId} not found or not visible to workflow owner`);
+  }
+  return {
+    output: {
+      policyId: result.policyId,
+      decision: result.decision,
+      matchedRule: result.matchedRule,
+      reason: result.reason,
+      processingTimeMs: result.processingTimeMs
+    },
+    // Surface the decision as a branch so downstream condition nodes can
+    // fan out on allow / deny / throttle / require_approval handles.
+    branch: result.decision
+  };
 };
 
 const policyValidHandler: NodeHandler = ({ inputs }) => {
@@ -175,6 +225,7 @@ export function createNodeHandlers(): Record<string, NodeHandler> {
     // Actions — real implementations.
     'create-policy': createPolicyHandler,
     'validate-policy': validatePolicyHandler,
+    'evaluate-policy': evaluatePolicyHandler,
     'evaluate-trust': evaluateTrustHandler,
     'send-alert': sendAlertHandler,
     'send-notification': sendAlertHandler, // designer palette alias
