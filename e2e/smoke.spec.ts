@@ -65,6 +65,25 @@ test('whitepaper PDF is publicly downloadable', async ({ baseURL }) => {
   expect(res.headers()['content-type']).toMatch(/pdf/);
 });
 
+// /api/workflows/cron — auth-gate smoke. Catches regressions where the
+// route gets renamed, the auth check is dropped, or the CRON_SECRET env
+// contract changes. The success path (200 with a non-empty body) needs a
+// real DATABASE_URL — covered by the production deploy + the manual
+// `Run workflow` in .github/workflows/workflow-cron.yml, not here.
+test('/api/workflows/cron rejects unauthenticated requests', async ({ baseURL }) => {
+  const ctx = await request.newContext({ baseURL });
+  const res = await ctx.get('/api/workflows/cron');
+  expect(res.status()).toBe(401);
+});
+
+test('/api/workflows/cron rejects a wrong bearer token', async ({ baseURL }) => {
+  const ctx = await request.newContext({ baseURL });
+  const res = await ctx.get('/api/workflows/cron', {
+    headers: { authorization: 'Bearer obviously-wrong-token-xyz' }
+  });
+  expect(res.status()).toBe(401);
+});
+
 test.fixme('/dashboard exposes agents + policy-editor navigation', async ({ page }) => {
   // FIXME(item-6): dashboard nav currently omits these links.
   await page.goto('/dashboard');
