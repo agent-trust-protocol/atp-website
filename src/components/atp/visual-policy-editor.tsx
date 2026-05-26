@@ -42,12 +42,14 @@ import {
   Plus,
   Trash2,
   Copy,
+  RotateCcw,
   Undo,
   Redo
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { PolicyRulesEditor, type PolicyRule } from '@/components/atp/policy-rules-editor';
+import { rulesToFlow } from '@/lib/policies/rules-to-flow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -750,6 +752,24 @@ function PolicyEditor() {
     setIsSimulating(false);
   };
 
+  // Regenerate the canvas from the current `rules` array. Source of truth
+  // is the rules — the canvas was inherited from the workflow editor and
+  // is otherwise inert for policies. This button is the explicit
+  // "unify" action: click to make the canvas reflect the rules. Manual
+  // canvas edits made before clicking are overwritten.
+  const syncCanvasFromRules = () => {
+    if (rules.length === 0) {
+      setInvalidHint('Nothing to sync yet — add rules first via the Rules button.');
+      setTimeout(() => setInvalidHint(null), 2500);
+      return;
+    }
+    const { nodes: nextNodes, edges: nextEdges } = rulesToFlow(rules, defaultDecision);
+    setNodes(nextNodes as typeof nodes);
+    setEdges(nextEdges as typeof edges);
+    setInvalidHint(`Canvas synced from ${rules.length} rule${rules.length === 1 ? '' : 's'}.`);
+    setTimeout(() => setInvalidHint(null), 2000);
+  };
+
   const clearCanvas = () => {
     setNodes([]);
     setEdges([]);
@@ -837,6 +857,10 @@ function PolicyEditor() {
             <Button variant="outline" size="sm" onClick={() => setRulesModalOpen(true)}>
               <FileText className="h-4 w-4 mr-2" />
               Rules ({rules.length})
+            </Button>
+            <Button variant="outline" size="sm" onClick={syncCanvasFromRules} disabled={rules.length === 0}>
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Sync canvas
             </Button>
             <Button variant="outline" size="sm" onClick={savePolicy}>
               <Save className="h-4 w-4 mr-2" />
@@ -1119,6 +1143,16 @@ function PolicyEditor() {
 
         {/* Canvas */}
         <div className={`flex-1 relative ${isDragging ? 'bg-blue-50 border-2 border-dashed border-blue-300' : ''}`}>
+          {/* Source-of-truth banner: the engine only reads `rules`. The
+              canvas was inherited from the workflow editor and is a
+              visualization, not the data model. Click "Sync canvas" in the
+              toolbar to regenerate this view from the current rules. */}
+          <div className="absolute top-2 left-2 right-2 z-20 pointer-events-none">
+            <div className="inline-flex items-center gap-2 rounded-md border border-blue-300/50 bg-blue-50/90 dark:bg-blue-900/30 dark:border-blue-700/50 px-3 py-1.5 text-xs text-blue-900 dark:text-blue-200 shadow-sm pointer-events-auto">
+              <FileText className="h-3.5 w-3.5" />
+              Rules are the source of truth. Edit via <strong>Rules</strong>; click <strong>Sync canvas</strong> to regenerate this view.
+            </div>
+          </div>
           {isDragging && (
             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
               <div className="bg-blue-100 border-2 border-blue-400 rounded-lg p-4 shadow-lg">
