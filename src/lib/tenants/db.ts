@@ -244,3 +244,98 @@ export async function deleteTenant(id: string, viewer: Viewer): Promise<boolean>
   const rows = await execute(`DELETE FROM tenants WHERE id = $1`, [id]);
   return rows > 0;
 }
+
+export interface TenantMember {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  role: 'owner' | 'admin' | 'member';
+  joinedAt: string;
+}
+
+interface TenantMemberRow {
+  user_id: string;
+  email: string | null;
+  name: string | null;
+  role: 'owner' | 'admin' | 'member';
+  created_at: Date;
+}
+
+/**
+ * Members of a tenant, joined with the Better Auth user table for
+ * display fields. Anyone who is themselves a member of the tenant
+ * (or founder) can see the member list.
+ */
+export async function listTenantMembers(
+  tenantId: string,
+  viewer: Viewer
+): Promise<TenantMember[] | null> {
+  await ensureInit();
+  // Visibility: same rule as getTenantById — must be a member or founder.
+  const tenant = await getTenantById(tenantId, viewer);
+  if (!tenant) return null;
+  const rows = await query<TenantMemberRow>(
+    `SELECT ut.user_id, ut.role, ut.created_at,
+            u.email, u.name
+     FROM user_tenants ut
+     LEFT JOIN "user" u ON u.id = ut.user_id
+     WHERE ut.tenant_id = $1
+     ORDER BY
+       CASE ut.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,
+       ut.created_at ASC`,
+    [tenantId]
+  );
+  return rows.map((r) => ({
+    userId: r.user_id,
+    email: r.email,
+    name: r.name,
+    role: r.role,
+    joinedAt: r.created_at.toISOString()
+  }));
+}
+
+/**
+ * Remove a user from a tenant. Owner-only (founder bypass). Cannot
+ * remove an owner via this path — to relinquish ownership, transfer
+ * the role first or delete the tenant.
+ * Returns true on success, false on not-found/not-permitted/refused.
+ */
+export async function removeTenantMember(
+  tenantId: string,
+  targetUserId: string,
+  actor: Viewer
+): Promise<{ ok: boolean; reason?: string }> {
+  await ensureInit();
+  const tenant = await getTenantById(tenantId, actor);
+  if (!tenant) return { ok: false, reason: 'Tenant not found' };
+
+  // Permission check — owner or founder only.
+  if (!actor.isFounder) {
+    const actorMembership = await queryOne<{ role: string }>(
+      `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+      [tenantId, actor.userId]
+    );
+    if (!actorMembership || actorMembership.role !== 'owner') {
+      return { ok: false, reason: 'Only the tenant owner can remove members' };
+    }
+  }
+
+  // Find target membership + role.
+  const targetMembership = await queryOne<{ role: string }>(
+    `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [tenantId, targetUserId]
+  );
+  if (!targetMembership) return { ok: false, reason: 'Member not found' };
+
+  // Can't remove an owner via this path — guards against accidental
+  // self-removal that would orphan the tenant.
+  if (targetMembership.role === 'owner') {
+    return { ok: false, reason: 'Cannot remove the tenant owner. Transfer ownership first or delete the tenant.' };
+  }
+
+  const rows = await execute(
+    `DELETE FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [tenantId, targetUserId]
+  );
+  return { ok: rows > 0 };
+}

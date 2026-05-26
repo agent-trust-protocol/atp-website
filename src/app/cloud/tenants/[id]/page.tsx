@@ -20,6 +20,7 @@ import { isFounderSession } from '@/lib/is-founder';
 import { getTenantById, getViewerRoleOnTenant } from '@/lib/tenants/db';
 import { TenantEditForm } from '@/components/cloud/tenant-edit-form';
 import { TenantDeleteButton } from '@/components/cloud/tenant-delete-button';
+import { TenantMembersPanel } from '@/components/cloud/tenant-members-panel';
 
 export const dynamic = 'force-dynamic';
 
@@ -111,16 +112,10 @@ export default async function TenantDetailPage({ params }: { params: { id: strin
 
           <TenantEditForm initialName={tenant.name} canEdit={canEdit} />
 
-          <Card className="border-dashed">
-            <CardHeader>
-              <CardTitle className="text-base">Coming soon</CardTitle>
-              <CardDescription>
-                Member management and plan upgrades land with multi-user tenants
-                (Phase 3b) + billing. Today the model is one tenant per user,
-                auto-provisioned at sign-in.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <TenantMembersPanel
+            tenantId={tenant.id}
+            canManage={role === 'owner' || viewer.isFounder}
+          />
 
           <TenantDeleteButton
             tenantId={tenant.id}
