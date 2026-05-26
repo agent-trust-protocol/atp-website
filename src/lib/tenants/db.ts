@@ -536,3 +536,122 @@ export async function acceptInvitation(
     return { ok: false, reason: err instanceof Error ? err.message : 'Accept failed' };
   }
 }
+
+/**
+ * Change a member's role. Owner-only (founder bypass).
+ *   - Cannot change the role of the current owner via this path —
+ *     use transferOwnership() instead, which is atomic.
+ *   - Cannot promote anyone TO owner via this path either; same reason.
+ *   - Self-modification of role is allowed (an owner can already do
+ *     anything; for admins/members, role is set when invited and only
+ *     owners can change it — so self-modification only matters for
+ *     the founder via the founder-bypass path).
+ */
+export async function setMemberRole(
+  tenantId: string,
+  targetUserId: string,
+  role: 'admin' | 'member',
+  actor: Viewer
+): Promise<{ ok: boolean; reason?: string }> {
+  await ensureInit();
+  const tenant = await getTenantById(tenantId, actor);
+  if (!tenant) return { ok: false, reason: 'Tenant not found' };
+
+  // Only owner or founder can change roles.
+  if (!actor.isFounder) {
+    const actorMembership = await queryOne<{ role: string }>(
+      `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+      [tenantId, actor.userId]
+    );
+    if (!actorMembership || actorMembership.role !== 'owner') {
+      return { ok: false, reason: 'Only the tenant owner can change member roles.' };
+    }
+  }
+
+  const targetMembership = await queryOne<{ role: string }>(
+    `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [tenantId, targetUserId]
+  );
+  if (!targetMembership) return { ok: false, reason: 'Member not found' };
+
+  if (targetMembership.role === 'owner') {
+    return {
+      ok: false,
+      reason: 'Cannot change the owner\'s role via this endpoint. Use ownership transfer.'
+    };
+  }
+  if (role !== 'admin' && role !== 'member') {
+    return { ok: false, reason: 'Role must be "admin" or "member".' };
+  }
+  if (targetMembership.role === role) {
+    return { ok: true }; // idempotent — already at requested role
+  }
+
+  const rows = await execute(
+    `UPDATE user_tenants SET role = $1 WHERE tenant_id = $2 AND user_id = $3`,
+    [role, tenantId, targetUserId]
+  );
+  return { ok: rows > 0 };
+}
+
+/**
+ * Atomically transfer tenant ownership to another member. Owner-only
+ * (founder bypass). The previous owner becomes an admin; the new
+ * owner gets the `owner` role. Wrapped in BEGIN/COMMIT so we never
+ * land in a half-applied state (zero owners or two owners).
+ *
+ * `newOwnerUserId` must already be a member of the tenant.
+ */
+export async function transferOwnership(
+  tenantId: string,
+  newOwnerUserId: string,
+  actor: Viewer
+): Promise<{ ok: boolean; reason?: string }> {
+  await ensureInit();
+  const tenant = await getTenantById(tenantId, actor);
+  if (!tenant) return { ok: false, reason: 'Tenant not found' };
+
+  // Find the current owner so we know whose role to demote. We use this
+  // even for the founder-bypass path (founder isn't necessarily a member).
+  const currentOwner = await queryOne<{ user_id: string }>(
+    `SELECT user_id FROM user_tenants WHERE tenant_id = $1 AND role = 'owner' LIMIT 1`,
+    [tenantId]
+  );
+  if (!currentOwner) return { ok: false, reason: 'Tenant has no owner row (data corruption).' };
+
+  // Only the current owner (or founder) can transfer.
+  if (!actor.isFounder && actor.userId !== currentOwner.user_id) {
+    return { ok: false, reason: 'Only the current owner can transfer ownership.' };
+  }
+  if (newOwnerUserId === currentOwner.user_id) {
+    return { ok: false, reason: 'New owner must be a different user.' };
+  }
+
+  const newOwnerMembership = await queryOne<{ role: string }>(
+    `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [tenantId, newOwnerUserId]
+  );
+  if (!newOwnerMembership) {
+    return { ok: false, reason: 'Target user is not a member of this tenant.' };
+  }
+
+  await execute(`BEGIN`);
+  try {
+    // Demote current owner to admin. (Not member — the role expectation
+    // is that an outgoing owner keeps elevated access until they choose
+    // to leave or be demoted further.)
+    await execute(
+      `UPDATE user_tenants SET role = 'admin' WHERE tenant_id = $1 AND user_id = $2`,
+      [tenantId, currentOwner.user_id]
+    );
+    await execute(
+      `UPDATE user_tenants SET role = 'owner' WHERE tenant_id = $1 AND user_id = $2`,
+      [tenantId, newOwnerUserId]
+    );
+    await execute(`COMMIT`);
+    return { ok: true };
+  } catch (err) {
+    await execute(`ROLLBACK`).catch(() => undefined);
+    return { ok: false, reason: err instanceof Error ? err.message : 'Transfer failed' };
+  }
+}

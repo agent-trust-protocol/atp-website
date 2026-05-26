@@ -24,11 +24,21 @@ const ROLE_BADGE: Record<string, string> = {
 
 interface TenantMembersPanelProps {
   tenantId: string;
-  /** Whether the current viewer can remove members (owner or founder). */
+  /** Whether the current viewer can manage members (owner or founder). */
   canManage: boolean;
+  /** The viewer's own user id, so we can hide self-targeted controls. */
+  viewerUserId: string | null;
+  /** Whether the viewer is the tenant owner (true owner only — not founder).
+   *  Controls visibility of the "Transfer ownership" affordance. */
+  isOwner: boolean;
 }
 
-export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelProps) {
+export function TenantMembersPanel({
+  tenantId,
+  canManage,
+  viewerUserId,
+  isOwner
+}: TenantMembersPanelProps) {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +49,9 @@ export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelPr
   const [inviting, setInviting] = useState(false);
   const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
   const [copiedInvite, setCopiedInvite] = useState(false);
+  const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
+  const [transferTargetId, setTransferTargetId] = useState<string | null>(null);
+  const [transferring, setTransferring] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -115,6 +128,53 @@ export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelPr
       setTimeout(() => setCopiedInvite(false), 1500);
     } catch {
       // clipboard denied; ignore silently
+    }
+  };
+
+  const changeRole = async (userId: string, role: 'admin' | 'member') => {
+    setChangingRoleId(userId);
+    setError(null);
+    try {
+      const r = await fetch(`/api/cloud/tenants/${tenantId}/members/${userId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role })
+      });
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        throw new Error(data?.error ?? `HTTP ${r.status}`);
+      }
+      void load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Role change failed');
+    } finally {
+      setChangingRoleId(null);
+    }
+  };
+
+  const transferOwnershipTo = async (newOwnerUserId: string, label: string) => {
+    if (!confirm(`Transfer ownership to ${label}? You'll be demoted to admin.`)) return;
+    setTransferring(true);
+    setTransferTargetId(newOwnerUserId);
+    setError(null);
+    try {
+      const r = await fetch(`/api/cloud/tenants/${tenantId}/transfer-ownership`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newOwnerUserId })
+      });
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        throw new Error(data?.error ?? `HTTP ${r.status}`);
+      }
+      void load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ownership transfer failed');
+    } finally {
+      setTransferring(false);
+      setTransferTargetId(null);
     }
   };
 
@@ -204,16 +264,35 @@ export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelPr
         ) : (
           members.map((m) => {
             const label = m.name || m.email || m.userId;
-            const isOwner = m.role === 'owner';
+            const isThisOwner = m.role === 'owner';
+            const isSelf = m.userId === viewerUserId;
             return (
               <div
                 key={m.userId}
-                className="flex items-center justify-between p-3 border rounded-lg bg-card"
+                className="flex items-center justify-between p-3 border rounded-lg bg-card gap-3"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium">{m.name ?? m.email ?? '(unknown user)'}</span>
-                    <Badge variant="outline" className={ROLE_BADGE[m.role]}>{m.role}</Badge>
+                    {/* Show the role select when the viewer can manage AND this row is
+                        a non-owner non-self; otherwise just render the badge. */}
+                    {canManage && !isThisOwner && !isSelf ? (
+                      <select
+                        value={m.role}
+                        onChange={(e) => changeRole(m.userId, e.target.value as 'admin' | 'member')}
+                        disabled={changingRoleId === m.userId}
+                        className="bg-background border border-border rounded-md px-2 py-0.5 text-xs"
+                        aria-label={`Change role for ${label}`}
+                      >
+                        <option value="member">member</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    ) : (
+                      <Badge variant="outline" className={ROLE_BADGE[m.role]}>{m.role}</Badge>
+                    )}
+                    {isSelf && (
+                      <span className="text-xs text-muted-foreground">(you)</span>
+                    )}
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5 truncate">
                     {m.email ?? ''}{m.email && m.userId ? ' · ' : ''}
@@ -221,20 +300,38 @@ export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelPr
                     <span className="ml-2">joined {new Date(m.joinedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-                {canManage && !isOwner && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => remove(m.userId, label)}
-                    disabled={removingId === m.userId}
-                    aria-label={`Remove ${label}`}
-                  >
-                    {removingId === m.userId
-                      ? <Loader2 className="h-4 w-4 animate-spin" />
-                      : <Trash2 className="h-4 w-4 text-red-600" />
-                    }
-                  </Button>
-                )}
+                <div className="flex items-center gap-1">
+                  {/* Owner can transfer ownership TO any non-owner non-self member. */}
+                  {isOwner && !isThisOwner && !isSelf && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => transferOwnershipTo(m.userId, label)}
+                      disabled={transferring && transferTargetId === m.userId}
+                      title={`Transfer ownership to ${label}`}
+                      className="text-xs"
+                    >
+                      {transferring && transferTargetId === m.userId
+                        ? <Loader2 className="h-3 w-3 animate-spin" />
+                        : 'Make owner'
+                      }
+                    </Button>
+                  )}
+                  {canManage && !isThisOwner && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => remove(m.userId, label)}
+                      disabled={removingId === m.userId}
+                      aria-label={`Remove ${label}`}
+                    >
+                      {removingId === m.userId
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Trash2 className="h-4 w-4 text-red-600" />
+                      }
+                    </Button>
+                  )}
+                </div>
               </div>
             );
           })
