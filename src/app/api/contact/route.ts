@@ -17,9 +17,9 @@ export async function POST(request: NextRequest) {
 
     const contactEmail = process.env.CONTACT_EMAIL ?? process.env.ADMIN_EMAIL ?? 'agenttrustprotocol@gmail.com';
     const fallbackEmail = 'dev@agenttrustprotocol.com';
-    const subject = `New Contact Form Submission from ${firstName} ${lastName}`;
+    const adminSubject = `New Contact Form Submission from ${firstName} ${lastName}`;
 
-    const html = `
+    const adminHtml = `
       <h2>New Contact Form Submission</h2>
       <p><strong>Name:</strong> ${firstName} ${lastName}</p>
       <p><strong>Email:</strong> ${email}</p>
@@ -29,11 +29,39 @@ export async function POST(request: NextRequest) {
       <p>${message.replace(/\n/g, '<br/>')}</p>
     `;
 
-    const sentToPrimary = await emailService.sendEmail({ to: contactEmail, subject, html, replyTo: email });
+    const sentToPrimary = await emailService.sendEmail({ to: contactEmail, subject: adminSubject, html: adminHtml, replyTo: email });
 
     const sentToFallback = contactEmail === fallbackEmail
       ? true
-      : await emailService.sendEmail({ to: fallbackEmail, subject: `[Copy] ${subject}`, html, replyTo: email });
+      : await emailService.sendEmail({ to: fallbackEmail, subject: `[Copy] ${adminSubject}`, html: adminHtml, replyTo: email });
+
+    // Confirmation back to the requester — best-effort. Failure here doesn't
+    // break the contact flow: admin already has the message, the requester
+    // is told (via the API response) that we received it.
+    const requesterHtml = `
+      <h2>Thanks for reaching out, ${firstName}.</h2>
+      <p>We received your message and our team will review it shortly.</p>
+      <p><strong>Expected response time:</strong> within 1 business day.</p>
+      <hr/>
+      <p><strong>Your submitted message:</strong></p>
+      <blockquote style="border-left:3px solid #ccc;padding-left:12px;color:#555">${message.replace(/\n/g, '<br/>')}</blockquote>
+      <p style="color:#888;font-size:12px;margin-top:24px">
+        — Agent Trust Protocol™
+      </p>
+    `;
+    const sentToRequester = await emailService.sendEmail({
+      to: email,
+      subject: 'We received your message — Agent Trust Protocol™',
+      html: requesterHtml,
+      replyTo: contactEmail
+    });
+
+    console.log('[contact] send results', {
+      contactEmail,
+      sentToPrimary,
+      sentToFallback,
+      sentToRequester
+    });
 
     if (!sentToPrimary && !sentToFallback) {
       return NextResponse.json({ message: 'Unable to send your message right now. Please try again later.' }, { status: 502 });
