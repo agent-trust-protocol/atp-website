@@ -22,7 +22,13 @@
 export interface RfNode {
   id: string;
   type?: string; // React Flow type (trigger|action|condition|output)
-  data?: { label?: string; type?: string }; // data.type is the catalog nodeType
+  data?: {
+    label?: string;
+    type?: string; // data.type is the catalog nodeType
+    // Per-node static config from the designer's Properties panel. Merged
+    // into the runtime inputs as defaults; upstream edges still win.
+    config?: Record<string, unknown>;
+  };
 }
 
 export interface RfEdge {
@@ -165,6 +171,16 @@ export async function executeWorkflow(
 
     const inputs: Record<string, unknown> = {};
     if (opts.triggerInput !== undefined) inputs.__trigger = opts.triggerInput;
+    // Per-node static config (set via the designer's Properties panel) acts
+    // as defaults — upstream edges can still override any key by name. This
+    // is what lets users hard-code e.g. policyId on an evaluate-policy node
+    // without wiring an input edge for it.
+    const staticConfig = (node.data as { config?: Record<string, unknown> } | undefined)?.config;
+    if (staticConfig && typeof staticConfig === 'object') {
+      for (const [k, v] of Object.entries(staticConfig)) {
+        if (v !== undefined) inputs[k] = v;
+      }
+    }
     for (const edge of incoming) {
       const pred = results.get(edge.source)!;
       const handle = edge.sourceHandle || FALLBACK_HANDLE;
