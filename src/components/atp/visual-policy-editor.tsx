@@ -647,6 +647,17 @@ function PolicyEditor() {
   };
 
   const savePolicy = async () => {
+    // Auto-sync the canvas from rules right before saving. Rules are the
+    // engine's source of truth (PR #52); regenerating the visualisation
+    // at save time keeps `document.nodes` / `document.edges` consistent
+    // with `document.rules` without forcing the user to click Sync first.
+    // Safe no-op when there are no rules — the manual canvas (if any)
+    // stays unmodified.
+    if (rules.length > 0) {
+      const { nodes: nextNodes, edges: nextEdges } = rulesToFlow(rules, defaultDecision);
+      setNodes(nextNodes as typeof nodes);
+      setEdges(nextEdges as typeof edges);
+    }
     const policy = await buildPolicyObject();
     if (!policy) return;
     try {
