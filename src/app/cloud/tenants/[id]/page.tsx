@@ -21,6 +21,7 @@ import { getTenantById, getViewerRoleOnTenant } from '@/lib/tenants/db';
 import { TenantEditForm } from '@/components/cloud/tenant-edit-form';
 import { TenantDeleteButton } from '@/components/cloud/tenant-delete-button';
 import { TenantMembersPanel } from '@/components/cloud/tenant-members-panel';
+import { TenantInvitationsPanel } from '@/components/cloud/tenant-invitations-panel';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,6 +118,12 @@ export default async function TenantDetailPage({ params }: { params: { id: strin
             canManage={role === 'owner' || viewer.isFounder}
             viewerUserId={viewer.userId}
             isOwner={role === 'owner'}
+          />
+
+          <TenantInvitationsPanel
+            tenantId={tenant.id}
+            canManage={role === 'owner' || role === 'admin' || viewer.isFounder}
+            origin={origin}
           />
 
           <TenantDeleteButton
