@@ -192,6 +192,28 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_user_tenants_tenant ON user_tenants(tenant_id);
 
+    -- Tenant invitations (Phase 3b). Token is the URL-as-secret used in
+    -- the public accept page. Status transitions: pending → accepted /
+    -- revoked / expired. Email is stored lowercase for case-insensitive
+    -- match against the eventual signer's Better Auth email.
+    CREATE TABLE IF NOT EXISTS tenant_invitations (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      tenant_id   UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+      email       TEXT NOT NULL,
+      role        TEXT NOT NULL DEFAULT 'member',
+      token       TEXT NOT NULL UNIQUE,
+      status      TEXT NOT NULL DEFAULT 'pending',
+      invited_by  TEXT REFERENCES "user"(id) ON DELETE SET NULL,
+      expires_at  TIMESTAMPTZ NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      accepted_at TIMESTAMPTZ,
+      CONSTRAINT valid_invitation_role CHECK (role IN ('admin','member')),
+      CONSTRAINT valid_invitation_status CHECK (status IN ('pending','accepted','revoked','expired'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_tenant_invitations_tenant ON tenant_invitations(tenant_id);
+    CREATE INDEX IF NOT EXISTS idx_tenant_invitations_token ON tenant_invitations(token);
+    CREATE INDEX IF NOT EXISTS idx_tenant_invitations_email ON tenant_invitations(email);
+
     -- Policies (Phase 4): replaces the previous reliance on an external
     -- atp-permission service. The full policy IR (nodes, edges, rules,
     -- tags) lives in the document JSONB column; everything else is
