@@ -209,3 +209,53 @@ export async function listExecutionsForWorkflow(workflowId: string, viewer: View
     .orderBy(sql`${workflowExecutions.startTime} DESC`)
     .limit(50);
 }
+
+/**
+ * List recent executions across every workflow the viewer can see.
+ *   - anonymous → []
+ *   - authenticated → executions of workflows they created
+ *   - founder → all executions system-wide
+ *
+ * Joins the workflow name in so the dashboard doesn't need a second
+ * round-trip. `status` filter narrows by execution status. `limit`
+ * clamped to 1-200 (UI default 50).
+ */
+export async function listExecutionsForViewer(
+  viewer: Viewer,
+  opts: { status?: string; limit?: number } = {}
+) {
+  const limit = Math.max(1, Math.min(200, opts.limit ?? 50));
+  const db = getDb();
+
+  // Build the visible-workflow filter — same shape as listWorkflows.
+  const visibleConds = viewer.isFounder
+    ? undefined
+    : !viewer.userId
+      ? sql`FALSE`
+      : eq(workflows.createdBy, viewer.userId);
+
+  // Status filter is optional; combine with visibility via and().
+  const rowConds = [
+    visibleConds,
+    opts.status ? eq(workflowExecutions.status, opts.status) : undefined
+  ].filter(Boolean);
+
+  // INNER JOIN so we only see executions whose workflow is visible.
+  return db.select({
+    id: workflowExecutions.id,
+    workflowId: workflowExecutions.workflowId,
+    workflowName: workflows.name,
+    status: workflowExecutions.status,
+    startTime: workflowExecutions.startTime,
+    endTime: workflowExecutions.endTime,
+    duration: workflowExecutions.duration,
+    triggeredBy: workflowExecutions.triggeredBy,
+    triggerType: workflowExecutions.triggerType,
+    errorMessage: workflowExecutions.errorMessage
+  })
+    .from(workflowExecutions)
+    .innerJoin(workflows, eq(workflows.id, workflowExecutions.workflowId))
+    .where(rowConds.length ? and(...(rowConds as any[])) : undefined)
+    .orderBy(sql`${workflowExecutions.startTime} DESC`)
+    .limit(limit);
+}

@@ -58,11 +58,19 @@ export default function WorkflowsPage() {
         variant="both"
       />
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Workflow Automation</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage and monitor automated workflows for your ATP system
-          </p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Workflow Automation</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage and monitor automated workflows for your ATP system
+            </p>
+          </div>
+          <a
+            href="/dashboard/workflow-runs"
+            className="text-sm text-primary hover:underline flex items-center gap-1 whitespace-nowrap mt-2"
+          >
+            View run history →
+          </a>
         </div>
 
         <WorkflowDashboard />
