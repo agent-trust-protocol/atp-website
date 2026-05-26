@@ -117,6 +117,94 @@ export async function findWebhookTrigger(triggerId: string) {
 }
 
 /**
+ * Find event triggers matching an event type and optional filter.
+ * Used by the policy engine to auto-fire workflows when a policy
+ * decision lands on a non-allow outcome.
+ *
+ * Trigger configuration shape for `type='event'`:
+ *   { event: 'policy.violation', policyId?: '<uuid>' }
+ *
+ * If `policyId` is set, the trigger only fires for that specific
+ * policy; otherwise it fires for any matching event.
+ */
+export async function findEventTriggers(eventType: string, filter: { policyId?: string } = {}) {
+  const db = getDb();
+  const rows = await db.execute<{
+    id: string;
+    workflow_id: string;
+    name: string;
+    configuration: Record<string, unknown>;
+    created_by: string | null;
+  }>(sql`
+    SELECT t.id, t.workflow_id, t.name, t.configuration, w.created_by
+    FROM workflow_triggers t
+    INNER JOIN workflows w ON w.id = t.workflow_id
+    WHERE t.type = 'event'
+      AND t.is_enabled = true
+      AND t.configuration->>'event' = ${eventType}
+      AND (
+        ${filter.policyId ?? null}::text IS NULL
+        OR t.configuration->>'policyId' IS NULL
+        OR t.configuration->>'policyId' = ${filter.policyId ?? null}
+      )
+  `);
+  return (Array.isArray(rows) ? rows : (rows as { rows?: unknown[] }).rows ?? []) as Array<{
+    id: string;
+    workflow_id: string;
+    name: string;
+    configuration: Record<string, unknown>;
+    created_by: string | null;
+  }>;
+}
+
+/**
+ * Fire an event by dispatching to every matching event trigger. Bounded
+ * concurrency — runs at most CONCURRENCY workflows in parallel so a busy
+ * event source can't blow out the connection pool.
+ *
+ * Synchronous on purpose for v1: the caller awaits all workflow runs so
+ * Vercel serverless functions don't terminate mid-run. If subscriber count
+ * grows past a handful, swap to a queue table processed by the cron.
+ */
+const CONCURRENCY = 5;
+export async function fireEvent(
+  eventType: string,
+  payload: { policyId?: string; [k: string]: unknown }
+): Promise<{ fired: number; failed: number }> {
+  // Imported lazily to avoid a circular dep (execute.ts → workflows/db → triggers
+  // and we want triggers → execute.ts indirectly here).
+  const { runWorkflow } = await import('./execute');
+
+  const triggers = await findEventTriggers(eventType, { policyId: payload.policyId });
+  let fired = 0;
+  let failed = 0;
+
+  // Simple parallel-bounded loop without a dep.
+  for (let i = 0; i < triggers.length; i += CONCURRENCY) {
+    const batch = triggers.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(
+      batch.map(async (t) => {
+        if (!t.created_by) {
+          throw new Error('workflow has no owner');
+        }
+        const result = await runWorkflow(
+          t.workflow_id,
+          { userId: t.created_by, isFounder: false },
+          { triggerType: 'event', triggerInput: { triggerId: t.id, triggerName: t.name, event: eventType, ...payload } }
+        );
+        await markTriggerFired(t.id);
+        return result;
+      })
+    );
+    for (const r of results) {
+      if (r.status === 'fulfilled') fired += 1;
+      else { failed += 1; console.error('[fireEvent]', r.reason); }
+    }
+  }
+  return { fired, failed };
+}
+
+/**
  * Schedule triggers due for firing — `last_triggered + intervalSeconds < now()`.
  * Returns the trigger + owner pair for each. Caller (cron endpoint) fires
  * them sequentially.

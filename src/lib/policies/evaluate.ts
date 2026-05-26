@@ -71,6 +71,27 @@ export async function evaluateSavedPolicy(
     evaluationId = rows > 0 ? 'persisted' : null;
   }
 
+  // Auto-fire workflow triggers subscribed to `policy.violation` whenever the
+  // engine returns a non-allow decision. Imported lazily to avoid a circular
+  // dep (triggers.ts → execute.ts → workflow handlers → policies/evaluate).
+  // Fire-and-forget at the call site would risk dropped events on Vercel
+  // serverless cold-stops; await-but-don't-fail lets the trigger workflows
+  // run synchronously without poisoning the caller if a subscriber crashes.
+  if (result.decision !== 'allow') {
+    try {
+      const { fireEvent } = await import('@/lib/workflows/triggers');
+      await fireEvent('policy.violation', {
+        policyId,
+        decision: result.decision,
+        matchedRule: result.matchedRule,
+        reason: result.reason,
+        context
+      });
+    } catch (err) {
+      console.error('[evaluateSavedPolicy] fireEvent failed:', err);
+    }
+  }
+
   return {
     ...result,
     evaluationId,

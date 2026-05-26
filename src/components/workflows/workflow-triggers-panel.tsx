@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Calendar, Webhook, Hand, Loader2, Copy, Check } from 'lucide-react';
+import { Plus, Trash2, Calendar, Webhook, Hand, Loader2, Copy, Check, Zap } from 'lucide-react';
 
 interface Trigger {
   id: string;
@@ -24,7 +24,7 @@ const TYPE_ICON = {
   manual: <Hand className="h-4 w-4" />,
   schedule: <Calendar className="h-4 w-4" />,
   webhook: <Webhook className="h-4 w-4" />,
-  event: <Hand className="h-4 w-4" />
+  event: <Zap className="h-4 w-4" />
 };
 
 export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: string; origin: string }) {
@@ -36,9 +36,11 @@ export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: stri
 
   // Add-trigger form state
   const [showForm, setShowForm] = useState(false);
-  const [newType, setNewType] = useState<'schedule' | 'webhook'>('schedule');
+  const [newType, setNewType] = useState<'schedule' | 'webhook' | 'event'>('schedule');
   const [newName, setNewName] = useState('');
   const [newInterval, setNewInterval] = useState(300);
+  const [newEventName, setNewEventName] = useState('policy.violation');
+  const [newEventPolicyId, setNewEventPolicyId] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -66,6 +68,15 @@ export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: stri
     setBusy(true);
     setError(null);
     try {
+      // Per-type configuration: schedule needs intervalSeconds, event needs
+      // an event name (+ optional policy filter), webhook is configurationless.
+      const configuration =
+        newType === 'schedule' ? { intervalSeconds: newInterval }
+        : newType === 'event' ? {
+            event: newEventName.trim() || 'policy.violation',
+            ...(newEventPolicyId.trim() ? { policyId: newEventPolicyId.trim() } : {})
+          }
+        : {};
       const r = await fetch(`/api/workflows/${workflowId}/triggers`, {
         method: 'POST',
         credentials: 'include',
@@ -73,7 +84,7 @@ export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: stri
         body: JSON.stringify({
           type: newType,
           name: newName.trim(),
-          configuration: newType === 'schedule' ? { intervalSeconds: newInterval } : {}
+          configuration
         })
       });
       const data = await r.json();
@@ -137,12 +148,13 @@ export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: stri
                 <select
                   id="trigger-type"
                   value={newType}
-                  onChange={(e) => setNewType(e.target.value as 'schedule' | 'webhook')}
+                  onChange={(e) => setNewType(e.target.value as 'schedule' | 'webhook' | 'event')}
                   className="mt-1 w-full bg-background border border-border rounded-md px-3 py-2 text-sm"
                   disabled={busy}
                 >
                   <option value="schedule">Schedule</option>
                   <option value="webhook">Webhook</option>
+                  <option value="event">Event (e.g. policy.violation)</option>
                 </select>
               </div>
               <div>
@@ -169,6 +181,32 @@ export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: stri
                   disabled={busy}
                   className="mt-1"
                 />
+              </div>
+            )}
+            {newType === 'event' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="trigger-event-name">Event name</Label>
+                  <Input
+                    id="trigger-event-name"
+                    value={newEventName}
+                    onChange={(e) => setNewEventName(e.target.value)}
+                    placeholder="policy.violation"
+                    disabled={busy}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="trigger-event-policy">Policy ID (optional filter)</Label>
+                  <Input
+                    id="trigger-event-policy"
+                    value={newEventPolicyId}
+                    onChange={(e) => setNewEventPolicyId(e.target.value)}
+                    placeholder="leave blank to match any policy"
+                    disabled={busy}
+                    className="mt-1"
+                  />
+                </div>
               </div>
             )}
             <Button type="submit" size="sm" disabled={busy || !newName.trim()}>
@@ -204,6 +242,14 @@ export function WorkflowTriggersPanel({ workflowId, origin }: { workflowId: stri
                     <div className="text-xs text-muted-foreground space-y-0.5">
                       {t.type === 'schedule' && (
                         <div>Every {(t.configuration as { intervalSeconds?: number }).intervalSeconds ?? 60} seconds</div>
+                      )}
+                      {t.type === 'event' && (
+                        <div>
+                          Event <code className="font-mono">{(t.configuration as { event?: string }).event ?? '(unset)'}</code>
+                          {(t.configuration as { policyId?: string }).policyId && (
+                            <> · policy <code className="font-mono text-xs">{(t.configuration as { policyId?: string }).policyId}</code></>
+                          )}
+                        </div>
                       )}
                       {webhookUrl && (
                         <div className="flex items-center gap-2">
