@@ -43,6 +43,7 @@ import {
   Trash2,
   Copy,
   RotateCcw,
+  Activity,
   Undo,
   Redo
 } from 'lucide-react';
@@ -861,6 +862,12 @@ function PolicyEditor() {
             <Button variant="outline" size="sm" onClick={syncCanvasFromRules} disabled={rules.length === 0}>
               <RotateCcw className="h-4 w-4 mr-2" />
               Sync canvas
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/dashboard/policy-evaluations">
+                <Activity className="h-4 w-4 mr-2" />
+                Evaluations
+              </a>
             </Button>
             <Button variant="outline" size="sm" onClick={savePolicy}>
               <Save className="h-4 w-4 mr-2" />

@@ -177,3 +177,107 @@ export async function deletePolicy(id: string, viewer: Viewer): Promise<boolean>
   const rows = await execute(`DELETE FROM policies WHERE id = $1`, [id]);
   return rows > 0;
 }
+
+export interface PolicyEvaluation {
+  id: string;
+  policyId: string;
+  policyName: string | null;
+  decision: 'allow' | 'deny' | 'throttle' | 'require_approval';
+  matchedRuleId: string | null;
+  matchedRuleName: string | null;
+  reason: string | null;
+  context: unknown;
+  evaluatedBy: string | null;
+  processingTimeMs: number;
+  evaluatedAt: string;
+}
+
+interface PolicyEvaluationRow {
+  id: string;
+  policy_id: string;
+  policy_name: string | null;
+  decision: 'allow' | 'deny' | 'throttle' | 'require_approval';
+  matched_rule_id: string | null;
+  matched_rule_name: string | null;
+  reason: string | null;
+  context: unknown;
+  evaluated_by: string | null;
+  processing_time_ms: number;
+  evaluated_at: Date;
+}
+
+function rowToEvaluation(row: PolicyEvaluationRow): PolicyEvaluation {
+  return {
+    id: row.id,
+    policyId: row.policy_id,
+    policyName: row.policy_name,
+    decision: row.decision,
+    matchedRuleId: row.matched_rule_id,
+    matchedRuleName: row.matched_rule_name,
+    reason: row.reason,
+    context: row.context,
+    evaluatedBy: row.evaluated_by,
+    processingTimeMs: row.processing_time_ms,
+    evaluatedAt: row.evaluated_at.toISOString()
+  };
+}
+
+/**
+ * List recent policy evaluations the viewer is allowed to see.
+ *   - anonymous → []
+ *   - authenticated → evaluations for policies they own
+ *   - founder → all evaluations system-wide
+ *
+ * `policyId` filter narrows to a single policy. `limit` caps the response
+ * (max 200) — UI defaults to 50.
+ */
+export async function listPolicyEvaluations(
+  viewer: Viewer,
+  opts: { policyId?: string; limit?: number } = {}
+): Promise<PolicyEvaluation[]> {
+  await ensureInit();
+  const limit = Math.max(1, Math.min(200, opts.limit ?? 50));
+
+  if (viewer.isFounder) {
+    const rows = opts.policyId
+      ? await query<PolicyEvaluationRow>(
+          `SELECT e.*, p.name AS policy_name
+           FROM policy_evaluations e
+           LEFT JOIN policies p ON p.id = e.policy_id
+           WHERE e.policy_id = $1
+           ORDER BY e.evaluated_at DESC
+           LIMIT $2`,
+          [opts.policyId, limit]
+        )
+      : await query<PolicyEvaluationRow>(
+          `SELECT e.*, p.name AS policy_name
+           FROM policy_evaluations e
+           LEFT JOIN policies p ON p.id = e.policy_id
+           ORDER BY e.evaluated_at DESC
+           LIMIT $1`,
+          [limit]
+        );
+    return rows.map(rowToEvaluation);
+  }
+  if (!viewer.userId) return [];
+  const rows = opts.policyId
+    ? await query<PolicyEvaluationRow>(
+        `SELECT e.*, p.name AS policy_name
+         FROM policy_evaluations e
+         INNER JOIN policies p ON p.id = e.policy_id
+         WHERE p.owner_user_id = $1 AND e.policy_id = $2
+         ORDER BY e.evaluated_at DESC
+         LIMIT $3`,
+        [viewer.userId, opts.policyId, limit]
+      )
+    : await query<PolicyEvaluationRow>(
+        `SELECT e.*, p.name AS policy_name
+         FROM policy_evaluations e
+         INNER JOIN policies p ON p.id = e.policy_id
+         WHERE p.owner_user_id = $1
+         ORDER BY e.evaluated_at DESC
+         LIMIT $2`,
+        [viewer.userId, limit]
+      );
+  return rows.map(rowToEvaluation);
+}
