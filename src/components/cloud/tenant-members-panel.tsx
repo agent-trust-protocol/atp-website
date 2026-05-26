@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Loader2, Trash2, AlertTriangle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Users, Loader2, Trash2, AlertTriangle, UserPlus, Copy, Check, Mail } from 'lucide-react';
 
 interface Member {
   userId: string;
@@ -31,6 +33,12 @@ export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelPr
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'member' | 'admin'>('member');
+  const [inviting, setInviting] = useState(false);
+  const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
+  const [copiedInvite, setCopiedInvite] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -76,20 +84,113 @@ export function TenantMembersPanel({ tenantId, canManage }: TenantMembersPanelPr
     }
   };
 
+  const invite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+    setInviting(true);
+    setError(null);
+    try {
+      const r = await fetch(`/api/cloud/tenants/${tenantId}/invitations`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inviteEmail.trim(), role: inviteRole })
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data?.error ?? `HTTP ${r.status}`);
+      setInviteEmail('');
+      setLastInviteUrl(data.inviteUrl ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invite failed');
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const copyInviteUrl = async () => {
+    if (!lastInviteUrl) return;
+    try {
+      await navigator.clipboard.writeText(lastInviteUrl);
+      setCopiedInvite(true);
+      setTimeout(() => setCopiedInvite(false), 1500);
+    } catch {
+      // clipboard denied; ignore silently
+    }
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Members ({members.length})
-        </CardTitle>
-        <CardDescription>
-          {canManage
-            ? 'Owners can remove members. Invitation flow is on the roadmap; until then, add members via psql.'
-            : 'Only the tenant owner can manage members.'}
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Members ({members.length})
+          </CardTitle>
+          <CardDescription className="mt-1.5">
+            {canManage
+              ? 'Invite new members by email; remove members anytime. Owners cannot be removed via this panel.'
+              : 'Only the tenant owner can manage members.'}
+          </CardDescription>
+        </div>
+        {canManage && (
+          <Button size="sm" onClick={() => { setShowInvite((s) => !s); setLastInviteUrl(null); }}>
+            <UserPlus className="h-4 w-4 mr-1" />
+            {showInvite ? 'Cancel' : 'Invite'}
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="space-y-2">
+        {canManage && showInvite && (
+          <form onSubmit={invite} className="p-3 border rounded-lg bg-muted/30 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2">
+                <Label htmlFor="invite-email" className="text-xs">Email</Label>
+                <div className="relative mt-1">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="teammate@example.com"
+                    disabled={inviting}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="invite-role" className="text-xs">Role</Label>
+                <select
+                  id="invite-role"
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value as 'member' | 'admin')}
+                  className="mt-1 w-full bg-background border border-border rounded-md px-3 py-2 text-sm"
+                  disabled={inviting}
+                >
+                  <option value="member">Member</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <Button type="submit" size="sm" disabled={inviting || !inviteEmail.trim()}>
+              {inviting && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+              Send invitation
+            </Button>
+            {lastInviteUrl && (
+              <div className="border rounded-md p-2 bg-green-50/40 dark:bg-green-900/20 border-green-200 dark:border-green-800/50 text-xs">
+                <div className="flex items-center gap-1 text-green-700 dark:text-green-400 mb-1">
+                  <Check className="h-3 w-3" /> Invitation sent (and emailed if email is configured).
+                </div>
+                <div className="flex items-center gap-2">
+                  <code className="font-mono break-all flex-1">{lastInviteUrl}</code>
+                  <Button type="button" size="sm" variant="ghost" className="h-6 px-2" onClick={copyInviteUrl}>
+                    {copiedInvite ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </form>
+        )}
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground py-6">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading members…

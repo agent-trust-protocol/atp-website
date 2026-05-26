@@ -9,6 +9,8 @@ const publicRoutes = [
   '/api/invites/validate',
   '/api/webhooks',
   '/api/workflows/cron', // Vercel cron — gated by CRON_SECRET in the route
+  '/invitations', // Public tenant-invitation accept pages (gated by token)
+  '/api/invitations', // Invitation lookup/accept (token IS the secret)
   '/api/auth', // Better Auth endpoints
   '/api/admin/setup', // Founder setup endpoint
   '/api/npm/stats', // Community stats for developers page

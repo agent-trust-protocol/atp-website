@@ -10,6 +10,7 @@
  *   - founder → every tenant in the system
  */
 
+import { randomBytes } from 'node:crypto';
 import { query, queryOne, execute, initializeAppTables } from '@/lib/db';
 import type { Viewer } from '@/lib/agents/store';
 
@@ -338,4 +339,200 @@ export async function removeTenantMember(
     [tenantId, targetUserId]
   );
   return { ok: rows > 0 };
+}
+
+export interface TenantInvitation {
+  id: string;
+  tenantId: string;
+  tenantName: string | null;
+  email: string;
+  role: 'admin' | 'member';
+  token: string;
+  status: 'pending' | 'accepted' | 'revoked' | 'expired';
+  invitedBy: string | null;
+  expiresAt: string;
+  createdAt: string;
+  acceptedAt: string | null;
+}
+
+interface TenantInvitationRow {
+  id: string;
+  tenant_id: string;
+  tenant_name: string | null;
+  email: string;
+  role: 'admin' | 'member';
+  token: string;
+  status: 'pending' | 'accepted' | 'revoked' | 'expired';
+  invited_by: string | null;
+  expires_at: Date;
+  created_at: Date;
+  accepted_at: Date | null;
+}
+
+function rowToInvitation(row: TenantInvitationRow): TenantInvitation {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    tenantName: row.tenant_name,
+    email: row.email,
+    role: row.role,
+    token: row.token,
+    status: row.status,
+    invitedBy: row.invited_by,
+    expiresAt: row.expires_at.toISOString(),
+    createdAt: row.created_at.toISOString(),
+    acceptedAt: row.accepted_at?.toISOString() ?? null
+  };
+}
+
+const INVITATION_TTL_DAYS = 14;
+
+async function canInvite(tenantId: string, actor: Viewer): Promise<boolean> {
+  if (actor.isFounder) return true;
+  if (!actor.userId) return false;
+  const r = await queryOne<{ role: string }>(
+    `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [tenantId, actor.userId]
+  );
+  return r?.role === 'owner' || r?.role === 'admin';
+}
+
+/**
+ * Create a pending invitation. Owner/admin (or founder) only. Returns the
+ * created row including the token so the caller can build a URL + send
+ * the email. Token is a URL-safe random string; matched only by exact
+ * value lookup so brute-forcing it is infeasible.
+ */
+export async function createInvitation(
+  tenantId: string,
+  input: { email: string; role?: 'admin' | 'member' },
+  actor: Viewer
+): Promise<TenantInvitation | null> {
+  await ensureInit();
+  const tenant = await getTenantById(tenantId, actor);
+  if (!tenant) return null;
+  if (!(await canInvite(tenantId, actor))) return null;
+
+  const email = input.email.trim().toLowerCase();
+  const role = input.role ?? 'member';
+  const token = randomBytes(24).toString('base64url');
+  const expiresAt = new Date(Date.now() + INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000);
+
+  const row = await queryOne<TenantInvitationRow>(
+    `INSERT INTO tenant_invitations (tenant_id, email, role, token, invited_by, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING *, (SELECT name FROM tenants WHERE id = $1) AS tenant_name`,
+    [tenantId, email, role, token, actor.userId, expiresAt]
+  );
+  return row ? rowToInvitation(row) : null;
+}
+
+/** List invitations on a tenant (any status). Member or founder can read. */
+export async function listInvitations(
+  tenantId: string,
+  viewer: Viewer
+): Promise<TenantInvitation[] | null> {
+  await ensureInit();
+  const tenant = await getTenantById(tenantId, viewer);
+  if (!tenant) return null;
+  const rows = await query<TenantInvitationRow>(
+    `SELECT i.*, t.name AS tenant_name
+     FROM tenant_invitations i
+     JOIN tenants t ON t.id = i.tenant_id
+     WHERE i.tenant_id = $1
+     ORDER BY i.created_at DESC`,
+    [tenantId]
+  );
+  return rows.map(rowToInvitation);
+}
+
+/** Revoke a pending invitation. Owner/admin (or founder) only. */
+export async function revokeInvitation(
+  invitationId: string,
+  actor: Viewer
+): Promise<boolean> {
+  await ensureInit();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(invitationId)) {
+    return false;
+  }
+  const inv = await queryOne<{ tenant_id: string; status: string }>(
+    `SELECT tenant_id, status FROM tenant_invitations WHERE id = $1`,
+    [invitationId]
+  );
+  if (!inv) return false;
+  if (!(await canInvite(inv.tenant_id, actor))) return false;
+  if (inv.status !== 'pending') return false;
+  const rows = await execute(
+    `UPDATE tenant_invitations SET status = 'revoked' WHERE id = $1`,
+    [invitationId]
+  );
+  return rows > 0;
+}
+
+/**
+ * Look up an invitation by its token. Public — no viewer scoping —
+ * because the token itself is the secret. Auto-marks expired ones on
+ * read so the UI doesn't have to.
+ */
+export async function getInvitationByToken(token: string): Promise<TenantInvitation | null> {
+  await ensureInit();
+  if (!token || token.length < 16) return null;
+  const row = await queryOne<TenantInvitationRow>(
+    `SELECT i.*, t.name AS tenant_name
+     FROM tenant_invitations i
+     JOIN tenants t ON t.id = i.tenant_id
+     WHERE i.token = $1`,
+    [token]
+  );
+  if (!row) return null;
+  if (row.status === 'pending' && row.expires_at < new Date()) {
+    await execute(
+      `UPDATE tenant_invitations SET status = 'expired' WHERE id = $1 AND status = 'pending'`,
+      [row.id]
+    );
+    row.status = 'expired';
+  }
+  return rowToInvitation(row);
+}
+
+/**
+ * Accept an invitation as the signed-in user. The acceptor's email
+ * must match the invitation's `email` (case-insensitive) — otherwise
+ * the invite is rejected. On success: adds a user_tenants row with
+ * the invited role and flips status to 'accepted'.
+ */
+export async function acceptInvitation(
+  token: string,
+  user: { id: string; email: string }
+): Promise<{ ok: boolean; reason?: string; tenantId?: string }> {
+  await ensureInit();
+  const inv = await getInvitationByToken(token);
+  if (!inv) return { ok: false, reason: 'Invitation not found' };
+  if (inv.status !== 'pending') return { ok: false, reason: `Invitation ${inv.status}` };
+  if (inv.email.toLowerCase() !== user.email.trim().toLowerCase()) {
+    return { ok: false, reason: 'This invitation was issued to a different email address.' };
+  }
+  // Check whether the user is already a member (idempotent accept).
+  const existing = await queryOne<{ user_id: string }>(
+    `SELECT user_id FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+    [inv.tenantId, user.id]
+  );
+  await execute(`BEGIN`);
+  try {
+    if (!existing) {
+      await execute(
+        `INSERT INTO user_tenants (user_id, tenant_id, role) VALUES ($1, $2, $3)`,
+        [user.id, inv.tenantId, inv.role]
+      );
+    }
+    await execute(
+      `UPDATE tenant_invitations SET status = 'accepted', accepted_at = NOW() WHERE id = $1`,
+      [inv.id]
+    );
+    await execute(`COMMIT`);
+    return { ok: true, tenantId: inv.tenantId };
+  } catch (err) {
+    await execute(`ROLLBACK`).catch(() => undefined);
+    return { ok: false, reason: err instanceof Error ? err.message : 'Accept failed' };
+  }
 }
