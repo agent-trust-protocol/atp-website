@@ -115,6 +115,8 @@ export default async function TenantDetailPage({ params }: { params: { id: strin
           <TenantMembersPanel
             tenantId={tenant.id}
             canManage={role === 'owner' || viewer.isFounder}
+            viewerUserId={viewer.userId}
+            isOwner={role === 'owner'}
           />
 
           <TenantDeleteButton
