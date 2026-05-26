@@ -219,3 +219,28 @@ export async function renameTenant(
   );
   return row ? rowToTenant(row) : null;
 }
+
+/**
+ * Delete a tenant. Owner-only (founder bypass). Returns true on success,
+ * false on not-found / not-permitted (same response shape so callers
+ * can't enumerate tenants they don't own via 404 vs 403).
+ *
+ * `user_tenants` cascades on delete (Phase 3 schema). Agents/workflows/
+ * policies aren't tenant-scoped today (they live by `owner_user_id`) so
+ * they're unaffected — matches the 1:1 model. When multi-org lands,
+ * this is where the "block delete while resources exist" check goes.
+ */
+export async function deleteTenant(id: string, viewer: Viewer): Promise<boolean> {
+  await ensureInit();
+  const tenant = await getTenantById(id, viewer);
+  if (!tenant) return false;
+  if (!viewer.isFounder) {
+    const membership = await queryOne<{ role: string }>(
+      `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+      [id, viewer.userId]
+    );
+    if (!membership || membership.role !== 'owner') return false;
+  }
+  const rows = await execute(`DELETE FROM tenants WHERE id = $1`, [id]);
+  return rows > 0;
+}
