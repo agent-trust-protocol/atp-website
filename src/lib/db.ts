@@ -146,6 +146,23 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_invites_code ON invites(code);
     CREATE INDEX IF NOT EXISTS idx_invites_email ON invites(email);
+
+    CREATE TABLE IF NOT EXISTS workflows (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'draft',
+      nodes JSONB NOT NULL DEFAULT '[]'::jsonb,
+      edges JSONB NOT NULL DEFAULT '[]'::jsonb,
+      variables JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT valid_workflow_status CHECK (status IN ('draft', 'active', 'paused', 'archived'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_workflows_user_id ON workflows(user_id);
+    CREATE INDEX IF NOT EXISTS idx_workflows_status ON workflows(status);
   `);
 }
 

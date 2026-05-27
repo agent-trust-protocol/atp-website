@@ -77,7 +77,7 @@ export function WorkflowDashboard() {
   const loadWorkflows = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${WORKFLOW_ENGINE_API  }&action=list`);
+      const response = await fetch(`/api/workflows`, { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         // Transform workflow data to summary format
@@ -381,9 +381,9 @@ export function WorkflowDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => alert(`Workflow details: ${  workflow.name}`)}
+                          onClick={() => window.location.href = `/dashboard/workflows/designer?id=${workflow.id}`}
                         >
-                          View
+                          Edit
                         </Button>
                       </div>
                     </div>

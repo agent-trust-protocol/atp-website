@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ReactFlow, {
   Node,
   Edge,
@@ -148,6 +148,9 @@ const nodeTemplates = [
 
 function WorkflowDesignerContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const workflowIdFromUrl = searchParams?.get('id') ?? null;
+  const [workflowId, setWorkflowId] = useState<string | null>(workflowIdFromUrl);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
@@ -215,8 +218,11 @@ function WorkflowDesignerContent() {
   const saveWorkflow = async () => {
     setSaveStatus({ kind: 'saving' });
     try {
-      const res = await fetch('/api/workflows', {
-        method: 'POST',
+      const isUpdate = Boolean(workflowId);
+      const url = isUpdate ? `/api/workflows/${workflowId}` : '/api/workflows';
+      const method = isUpdate ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ name: workflowName, nodes, edges })
@@ -224,6 +230,15 @@ function WorkflowDesignerContent() {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || err.message || `HTTP ${res.status}`);
+      }
+      const data = await res.json().catch(() => ({}));
+      const savedId: string | undefined = data?.workflow?.id;
+      if (!isUpdate && savedId) {
+        setWorkflowId(savedId);
+        // Reflect the new id in the URL so reloads/back-forward stay on the same workflow.
+        const params = new URLSearchParams(searchParams?.toString() ?? '');
+        params.set('id', savedId);
+        router.replace(`/dashboard/workflows/designer?${params.toString()}`);
       }
       setSaveStatus({ kind: 'ok', message: `Saved "${workflowName}".` });
     } catch (e) {
@@ -286,6 +301,30 @@ function WorkflowDesignerContent() {
 
     checkAuth();
   }, [router]);
+
+  // Load an existing workflow when the URL has ?id=.
+  useEffect(() => {
+    if (!isAuthenticated || !workflowId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/workflows/${workflowId}`, { credentials: 'include' });
+        if (!res.ok) {
+          if (!cancelled) setSaveStatus({ kind: 'error', message: `Failed to load workflow (${res.status})` });
+          return;
+        }
+        const data = await res.json();
+        const wf = data?.workflow;
+        if (!wf || cancelled) return;
+        setWorkflowName(wf.name ?? 'Untitled workflow');
+        if (Array.isArray(wf.nodes)) setNodes(wf.nodes as Node[]);
+        if (Array.isArray(wf.edges)) setEdges(wf.edges as Edge[]);
+      } catch (e) {
+        if (!cancelled) setSaveStatus({ kind: 'error', message: e instanceof Error ? e.message : 'Load failed' });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, workflowId, setNodes, setEdges]);
 
   // Load node input schemas once authenticated.
   useEffect(() => {
