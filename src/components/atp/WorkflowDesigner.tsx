@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { NodeInputField, type NodeInputSchema } from '@/components/atp/node-input-field';
 import {
   Save,
   Play,
@@ -153,6 +154,8 @@ function WorkflowDesignerContent() {
   const [workflowName, setWorkflowName] = useState('New Workflow');
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [nodeSchemas, setNodeSchemas] = useState<Record<string, NodeInputSchema[]>>({});
+  const [saveStatus, setSaveStatus] = useState<{ kind: 'idle' | 'saving' | 'ok' | 'error'; message?: string }>({ kind: 'idle' });
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
@@ -209,20 +212,56 @@ function WorkflowDesignerContent() {
     setSelectedNode(node);
   }, []);
 
-  const saveWorkflow = () => {
-    const workflow = {
-      name: workflowName,
-      nodes,
-      edges,
-      timestamp: new Date().toISOString()
-    };
-
-    // Save to localStorage for demo purposes
-    localStorage.setItem(`workflow-${Date.now()}`, JSON.stringify(workflow));
-
-    // In a real app, this would save to the backend
-    alert(`Workflow "${workflowName}" saved successfully!`);
+  const saveWorkflow = async () => {
+    setSaveStatus({ kind: 'saving' });
+    try {
+      const res = await fetch('/api/workflows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name: workflowName, nodes, edges })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || err.message || `HTTP ${res.status}`);
+      }
+      setSaveStatus({ kind: 'ok', message: `Saved "${workflowName}".` });
+    } catch (e) {
+      setSaveStatus({ kind: 'error', message: e instanceof Error ? e.message : 'Save failed' });
+    }
   };
+
+  const deleteSelectedNode = useCallback(() => {
+    if (!selectedNode) return;
+    setNodes((nds) => nds.filter((n) => n.id !== selectedNode.id));
+    setEdges((eds) => eds.filter((e) => e.source !== selectedNode.id && e.target !== selectedNode.id));
+    setSelectedNode(null);
+  }, [selectedNode, setNodes, setEdges]);
+
+  const updateSelectedNodeInput = useCallback(
+    (fieldName: string, fieldValue: unknown) => {
+      if (!selectedNode) return;
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === selectedNode.id
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  inputs: { ...(node.data.inputs ?? {}), [fieldName]: fieldValue }
+                }
+              }
+            : node
+        )
+      );
+      setSelectedNode((prev) =>
+        prev && prev.id === selectedNode.id
+          ? { ...prev, data: { ...prev.data, inputs: { ...(prev.data.inputs ?? {}), [fieldName]: fieldValue } } }
+          : prev
+      );
+    },
+    [selectedNode, setNodes]
+  );
 
   const resetWorkflow = () => {
     setNodes(initialNodes);
@@ -247,6 +286,27 @@ function WorkflowDesignerContent() {
 
     checkAuth();
   }, [router]);
+
+  // Load node input schemas once authenticated.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/workflows/nodes', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const map: Record<string, NodeInputSchema[]> = {};
+        for (const n of data.nodes ?? []) {
+          if (Array.isArray(n.inputs)) map[n.type] = n.inputs as NodeInputSchema[];
+        }
+        if (!cancelled) setNodeSchemas(map);
+      } catch {
+        // Non-fatal: panel will fall back to label-only editor.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
@@ -312,10 +372,16 @@ function WorkflowDesignerContent() {
                 <RotateCcw className="h-4 w-4 mr-1" />
                 Reset
               </Button>
-              <Button size="sm" onClick={saveWorkflow}>
+              <Button size="sm" onClick={saveWorkflow} disabled={saveStatus.kind === 'saving'}>
                 <Save className="h-4 w-4 mr-1" />
-                Save
+                {saveStatus.kind === 'saving' ? 'Saving…' : 'Save'}
               </Button>
+              {saveStatus.kind === 'ok' && (
+                <span className="text-xs text-green-600">{saveStatus.message}</span>
+              )}
+              {saveStatus.kind === 'error' && (
+                <span className="text-xs text-red-600">{saveStatus.message}</span>
+              )}
               <Button size="sm" variant="outline">
                 <Play className="h-4 w-4 mr-1" />
                 Test
@@ -374,16 +440,44 @@ function WorkflowDesignerContent() {
                             : node
                         )
                       );
+                      setSelectedNode((prev) =>
+                        prev && prev.id === selectedNode.id
+                          ? { ...prev, data: { ...prev.data, label: e.target.value } }
+                          : prev
+                      );
                     }}
                   />
                 </div>
+
+                {(() => {
+                  const schema = nodeSchemas[selectedNode.data.type];
+                  if (!schema || schema.length === 0) return null;
+                  const inputs = (selectedNode.data.inputs ?? {}) as Record<string, unknown>;
+                  return (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Inputs</Label>
+                        {schema.map((field) => (
+                          <NodeInputField
+                            key={field.name}
+                            field={field}
+                            value={inputs[field.name]}
+                            onChange={(v) => updateSelectedNodeInput(field.name, v)}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
+
                 <div>
                   <Label className="text-sm font-medium">Position</Label>
                   <div className="text-sm text-gray-600">
                     X: {Math.round(selectedNode.position.x)}, Y: {Math.round(selectedNode.position.y)}
                   </div>
                 </div>
-                <Button size="sm" variant="destructive" className="w-full">
+                <Button size="sm" variant="destructive" className="w-full" onClick={deleteSelectedNode}>
                   Delete Node
                 </Button>
               </div>

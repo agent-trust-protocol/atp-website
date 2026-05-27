@@ -45,6 +45,32 @@ const workflowNodes = [
     outputs: [{ name: 'isValid', type: 'boolean' }, { name: 'errors', type: 'array' }]
   },
   {
+    type: 'evaluate-policy',
+    category: 'action',
+    label: 'Evaluate Policy',
+    description: 'Runs a saved policy against a context and returns the decision',
+    icon: '⚖️',
+    color: '#6366F1',
+    inputs: [
+      { name: 'policyId', type: 'string', required: true, description: 'UUID of the policy to evaluate' },
+      { name: 'context', type: 'object', required: false, description: 'JSON context passed to the policy engine (e.g. { agentId, action, resource })' }
+    ],
+    outputs: [{ name: 'decision', type: 'string' }, { name: 'matchedRule', type: 'string' }]
+  },
+  {
+    type: 'deploy-policy',
+    category: 'action',
+    label: 'Deploy Policy',
+    description: 'Promotes a policy to a target environment',
+    icon: '🚀',
+    color: '#0EA5E9',
+    inputs: [
+      { name: 'policyId', type: 'string', required: true, description: 'UUID of the policy to deploy' },
+      { name: 'environment', type: 'string', required: false, description: 'Target environment', validation: { enum: ['development', 'staging', 'production'] } }
+    ],
+    outputs: [{ name: 'deployed', type: 'boolean' }]
+  },
+  {
     type: 'policy-valid',
     category: 'condition',
     label: 'Policy Valid?',
@@ -73,7 +99,7 @@ const workflowNodes = [
     description: 'Calculates trust score for an agent or transaction',
     icon: '📊',
     color: '#84CC16',
-    inputs: [{ name: 'agentId', type: 'string', required: true }],
+    inputs: [{ name: 'agentId', type: 'string', required: true, description: 'Agent DID or internal id to score' }],
     outputs: [{ name: 'trustScore', type: 'number' }, { name: 'factors', type: 'array' }]
   },
   {
