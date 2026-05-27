@@ -202,6 +202,25 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_tenants_user_id ON tenants(user_id);
     CREATE INDEX IF NOT EXISTS idx_tenants_status ON tenants(status);
+
+    CREATE TABLE IF NOT EXISTS policies (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      version TEXT NOT NULL DEFAULT '1.0.0',
+      enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+      category TEXT NOT NULL DEFAULT 'operational',
+      nodes JSONB NOT NULL DEFAULT '[]'::jsonb,
+      edges JSONB NOT NULL DEFAULT '[]'::jsonb,
+      created_by TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_policies_user_id ON policies(user_id);
+    CREATE INDEX IF NOT EXISTS idx_policies_enabled ON policies(enabled);
   `);
 }
 

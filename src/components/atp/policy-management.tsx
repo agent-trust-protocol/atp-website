@@ -197,8 +197,9 @@ export function PolicyManagement() {
       try {
         setIsLoading(true);
         setApiError(null);
-        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
-        const res = await fetch(`${baseUrl}/policies`);
+        // Fall back to the local /api routes when no external Permission Service is configured.
+        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || '/api';
+        const res = await fetch(`${baseUrl}/policies`, { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
         if (!data || !Array.isArray(data.policies)) return;
@@ -235,7 +236,8 @@ export function PolicyManagement() {
     const sync = async () => {
       if (!selectedPolicy) return;
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
+        // Fall back to the local /api routes when no external Permission Service is configured.
+        const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL || '/api';
         const body = {
           document: {
             id: selectedPolicy.id,
@@ -255,12 +257,14 @@ export function PolicyManagement() {
         const putRes = await fetch(`${baseUrl}/policies/${encodeURIComponent(selectedPolicy.id)}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(body)
         });
         if (!putRes.ok) {
           await fetch(`${baseUrl}/policies`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(body)
           });
         }
@@ -330,7 +334,7 @@ export function PolicyManagement() {
     setPolicies(prev => prev.filter(p => p.id !== policyId));
     try {
       const baseUrl = process.env.NEXT_PUBLIC_ATP_PERMISSION_URL;
-      await fetch(`${baseUrl}/policies/${encodeURIComponent(policyId)}`, { method: 'DELETE' });
+      await fetch(`${baseUrl}/policies/${encodeURIComponent(policyId)}`, { method: 'DELETE', credentials: 'include' });
     } catch (err) {
       setApiError('Failed to delete policy on service');
     }
