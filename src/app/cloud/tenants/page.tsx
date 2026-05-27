@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Users,
   Plus,
@@ -20,56 +20,44 @@ import { Badge } from '@/components/ui/badge';
 import { Subnav } from '@/components/ui/subnav';
 import Link from 'next/link';
 
+interface Tenant {
+  id: string;
+  name: string;
+  domain: string;
+  status: 'active' | 'suspended' | 'pending';
+  plan: 'Basic' | 'Professional' | 'Enterprise';
+  trustLevel: 'Basic' | 'Verified' | 'Premium' | 'Enterprise';
+  users: number;
+  createdAt: string;
+  lastActive: string;
+}
+
 export default function TenantsPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock tenant data
-  const tenants = [
-    {
-      id: '1',
-      name: 'Enterprise Corp',
-      domain: 'enterprise-corp.atp.cloud',
-      status: 'active',
-      plan: 'Enterprise',
-      users: 150,
-      lastActive: '2 minutes ago',
-      created: '2024-01-15',
-      trustLevel: 'Enterprise'
-    },
-    {
-      id: '2',
-      name: 'Tech Solutions Inc',
-      domain: 'tech-solutions.atp.cloud',
-      status: 'active',
-      plan: 'Professional',
-      users: 85,
-      lastActive: '1 hour ago',
-      created: '2024-02-10',
-      trustLevel: 'Premium'
-    },
-    {
-      id: '3',
-      name: 'Global Systems Ltd',
-      domain: 'global-systems.atp.cloud',
-      status: 'suspended',
-      plan: 'Basic',
-      users: 25,
-      lastActive: '3 days ago',
-      created: '2024-03-05',
-      trustLevel: 'Verified'
-    },
-    {
-      id: '4',
-      name: 'Innovation Hub',
-      domain: 'innovation-hub.atp.cloud',
-      status: 'active',
-      plan: 'Professional',
-      users: 42,
-      lastActive: '30 minutes ago',
-      created: '2024-03-20',
-      trustLevel: 'Premium'
-    }
-  ];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/tenants', { credentials: 'include' });
+        if (res.status === 401) {
+          if (!cancelled) setError('Sign in to view your tenants.');
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!cancelled) setTenants(Array.isArray(data.tenants) ? data.tenants : []);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load tenants');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -243,6 +231,20 @@ export default function TenantsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {loading && (
+                <p className="text-sm text-muted-foreground py-6">Loading tenants…</p>
+              )}
+              {!loading && error && (
+                <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              {!loading && !error && filteredTenants.length === 0 && (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  No tenants yet.{' '}
+                  <Link href="/cloud/tenants/new" className="text-primary underline">Create your first one</Link>.
+                </div>
+              )}
               <div className="space-y-4">
                 {filteredTenants.map((tenant) => (
                   <div key={tenant.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:shadow-md transition-shadow">
@@ -264,8 +266,8 @@ export default function TenantsPage() {
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
                           <span>{tenant.users} users</span>
                           <span>Plan: {tenant.plan}</span>
-                          <span>Last active: {tenant.lastActive}</span>
-                          <span>Created: {tenant.created}</span>
+                          <span>Last active: {new Date(tenant.lastActive).toLocaleString()}</span>
+                          <span>Created: {new Date(tenant.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>
                     </div>

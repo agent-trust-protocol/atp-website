@@ -183,6 +183,25 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_agents_user_id ON agents(user_id);
     CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
+
+    CREATE TABLE IF NOT EXISTS tenants (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      domain TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL DEFAULT 'pending',
+      plan TEXT NOT NULL DEFAULT 'Basic',
+      trust_level TEXT NOT NULL DEFAULT 'Basic',
+      user_count INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_active TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT valid_tenant_status CHECK (status IN ('active','suspended','pending')),
+      CONSTRAINT valid_tenant_plan CHECK (plan IN ('Basic','Professional','Enterprise')),
+      CONSTRAINT valid_tenant_trust CHECK (trust_level IN ('Basic','Verified','Premium','Enterprise'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_tenants_user_id ON tenants(user_id);
+    CREATE INDEX IF NOT EXISTS idx_tenants_status ON tenants(status);
   `);
 }
 
