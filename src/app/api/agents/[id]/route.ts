@@ -1,22 +1,45 @@
-import { NextResponse } from 'next/server';
-import { getAgent } from '@/lib/demo-agents';
+import { NextRequest, NextResponse } from 'next/server';
+import { getViewer } from '@/lib/viewer';
+import { getAgent, deleteAgent, toApiShape } from '@/lib/agents/store';
+import { getAgent as getDemoAgent } from '@/lib/demo-agents';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
+const noStore = { 'Cache-Control': 'no-store' } as const;
+
 export async function GET(
-  _req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const agent = getAgent(params.id);
-  if (!agent) {
+  const viewer = await getViewer(request.headers);
+
+  // Anonymous viewer: serve the synthetic demo agents so public
+  // dashboard deep-links keep working.
+  if (!viewer.userId && !viewer.isFounder) {
+    const demo = getDemoAgent(params.id);
+    if (!demo) return NextResponse.json({ error: 'Agent not found' }, { status: 404, headers: noStore });
+    return NextResponse.json(demo, { headers: noStore });
+  }
+
+  const row = await getAgent(viewer, params.id);
+  if (!row) return NextResponse.json({ error: 'Agent not found' }, { status: 404, headers: noStore });
+  return NextResponse.json(toApiShape(row), { headers: noStore });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const viewer = await getViewer(request.headers);
+  if (!viewer.userId && !viewer.isFounder) {
     return NextResponse.json(
-      { error: 'Agent not found' },
-      { status: 404, headers: { 'Cache-Control': 'no-store' } }
+      { error: 'Authentication required', code: 'AUTH_REQUIRED', loginUrl: '/login' },
+      { status: 401, headers: noStore }
     );
   }
-  return NextResponse.json(agent, {
-    headers: { 'Cache-Control': 'no-store' }
-  });
+  const ok = await deleteAgent(viewer, params.id);
+  if (!ok) return NextResponse.json({ error: 'Agent not found' }, { status: 404, headers: noStore });
+  return NextResponse.json({ deleted: true, id: params.id }, { headers: noStore });
 }

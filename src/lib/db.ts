@@ -163,6 +163,26 @@ export async function initializeAppTables(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_workflows_user_id ON workflows(user_id);
     CREATE INDEX IF NOT EXISTS idx_workflows_status ON workflows(status);
+
+    CREATE TABLE IF NOT EXISTS agents (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      did TEXT NOT NULL,
+      organization TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      trust_level TEXT NOT NULL DEFAULT 'basic',
+      trust_score REAL NOT NULL DEFAULT 0.35,
+      status TEXT NOT NULL DEFAULT 'active',
+      risk_factors TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT valid_agent_status CHECK (status IN ('active','inactive','suspended')),
+      CONSTRAINT valid_agent_tier CHECK (trust_level IN ('untrusted','basic','verified','premium','enterprise'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_agents_user_id ON agents(user_id);
+    CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
   `);
 }
 
