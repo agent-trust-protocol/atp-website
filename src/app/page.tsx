@@ -27,8 +27,7 @@ import { QuantumShieldIcon, TrustNetworkIcon, PolicyFlowIcon } from '@/component
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { QuantumSafeSignatureDemoLite } from '@/components/atp/quantum-safe-signature-demo-lite';
-import { TrustLevelManagementDemo } from '@/components/atp/trust-level-management-demo';
+import { HomepageDemos } from '@/components/atp/homepage-demos';
 import { QuickAccess } from '@/components/ui/quick-access';
 
 export default function HomePage() {
@@ -324,10 +323,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-            <QuantumSafeSignatureDemoLite />
-            <TrustLevelManagementDemo />
-          </div>
+          <HomepageDemos />
         </div>
 
         {/* ATP 2.0 Roadmap Teaser */}
