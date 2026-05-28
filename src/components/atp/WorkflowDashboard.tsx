@@ -100,7 +100,7 @@ export function WorkflowDashboard() {
 
   const loadExecutions = async () => {
     try {
-      const response = await fetch(`${WORKFLOW_ENGINE_API}&action=executions`);
+      const response = await fetch(`/api/workflows/executions`, { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         const summaries: ExecutionSummary[] = data.executions?.map((e: any) => ({
@@ -119,9 +119,10 @@ export function WorkflowDashboard() {
 
   const executeWorkflow = async (workflowId: string) => {
     try {
-      const response = await fetch(`${WORKFLOW_ENGINE_API}/${workflowId}/execute`, {
+      const response = await fetch(`/api/workflows/${workflowId}/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ initialData: {} })
       });
 

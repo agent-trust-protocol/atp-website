@@ -514,8 +514,8 @@ export const complianceStatusConditionExecutor: NodeExecutor = {
         auditLogging: 0.92,
         encryption: 0.85
       },
-      nonCompliantItems: [],
-      recommendations: []
+      nonCompliantItems: [] as string[],
+      recommendations: [] as string[]
     };
 
     complianceCheck.isCompliant = complianceCheck.score >= requiredScore;

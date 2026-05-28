@@ -164,6 +164,25 @@ export async function initializeAppTables(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_workflows_user_id ON workflows(user_id);
     CREATE INDEX IF NOT EXISTS idx_workflows_status ON workflows(status);
 
+    CREATE TABLE IF NOT EXISTS workflow_executions (
+      id TEXT PRIMARY KEY,
+      workflow_id TEXT NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      state TEXT NOT NULL,
+      start_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      end_time TIMESTAMPTZ,
+      duration_ms INTEGER,
+      initial_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+      result JSONB,
+      error TEXT,
+      completed_nodes TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+      CONSTRAINT valid_execution_state CHECK (state IN ('running','completed','failed','cancelled'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_workflow_executions_user_id ON workflow_executions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_workflow_executions_workflow_id ON workflow_executions(workflow_id);
+    CREATE INDEX IF NOT EXISTS idx_workflow_executions_state ON workflow_executions(state);
+
     CREATE TABLE IF NOT EXISTS agents (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,

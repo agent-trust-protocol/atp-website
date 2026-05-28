@@ -407,8 +407,8 @@ export const policyValidConditionExecutor: NodeExecutor = {
         logic: { passed: true, message: 'Logic is consistent' },
         conflicts: { passed: Math.random() > 0.3, message: 'No conflicts detected' }
       },
-      errors: [],
-      warnings: []
+      errors: [] as string[],
+      warnings: [] as string[]
     };
 
     if (!validationResult.checks.conflicts.passed) {
@@ -475,8 +475,8 @@ export const policyCompliantConditionExecutor: NodeExecutor = {
       agentDid,
       policyId,
       checkedAt: new Date(),
-      violations: [],
-      recommendations: []
+      violations: [] as Array<{ rule: string; expected: any; actual: number }>,
+      recommendations: [] as string[]
     };
 
     if (complianceCheck.complianceScore < complianceLevel) {
