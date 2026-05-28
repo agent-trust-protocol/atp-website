@@ -221,6 +221,67 @@ export async function renameTenant(
   return row ? rowToTenant(row) : null;
 }
 
+/** Thrown when a requested slug collides with another tenant. Callers
+ *  surface this as a 409 so the form can show "that subdomain is taken." */
+export class SlugTakenError extends Error {
+  constructor(public readonly slug: string) {
+    super(`Slug "${slug}" is already in use`);
+    this.name = 'SlugTakenError';
+  }
+}
+
+const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?$/;
+
+/** Validate a user-supplied tenant slug. Returns null if it passes,
+ *  otherwise a human-readable reason. */
+export function validateSlug(slug: string): string | null {
+  if (slug.length < 2) return 'Subdomain must be at least 2 characters.';
+  if (slug.length > 40) return 'Subdomain must be 40 characters or fewer.';
+  if (!SLUG_RE.test(slug)) {
+    return 'Subdomain may only contain lowercase letters, digits, and dashes (no leading/trailing dash).';
+  }
+  return null;
+}
+
+/**
+ * Change a tenant's slug. Owner/admin (or founder) only. Returns the
+ * updated tenant; throws SlugTakenError on collision so the route can
+ * map it to 409. No-ops (returns the existing tenant) when the slug
+ * isn't actually changing.
+ */
+export async function renameTenantSlug(
+  id: string,
+  slug: string,
+  viewer: Viewer
+): Promise<Tenant | null> {
+  await ensureInit();
+  const tenant = await getTenantById(id, viewer);
+  if (!tenant) return null;
+  if (tenant.slug === slug) return tenant;
+
+  if (!viewer.isFounder) {
+    const membership = await queryOne<{ role: string }>(
+      `SELECT role FROM user_tenants WHERE tenant_id = $1 AND user_id = $2`,
+      [id, viewer.userId]
+    );
+    if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
+      return null;
+    }
+  }
+
+  const clash = await queryOne<{ id: string }>(
+    `SELECT id FROM tenants WHERE slug = $1 AND id <> $2`,
+    [slug, id]
+  );
+  if (clash) throw new SlugTakenError(slug);
+
+  const row = await queryOne<TenantRow>(
+    `UPDATE tenants SET slug = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+    [slug, id]
+  );
+  return row ? rowToTenant(row) : null;
+}
+
 /**
  * Delete a tenant. Owner-only (founder bypass). Returns true on success,
  * false on not-found / not-permitted (same response shape so callers

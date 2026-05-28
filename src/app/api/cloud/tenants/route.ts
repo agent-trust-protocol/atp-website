@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
-import { getOrCreateTenantForUser, listTenantsForViewer, renameTenant } from '@/lib/tenants/db';
+import {
+  getOrCreateTenantForUser,
+  listTenantsForViewer,
+  renameTenant,
+  renameTenantSlug,
+  validateSlug,
+  SlugTakenError,
+  type Tenant
+} from '@/lib/tenants/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -65,21 +73,65 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Tenant name is required' }, { status: 400, headers: NO_STORE });
   }
 
+  // Slug is optional on init/rename — if omitted we keep whatever's
+  // there (auto-generated on first provision). When supplied we
+  // normalize + validate up front so the user sees a clean error.
+  const rawSlug = typeof body.slug === 'string' ? body.slug.trim().toLowerCase() : '';
+  if (rawSlug) {
+    const slugError = validateSlug(rawSlug);
+    if (slugError) {
+      return NextResponse.json({ error: slugError, code: 'INVALID_SLUG' }, { status: 400, headers: NO_STORE });
+    }
+  }
+
+  const viewer = { userId: session.user.id, isFounder: isFounderSession(session) };
+
   try {
-    // Find (or create) the caller's tenant, then rename it.
-    const tenant = await getOrCreateTenantForUser({
+    // Find (or create) the caller's tenant, then apply name + slug
+    // updates. Idempotent on first-run for new users. We narrow to
+    // `Tenant` (dropping the membership fields the join returns) once
+    // we start chaining rename calls so the type matches.
+    const base = await getOrCreateTenantForUser({
       id: session.user.id,
       email: session.user.email,
       name: session.user.name ?? null
     });
-    const updated = await renameTenant(
-      tenant.id,
-      name,
-      { userId: session.user.id, isFounder: isFounderSession(session) }
-    );
-    if (!updated) {
-      return NextResponse.json({ error: 'Tenant not found or no permission' }, { status: 404, headers: NO_STORE });
+    let updated: Tenant = {
+      id: base.id,
+      name: base.name,
+      slug: base.slug,
+      plan: base.plan,
+      status: base.status,
+      createdAt: base.createdAt,
+      updatedAt: base.updatedAt
+    };
+
+    if (updated.name !== name) {
+      const renamed = await renameTenant(updated.id, name, viewer);
+      if (!renamed) {
+        return NextResponse.json({ error: 'Tenant not found or no permission' }, { status: 404, headers: NO_STORE });
+      }
+      updated = renamed;
     }
+
+    if (rawSlug && rawSlug !== updated.slug) {
+      try {
+        const slugRenamed = await renameTenantSlug(updated.id, rawSlug, viewer);
+        if (!slugRenamed) {
+          return NextResponse.json({ error: 'Tenant not found or no permission' }, { status: 404, headers: NO_STORE });
+        }
+        updated = slugRenamed;
+      } catch (err) {
+        if (err instanceof SlugTakenError) {
+          return NextResponse.json(
+            { error: 'That subdomain is already in use.', code: 'SLUG_TAKEN' },
+            { status: 409, headers: NO_STORE }
+          );
+        }
+        throw err;
+      }
+    }
+
     return NextResponse.json({ tenant: updated }, { status: 200, headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants POST]', error);
