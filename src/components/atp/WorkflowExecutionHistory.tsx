@@ -70,77 +70,25 @@ export function WorkflowExecutionHistory() {
   const loadExecutions = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/health?type=workflows&action=executions');
+      const response = await fetch('/api/workflows/executions?limit=100', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
-        // Enhanced mock data with more execution history
-        const mockExecutions: WorkflowExecution[] = [
-          {
-            executionId: 'exec-running-1',
-            workflowId: 'workflow-1',
-            workflowName: 'Policy Validation Workflow',
-            state: 'running',
-            startTime: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
-            progress: 65,
-            currentStep: 'Validating policy syntax',
-            trigger: 'policy-change-trigger',
-            inputs: { policy_id: 'pol-001', change_type: 'update' }
-          },
-          {
-            executionId: 'exec-completed-1',
-            workflowId: 'workflow-2',
-            workflowName: 'Trust Score Monitoring',
-            state: 'completed',
-            startTime: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-            endTime: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
-            duration: 120000,
-            progress: 100,
-            trigger: 'trust-change-trigger',
-            inputs: { agent_id: 'agent-001', threshold: 0.8 },
-            outputs: { trust_score: 0.92, recommendation: 'maintain' }
-          },
-          {
-            executionId: 'exec-failed-1',
-            workflowId: 'workflow-3',
-            workflowName: 'Security Alert Response',
-            state: 'failed',
-            startTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-            endTime: new Date(Date.now() - 2 * 60 * 60 * 1000 + 30000).toISOString(),
-            duration: 30000,
-            progress: 25,
-            currentStep: 'Generate Incident Report',
-            trigger: 'security-alert-trigger',
-            inputs: { alert_level: 'high', threat_type: 'anomaly' },
-            error: 'Failed to connect to reporting service'
-          },
-          {
-            executionId: 'exec-completed-2',
-            workflowId: 'workflow-1',
-            workflowName: 'Policy Validation Workflow',
-            state: 'completed',
-            startTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-            endTime: new Date(Date.now() - 4 * 60 * 60 * 1000 + 90000).toISOString(),
-            duration: 90000,
-            progress: 100,
-            trigger: 'schedule-trigger',
-            inputs: { schedule_config: '0 */4 * * *' },
-            outputs: { policies_validated: 12, violations: 0 }
-          },
-          {
-            executionId: 'exec-completed-3',
-            workflowId: 'workflow-2',
-            workflowName: 'Trust Score Monitoring',
-            state: 'completed',
-            startTime: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-            endTime: new Date(Date.now() - 8 * 60 * 60 * 1000 + 75000).toISOString(),
-            duration: 75000,
-            progress: 100,
-            trigger: 'trust-change-trigger',
-            inputs: { agent_id: 'agent-002', threshold: 0.7 },
-            outputs: { trust_score: 0.85, recommendation: 'monitor' }
-          }
-        ];
-        setExecutions(mockExecutions);
+        const rows: WorkflowExecution[] = (data.executions ?? []).map((e: any) => ({
+          executionId: e.executionId,
+          workflowId: e.workflowId,
+          workflowName: e.workflowId,
+          state: e.state,
+          startTime: e.startTime,
+          endTime: e.endTime ?? undefined,
+          duration: e.duration ?? undefined,
+          progress: e.state === 'completed' ? 100 : e.state === 'running' ? 50 : 0,
+          trigger: 'manual',
+          inputs: {},
+          error: e.error ?? undefined
+        }));
+        setExecutions(rows);
+      } else if (response.status === 401) {
+        setError('Sign in to view execution history.');
       } else {
         setError('Failed to load execution history');
       }
@@ -428,9 +376,11 @@ export function WorkflowExecutionHistory() {
                   </div>
 
                   <div className="flex gap-2 ml-4">
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-3 w-3 mr-1" />
-                      View
+                    <Button size="sm" variant="outline" asChild>
+                      <a href={`/dashboard/workflows/executions/${execution.executionId}`}>
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </a>
                     </Button>
                     <Button size="sm" variant="outline">
                       <Download className="h-3 w-3 mr-1" />
