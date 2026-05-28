@@ -369,6 +369,24 @@ export async function initializeAppTables(): Promise<void> {
       timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+    -- Loosen entity_id to TEXT so we can audit non-UUID entities
+    -- (agents use slug-prefixed text ids). Existing UUID rows cast
+    -- losslessly; idempotent because pg_typeof returns 'text' after the
+    -- first run so the DO block is a no-op on subsequent boots.
+    DO $$
+    BEGIN
+      IF (
+        SELECT data_type FROM information_schema.columns
+        WHERE table_name = 'audit_logs' AND column_name = 'entity_id'
+      ) = 'uuid' THEN
+        ALTER TABLE audit_logs ALTER COLUMN entity_id TYPE TEXT USING entity_id::text;
+      END IF;
+    END $$;
+
+    CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
+    CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
+    CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp DESC);
+
     CREATE TABLE IF NOT EXISTS policy_workflows (
       id            UUID PRIMARY KEY,
       policy_id     VARCHAR(255) NOT NULL,

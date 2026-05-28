@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getViewer } from '@/lib/viewer';
 import { createPolicy, listPolicies } from '@/lib/policies/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -66,6 +67,14 @@ export async function POST(request: NextRequest) {
       },
       { userId: viewer.userId }
     );
+    await recordAuditEvent(viewer, {
+      entityType: 'policy',
+      entityId: policy.id,
+      action: 'create',
+      changes: { name: policy.name, version: policy.version, enabled: policy.enabled },
+      request
+    });
+
     return NextResponse.json(
       { message: 'Policy created successfully', policy },
       { status: 201, headers: NO_STORE }

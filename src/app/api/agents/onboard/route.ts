@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAgent, type TrustTier } from '@/lib/agents/store';
 import { getViewer } from '@/lib/viewer';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 const VALID_TIERS: TrustTier[] = ['untrusted', 'basic', 'verified', 'premium', 'enterprise'];
 
@@ -49,6 +50,14 @@ export async function POST(req: NextRequest) {
     },
     { userId: viewer.userId }
   );
+
+  await recordAuditEvent(viewer, {
+    entityType: 'agent',
+    entityId: agent.id,
+    action: 'create',
+    changes: { name: agent.name, trustLevel: agent.trustLevel, did: agent.did },
+    request: req
+  });
 
   return NextResponse.json(agent, { status: 201 });
 }

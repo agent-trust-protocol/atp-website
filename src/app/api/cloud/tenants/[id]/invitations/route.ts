@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
 import { headers as nextHeaders } from 'next/headers';
 import { createInvitation, listInvitations } from '@/lib/tenants/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 import { emailService } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
@@ -96,6 +97,15 @@ export async function POST(
         <p style="color:#888;font-size:11px;font-family:monospace">${inviteUrl}</p>
       `,
       replyTo: session.user.email ?? undefined
+    });
+
+    await recordAuditEvent(actor, {
+      entityType: 'tenant_invitation',
+      entityId: invitation.id,
+      action: 'create',
+      changes: { email: invitation.email, role: invitation.role },
+      metadata: { tenantId: params.id, emailSent: sent },
+      request
     });
 
     return NextResponse.json(

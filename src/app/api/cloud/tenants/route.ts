@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
 import { getOrCreateTenantForUser, listTenantsForViewer, renameTenant } from '@/lib/tenants/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -80,6 +81,16 @@ export async function POST(request: NextRequest) {
     if (!updated) {
       return NextResponse.json({ error: 'Tenant not found or no permission' }, { status: 404, headers: NO_STORE });
     }
+    await recordAuditEvent(
+      { userId: session.user.id, isFounder: isFounderSession(session) },
+      {
+        entityType: 'tenant',
+        entityId: updated.id,
+        action: 'rename',
+        changes: { from: tenant.name, to: updated.name },
+        request
+      }
+    );
     return NextResponse.json({ tenant: updated }, { status: 200, headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants POST]', error);

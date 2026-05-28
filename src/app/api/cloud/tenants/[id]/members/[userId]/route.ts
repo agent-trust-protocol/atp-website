@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
 import { removeTenantMember, setMemberRole } from '@/lib/tenants/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
@@ -31,6 +32,13 @@ export async function DELETE(
       const status = result.reason?.startsWith('Tenant') || result.reason?.startsWith('Member') ? 404 : 403;
       return NextResponse.json({ error: result.reason ?? 'Failed' }, { status, headers: NO_STORE });
     }
+    await recordAuditEvent(actor, {
+      entityType: 'tenant_member',
+      entityId: params.userId,
+      action: 'remove',
+      metadata: { tenantId: params.id },
+      request
+    });
     return NextResponse.json({ removed: true }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants/:id/members/:userId DELETE]', error);
@@ -84,6 +92,14 @@ export async function PUT(
         : 403;
       return NextResponse.json({ error: result.reason ?? 'Failed' }, { status, headers: NO_STORE });
     }
+    await recordAuditEvent(actor, {
+      entityType: 'tenant_member',
+      entityId: params.userId,
+      action: 'role_change',
+      changes: { role },
+      metadata: { tenantId: params.id },
+      request
+    });
     return NextResponse.json({ role }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants/:id/members/:userId PUT]', error);

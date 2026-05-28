@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
 import { transferOwnership } from '@/lib/tenants/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
@@ -53,6 +54,13 @@ export async function POST(
           : 403;
       return NextResponse.json({ error: result.reason ?? 'Failed' }, { status, headers: NO_STORE });
     }
+    await recordAuditEvent(actor, {
+      entityType: 'tenant',
+      entityId: params.id,
+      action: 'transfer_ownership',
+      changes: { newOwnerUserId, previousOwnerUserId: actor.userId },
+      request
+    });
     return NextResponse.json({ transferred: true, newOwnerUserId }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants/:id/transfer-ownership]', error);

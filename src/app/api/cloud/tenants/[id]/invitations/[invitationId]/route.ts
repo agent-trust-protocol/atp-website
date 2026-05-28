@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
 import { revokeInvitation } from '@/lib/tenants/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
@@ -26,6 +27,13 @@ export async function DELETE(
         { status: 404, headers: NO_STORE }
       );
     }
+    await recordAuditEvent(actor, {
+      entityType: 'tenant_invitation',
+      entityId: params.invitationId,
+      action: 'revoke',
+      metadata: { tenantId: params.id },
+      request
+    });
     return NextResponse.json({ revoked: true }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants/:id/invitations/:invitationId DELETE]', error);

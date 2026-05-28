@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getViewer } from '@/lib/viewer';
 import { deletePolicy, getPolicy, updatePolicy } from '@/lib/policies/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -60,6 +61,19 @@ export async function PUT(
     if (!updated) {
       return NextResponse.json({ error: 'Policy not found' }, { status: 404, headers: NO_STORE });
     }
+    // Only log fields the caller actually sent — avoids noise from
+    // touch-only updates where nothing real changed.
+    const changes: Record<string, unknown> = {};
+    for (const k of ['name', 'description', 'version', 'enabled', 'tags'] as const) {
+      if (body[k] !== undefined) changes[k] = (updated as any)[k];
+    }
+    await recordAuditEvent(viewer, {
+      entityType: 'policy',
+      entityId: updated.id,
+      action: 'update',
+      changes,
+      request
+    });
     return NextResponse.json({ policy: updated }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/policies/:id PUT]', error);
@@ -83,6 +97,12 @@ export async function DELETE(
     if (!ok) {
       return NextResponse.json({ error: 'Policy not found' }, { status: 404, headers: NO_STORE });
     }
+    await recordAuditEvent(viewer, {
+      entityType: 'policy',
+      entityId: params.id,
+      action: 'delete',
+      request
+    });
     return NextResponse.json({ deleted: true }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/policies/:id DELETE]', error);

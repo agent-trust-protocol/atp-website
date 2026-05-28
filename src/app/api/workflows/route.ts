@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getViewer } from '@/lib/viewer';
 import { createWorkflow, listWorkflows } from '@/lib/workflows/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -70,6 +71,14 @@ export async function POST(request: NextRequest) {
       },
       { userId: viewer.userId }
     );
+    await recordAuditEvent(viewer, {
+      entityType: 'workflow',
+      entityId: workflow.id,
+      action: 'create',
+      changes: { name: workflow.name, status: workflow.status, category: workflow.category },
+      request
+    });
+
     return NextResponse.json(
       { message: 'Workflow created successfully', workflow },
       { status: 201, headers: NO_STORE }

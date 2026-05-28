@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { acceptInvitation, getInvitationByToken } from '@/lib/tenants/db';
+import { isFounderSession } from '@/lib/is-founder';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 const NO_STORE = { 'Cache-Control': 'no-store' } as const;
@@ -32,6 +34,9 @@ export async function POST(
     );
   }
   try {
+    // Snapshot the invitation BEFORE accepting so we can log the real
+    // invitation id without including the secret token in audit_logs.
+    const pre = await getInvitationByToken(params.token);
     const result = await acceptInvitation(params.token, {
       id: session.user.id,
       email: session.user.email
@@ -40,6 +45,18 @@ export async function POST(
       return NextResponse.json(
         { error: result.reason ?? 'Accept failed' },
         { status: 400, headers: NO_STORE }
+      );
+    }
+    if (pre) {
+      await recordAuditEvent(
+        { userId: session.user.id, isFounder: isFounderSession(session) },
+        {
+          entityType: 'tenant_invitation',
+          entityId: pre.id,
+          action: 'accept',
+          metadata: { tenantId: result.tenantId, role: pre.role },
+          request
+        }
       );
     }
     return NextResponse.json({ accepted: true, tenantId: result.tenantId }, { headers: NO_STORE });

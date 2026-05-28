@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { isFounderSession } from '@/lib/is-founder';
 import { deleteTenant, getTenantById } from '@/lib/tenants/db';
+import { recordAuditEvent } from '@/lib/audit/log';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -53,6 +54,12 @@ export async function DELETE(
         { status: 404, headers: NO_STORE }
       );
     }
+    await recordAuditEvent(viewer, {
+      entityType: 'tenant',
+      entityId: params.id,
+      action: 'delete',
+      request
+    });
     return NextResponse.json({ deleted: true }, { headers: NO_STORE });
   } catch (error) {
     console.error('[api/cloud/tenants/:id DELETE]', error);
